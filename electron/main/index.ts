@@ -6,6 +6,7 @@ import os from "node:os";
 import { IpcChannels } from "../../src/constants/ipcChannels";
 import fs from "node:fs";
 import readline from "node:readline";
+import sqlite3 from "sqlite3";
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -44,6 +45,21 @@ if (!app.requestSingleInstanceLock()) {
 let mainWindow: BrowserWindow | null = null;
 const preload = path.join(__dirname, "../preload/index.mjs");
 const indexHtml = path.join(RENDERER_DIST, "index.html");
+
+const dbPath = path.join(process.env.APP_ROOT, "data.db");
+const db = new sqlite3.Database(dbPath);
+
+db.serialize(() => {
+  db.run(`CREATE TABLE IF NOT EXISTS data (
+    cif TEXT,
+    account TEXT,
+    name TEXT,
+    branch TEXT,
+    region TEXT,
+    points INTEGER,
+    balance INTEGER
+  )`);
+});
 
 async function createWindow() {
   mainWindow = new BrowserWindow({
@@ -140,19 +156,69 @@ ipcMain.on(IpcChannels.OPEN_FILE_DIALOG, (event) => {
   }
 });
 
-ipcMain.on(IpcChannels.UPLOAD_DATA_TO_DATABASE, (event, path) => {
-  console.log("Upload data to database:", path);
+ipcMain.on(IpcChannels.UPLOAD_DATA_TO_DATABASE, (event, filePath) => {
+  console.log("Upload data to database:", filePath);
 
   const rl = readline.createInterface({
-    input: fs.createReadStream(path),
+    input: fs.createReadStream(filePath),
     crlfDelay: Infinity,
   });
 
   rl.on("line", (line) => {
-    console.log(line);
+    const [cif, account, name, branch, region, points, balance] =
+      line.split("|");
+    db.run(
+      `INSERT INTO data (cif, account, name, branch, region, points, balance) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [cif, account, name, branch, region, points, balance],
+      (err) => {
+        if (err) {
+          console.error("Error inserting data:", err.message);
+        } else {
+          console.log("Data inserted successfully");
+        }
+      }
+    );
   });
 
   rl.on("close", () => {
     console.log("File has been read");
+  });
+
+  event.sender.send(IpcChannels.IS_DATA_EXIST, false);
+});
+
+ipcMain.on(IpcChannels.GET_ALL_DATA, (event) => {
+  db.all(`SELECT * FROM data`, (err, rows) => {
+    if (err) {
+      console.error("Error fetching data:", err.message);
+    } else {
+      console.log("Data fetched successfully", rows);
+      event.sender.send(IpcChannels.GET_ALL_DATA, rows);
+    }
+  });
+});
+
+ipcMain.on(IpcChannels.DELETE_DATA_IN_DATABASE, (event) => {
+  db.run(`DELETE FROM data`, (err) => {
+    if (err) {
+      console.error("Error deleting data:", err.message);
+      event.sender.send(IpcChannels.DELETE_DATA_IN_DATABASE, {
+        success: false,
+      });
+    } else {
+      console.log("All data deleted successfully");
+      event.sender.send(IpcChannels.DELETE_DATA_IN_DATABASE, { success: true });
+    }
+  });
+});
+
+ipcMain.on(IpcChannels.IS_DATA_EXIST, (event) => {
+  db.get("SELECT name FROM data limit 1", (err, row) => {
+    if (err) {
+      console.error("Error checking if data exists:", err.message);
+      event.sender.send(IpcChannels.IS_DATA_EXIST, false);
+    } else {
+      event.sender.send(IpcChannels.IS_DATA_EXIST, row !== undefined);
+    }
   });
 });
