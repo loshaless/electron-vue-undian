@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import SettingsPage from "./pages/SettingsPage.vue";
+import SettingsPage from "./pages/UploadPage.vue";
 </script>
 
 <template>
