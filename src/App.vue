@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import SettingsPage from "./pages/SettingsPage.vue";
 </script>
 
 <template>
-  <div class="text-amber-300 text-9xl">
-    hansel
+  <div class="flex h-screen items-center justify-center">
+    <SettingsPage></SettingsPage>
   </div>
 </template>
 
