@@ -1,14 +1,12 @@
-import {app, BrowserWindow, shell, ipcMain, dialog} from "electron";
-import {createRequire} from "node:module";
-import {fileURLToPath} from "node:url";
+import { app, BrowserWindow, ipcMain, dialog } from "electron";
+import { fileURLToPath } from "node:url";
 import path from "node:path";
 import os from "node:os";
-import {IpcChannels} from "../../src/constants/ipcChannels";
+import { IpcChannels } from "../../src/constants/ipcChannels";
 import fs from "node:fs";
 import readline from "node:readline";
 import sqlite3 from "sqlite3";
 
-const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // The built directory structure
@@ -43,6 +41,7 @@ if (!app.requestSingleInstanceLock()) {
 }
 
 let mainWindow: BrowserWindow | null = null;
+let secondWindow: BrowserWindow | null = null;
 const preload = path.join(__dirname, "../preload/index.mjs");
 const indexHtml = path.join(RENDERER_DIST, "index.html");
 const DBSOURCE = "db.sqlite";
@@ -65,7 +64,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
   });
 });
 
-async function createWindow() {
+async function createMainWindow() {
   mainWindow = new BrowserWindow({
     title: "Main window",
     icon: path.join(process.env.VITE_PUBLIC, "favicon.ico"),
@@ -81,31 +80,32 @@ async function createWindow() {
   });
 
   if (VITE_DEV_SERVER_URL) {
-    // #298
     await mainWindow.loadURL(VITE_DEV_SERVER_URL);
     // Open devTool if the app is not packaged
     mainWindow.webContents.openDevTools();
   } else {
     await mainWindow.loadFile(indexHtml);
   }
-
-  // Test actively push message to the Electron-Renderer
-  mainWindow.webContents.on("did-finish-load", () => {
-    mainWindow?.webContents.send(
-      "main-process-message",
-      new Date().toLocaleString()
-    );
-  });
-
-  // Make all links open with the browser, not with the application
-  mainWindow.webContents.setWindowOpenHandler(({url}) => {
-    if (url.startsWith("https:")) shell.openExternal(url);
-    return {action: "deny"};
-  });
-  // mainWindow.webContents.on('will-navigate', (event, url) => { }) #344
 }
 
-app.whenReady().then(() => createWindow());
+async function createSecondWindow() {
+  secondWindow = new BrowserWindow({
+    webPreferences: {
+      preload,
+    },
+  });
+
+  if (VITE_DEV_SERVER_URL) {
+    await secondWindow.loadURL(`${VITE_DEV_SERVER_URL}/secondWindow.html`);
+  } else {
+    await secondWindow.loadFile(path.join(RENDERER_DIST, "secondWindow.html"));
+  }
+}
+
+app.whenReady().then(() => {
+  createMainWindow();
+  createSecondWindow();
+});
 
 app.on("window-all-closed", () => {
   mainWindow = null;
@@ -125,7 +125,8 @@ app.on("activate", () => {
   if (allWindows.length) {
     allWindows[0].focus();
   } else {
-    createWindow();
+    createMainWindow();
+    createSecondWindow();
   }
 });
 
@@ -142,7 +143,7 @@ ipcMain.handle("open-win", (_, arg) => {
   if (VITE_DEV_SERVER_URL) {
     childWindow.loadURL(`${VITE_DEV_SERVER_URL}#${arg}`);
   } else {
-    childWindow.loadFile(indexHtml, {hash: arg});
+    childWindow.loadFile(indexHtml, { hash: arg });
   }
 });
 
@@ -150,7 +151,7 @@ ipcMain.handle("open-win", (_, arg) => {
 ipcMain.on(IpcChannels.OPEN_FILE_DIALOG, (event) => {
   const result = dialog.showOpenDialogSync({
     properties: ["openFile"],
-    filters: [{name: "Text Files", extensions: ["txt"]}],
+    filters: [{ name: "Text Files", extensions: ["txt"] }],
   });
 
   console.log("Dialog result:", result); // Debug log
@@ -172,7 +173,8 @@ ipcMain.on(IpcChannels.UPLOAD_DATA_TO_DATABASE, async (event, filePath) => {
   const insertPromises = [];
 
   for await (const line of rl) {
-    const [cif, account, name, branch, region, points, balance] = line.split("|");
+    const [cif, account, name, branch, region, points, balance] =
+      line.split("|");
     batch.push([cif, account, name, branch, region, points, balance]);
 
     if (batch.length >= batchSize) {
