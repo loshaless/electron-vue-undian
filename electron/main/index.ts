@@ -1,14 +1,12 @@
-import {app, BrowserWindow, shell, ipcMain, dialog} from "electron";
-import {createRequire} from "node:module";
-import {fileURLToPath} from "node:url";
+import { app, BrowserWindow, shell, ipcMain, dialog } from "electron";
+import { fileURLToPath } from "node:url";
 import path from "node:path";
 import os from "node:os";
-import {IpcChannels} from "../../src/constants/ipcChannels";
+import { IpcChannels } from "../../src/constants/ipcChannels";
 import fs from "node:fs";
 import readline from "node:readline";
 import sqlite3 from "sqlite3";
 
-const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // The built directory structure
@@ -42,7 +40,7 @@ if (!app.requestSingleInstanceLock()) {
   process.exit(0);
 }
 
-let mainWindow: BrowserWindow | null = null;
+let windows: BrowserWindow[] = [];
 const preload = path.join(__dirname, "../preload/index.mjs");
 const indexHtml = path.join(RENDERER_DIST, "index.html");
 const DBSOURCE = "db.sqlite";
@@ -65,8 +63,8 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
   });
 });
 
-async function createWindow() {
-  mainWindow = new BrowserWindow({
+async function createWindow(html = "index.html") {
+  const win = new BrowserWindow({
     title: "Main window",
     icon: path.join(process.env.VITE_PUBLIC, "favicon.ico"),
     webPreferences: {
@@ -82,42 +80,23 @@ async function createWindow() {
 
   if (VITE_DEV_SERVER_URL) {
     // #298
-    await mainWindow.loadURL(VITE_DEV_SERVER_URL);
+    await win.loadURL(path.posix.join(process.env.VITE_DEV_SERVER_URL, html));
     // Open devTool if the app is not packaged
-    mainWindow.webContents.openDevTools();
+    win.webContents.openDevTools();
   } else {
-    await mainWindow.loadFile(indexHtml);
+    await win.loadFile(path.join(__dirname, `../dist/${html}`));
   }
-
-  // Test actively push message to the Electron-Renderer
-  mainWindow.webContents.on("did-finish-load", () => {
-    mainWindow?.webContents.send(
-      "main-process-message",
-      new Date().toLocaleString()
-    );
-  });
-
-  // Make all links open with the browser, not with the application
-  mainWindow.webContents.setWindowOpenHandler(({url}) => {
-    if (url.startsWith("https:")) shell.openExternal(url);
-    return {action: "deny"};
-  });
-  // mainWindow.webContents.on('will-navigate', (event, url) => { }) #344
+  windows.push(win);
 }
 
-app.whenReady().then(() => createWindow());
-
-app.on("window-all-closed", () => {
-  mainWindow = null;
-  if (process.platform !== "darwin") app.quit();
+app.whenReady().then(() => {
+  createWindow();
+  createWindow("secondWindow.html");
 });
 
-app.on("second-instance", () => {
-  if (mainWindow) {
-    // Focus on the main window if the user tried to open another
-    if (mainWindow.isMinimized()) mainWindow.restore();
-    mainWindow.focus();
-  }
+app.on("window-all-closed", () => {
+  windows = null;
+  if (process.platform !== "darwin") app.quit();
 });
 
 app.on("activate", () => {
@@ -129,28 +108,11 @@ app.on("activate", () => {
   }
 });
 
-// New window example arg: new windows url
-ipcMain.handle("open-win", (_, arg) => {
-  const childWindow = new BrowserWindow({
-    webPreferences: {
-      preload,
-      nodeIntegration: true,
-      contextIsolation: false,
-    },
-  });
-
-  if (VITE_DEV_SERVER_URL) {
-    childWindow.loadURL(`${VITE_DEV_SERVER_URL}#${arg}`);
-  } else {
-    childWindow.loadFile(indexHtml, {hash: arg});
-  }
-});
-
 // IPC HANDLER
 ipcMain.on(IpcChannels.OPEN_FILE_DIALOG, (event) => {
   const result = dialog.showOpenDialogSync({
     properties: ["openFile"],
-    filters: [{name: "Text Files", extensions: ["txt"]}],
+    filters: [{ name: "Text Files", extensions: ["txt"] }],
   });
 
   console.log("Dialog result:", result); // Debug log
@@ -172,7 +134,8 @@ ipcMain.on(IpcChannels.UPLOAD_DATA_TO_DATABASE, async (event, filePath) => {
   const insertPromises = [];
 
   for await (const line of rl) {
-    const [cif, account, name, branch, region, points, balance] = line.split("|");
+    const [cif, account, name, branch, region, points, balance] =
+      line.split("|");
     batch.push([cif, account, name, branch, region, points, balance]);
 
     if (batch.length >= batchSize) {
