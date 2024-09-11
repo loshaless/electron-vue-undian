@@ -1,9 +1,10 @@
 <template>
   <div>
-    <h1>Welcome to the Second Window</h1>
+    <roller-page>
+    </roller-page>
   </div>
 </template>
 
-<script lang="ts" setup></script>
-
-<style scoped></style>
+<script lang="ts" setup>
+import RollerPage from "./pages/RollerPage.vue";
+</script>

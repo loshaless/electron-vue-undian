@@ -96,7 +96,9 @@ async function createSecondWindow() {
   });
 
   if (VITE_DEV_SERVER_URL) {
+    console.log("create second window")
     await secondWindow.loadURL(`${VITE_DEV_SERVER_URL}/secondWindow.html`);
+    secondWindow.webContents.openDevTools();
   } else {
     await secondWindow.loadFile(path.join(RENDERER_DIST, "secondWindow.html"));
   }
@@ -104,11 +106,12 @@ async function createSecondWindow() {
 
 app.whenReady().then(() => {
   createMainWindow();
-  createSecondWindow();
+  // createSecondWindow();
 });
 
 app.on("window-all-closed", () => {
   mainWindow = null;
+  secondWindow = null;
   if (process.platform !== "darwin") app.quit();
 });
 
@@ -126,7 +129,7 @@ app.on("activate", () => {
     allWindows[0].focus();
   } else {
     createMainWindow();
-    createSecondWindow();
+    // createSecondWindow();
   }
 });
 
