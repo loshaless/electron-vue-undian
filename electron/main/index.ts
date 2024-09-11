@@ -84,7 +84,7 @@ async function createWindow(html = "index.html") {
     // Open devTool if the app is not packaged
     win.webContents.openDevTools();
   } else {
-    await win.loadFile(path.join(__dirname, `../dist/${html}`));
+    await win.loadFile(path.join(__dirname, `../../dist/${html}`));
   }
   windows.push(win);
 }
