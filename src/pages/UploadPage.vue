@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import {IpcChannels} from "../constants/ipcChannels";
 import {ref, onBeforeMount} from "vue";
+import TooltipComponent from "../components/TooltipComponent.vue";
 
 /* CHECK PATH OF URL */
 const pathUrl = ref("");
@@ -59,17 +60,28 @@ onBeforeMount(() => {
         {{ (pathUrl && isDataExist) ? "Change File" : "Select New File" }}
       </button>
 
-      <button
-        :class="{
-        'bg-gray-500 cursor-not-allowed': !pathUrl,
-        'bg-blue-500 cursor-pointer': !!pathUrl,
-      }"
-        :disabled="pathUrl === ''"
-        class="text-white p-2 rounded-md"
-        @click="uploadDataToDatabase"
+      <tooltip-component
+        :canShow="pathUrl === ''"
+        :tooltipTextStyle="{width: '150px', left: '125px'}"
+        :tooltipTriangleStyle="{left: '75px'}"
       >
-        {{ pathUrl ? "Upload data to database" : "Please select the file first" }}
-      </button>
+        <template v-slot:toggle>
+          <button
+            :class="{
+                'bg-gray-500 cursor-not-allowed': !pathUrl,
+                'bg-blue-500 cursor-pointer': !!pathUrl,
+            }"
+            :disabled="pathUrl === ''"
+            class="text-white p-2 rounded-md"
+            @click="uploadDataToDatabase"
+          >
+            Upload data to database
+          </button>
+        </template>
+        <template v-slot:tooltipText>
+          Please Upload the file first!
+        </template>
+      </tooltip-component>
 
       <button
         v-if="isDataExist"
