@@ -45,20 +45,24 @@ if (!app.requestSingleInstanceLock()) {
 let mainWindow: BrowserWindow | null = null;
 const preload = path.join(__dirname, "../preload/index.mjs");
 const indexHtml = path.join(RENDERER_DIST, "index.html");
+const DBSOURCE = "db.sqlite";
 
-const dbPath = path.join(process.env.APP_ROOT, "data.db");
-const db = new sqlite3.Database(dbPath);
-
-db.serialize(() => {
-  db.run(`CREATE TABLE IF NOT EXISTS data (
-    cif TEXT,
-    account TEXT,
-    name TEXT,
-    branch TEXT,
-    region TEXT,
-    points INTEGER,
-    balance INTEGER
-  )`);
+let db = new sqlite3.Database(DBSOURCE, (err) => {
+  if (err) {
+    console.error(err.message);
+    return;
+  }
+  db.serialize(() => {
+    db.run(`CREATE TABLE IF NOT EXISTS data (
+      cif TEXT,
+      account TEXT,
+      name TEXT,
+      branch TEXT,
+      region TEXT,
+      points INTEGER,
+      balance INTEGER
+    )`);
+  });
 });
 
 async function createWindow() {
