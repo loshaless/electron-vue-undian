@@ -1,9 +1,9 @@
-import { app, BrowserWindow, shell, ipcMain, dialog } from "electron";
-import { createRequire } from "node:module";
-import { fileURLToPath } from "node:url";
+import {app, BrowserWindow, shell, ipcMain, dialog} from "electron";
+import {createRequire} from "node:module";
+import {fileURLToPath} from "node:url";
 import path from "node:path";
 import os from "node:os";
-import { IpcChannels } from "../../src/constants/ipcChannels";
+import {IpcChannels} from "../../src/constants/ipcChannels";
 import fs from "node:fs";
 import readline from "node:readline";
 import sqlite3 from "sqlite3";
@@ -98,9 +98,9 @@ async function createWindow() {
   });
 
   // Make all links open with the browser, not with the application
-  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+  mainWindow.webContents.setWindowOpenHandler(({url}) => {
     if (url.startsWith("https:")) shell.openExternal(url);
-    return { action: "deny" };
+    return {action: "deny"};
   });
   // mainWindow.webContents.on('will-navigate', (event, url) => { }) #344
 }
@@ -142,7 +142,7 @@ ipcMain.handle("open-win", (_, arg) => {
   if (VITE_DEV_SERVER_URL) {
     childWindow.loadURL(`${VITE_DEV_SERVER_URL}#${arg}`);
   } else {
-    childWindow.loadFile(indexHtml, { hash: arg });
+    childWindow.loadFile(indexHtml, {hash: arg});
   }
 });
 
@@ -150,7 +150,7 @@ ipcMain.handle("open-win", (_, arg) => {
 ipcMain.on(IpcChannels.OPEN_FILE_DIALOG, (event) => {
   const result = dialog.showOpenDialogSync({
     properties: ["openFile"],
-    filters: [{ name: "Text Files", extensions: ["txt"] }],
+    filters: [{name: "Text Files", extensions: ["txt"]}],
   });
 
   console.log("Dialog result:", result); // Debug log
@@ -160,35 +160,60 @@ ipcMain.on(IpcChannels.OPEN_FILE_DIALOG, (event) => {
   }
 });
 
-ipcMain.on(IpcChannels.UPLOAD_DATA_TO_DATABASE, (event, filePath) => {
-  console.log("Upload data to database:", filePath);
-
+ipcMain.on(IpcChannels.UPLOAD_DATA_TO_DATABASE, async (event, filePath) => {
   const rl = readline.createInterface({
     input: fs.createReadStream(filePath),
     crlfDelay: Infinity,
   });
 
-  rl.on("line", (line) => {
-    const [cif, account, name, branch, region, points, balance] =
-      line.split("|");
-    db.run(
-      `INSERT INTO data (cif, account, name, branch, region, points, balance) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [cif, account, name, branch, region, points, balance],
-      (err) => {
+  let inserted = 0;
+  const batchSize = 100; // Adjust the batch size as needed
+  let batch = [];
+  const insertPromises = [];
+
+  for await (const line of rl) {
+    const [cif, account, name, branch, region, points, balance] = line.split("|");
+    batch.push([cif, account, name, branch, region, points, balance]);
+
+    if (batch.length >= batchSize) {
+      insertPromises.push(insertBatch(batch));
+      inserted += batch.length;
+      event.sender.send(IpcChannels.UPLOAD_DATA_TO_DATABASE, inserted);
+      batch = [];
+    }
+  }
+
+  // Insert any remaining records in the last batch
+  if (batch.length > 0) {
+    insertPromises.push(insertBatch(batch));
+    inserted += batch.length;
+    event.sender.send(IpcChannels.UPLOAD_DATA_TO_DATABASE, inserted);
+  }
+
+  // Wait for all insert operations to complete
+  await Promise.all(insertPromises);
+
+  console.log("File processing complete");
+  event.sender.send(IpcChannels.UPLOAD_COMPLETE, inserted);
+  event.sender.send(IpcChannels.IS_DATA_EXIST, true);
+
+  async function insertBatch(batch) {
+    return new Promise<void>((resolve, reject) => {
+      const placeholders = batch.map(() => "(?, ?, ?, ?, ?, ?, ?)").join(", ");
+      const values = batch.flat();
+      const sql = `INSERT INTO data (cif, account, name, branch, region, points, balance) VALUES ${placeholders}`;
+
+      db.run(sql, values, (err) => {
         if (err) {
-          console.error("Error inserting data:", err.message);
+          console.error("Error inserting batch:", err.message);
+          reject(err);
         } else {
-          console.log("Data inserted successfully");
+          console.log(`Batch of ${batch.length} records inserted successfully`);
+          resolve();
         }
-      }
-    );
-  });
-
-  rl.on("close", () => {
-    console.log("File has been read");
-  });
-
-  event.sender.send(IpcChannels.IS_DATA_EXIST, false);
+      });
+    });
+  }
 });
 
 ipcMain.on(IpcChannels.GET_ALL_DATA, (event) => {
@@ -206,12 +231,9 @@ ipcMain.on(IpcChannels.DELETE_DATA_IN_DATABASE, (event) => {
   db.run(`DELETE FROM data`, (err) => {
     if (err) {
       console.error("Error deleting data:", err.message);
-      event.sender.send(IpcChannels.DELETE_DATA_IN_DATABASE, {
-        success: false,
-      });
     } else {
       console.log("All data deleted successfully");
-      event.sender.send(IpcChannels.DELETE_DATA_IN_DATABASE, { success: true });
+      event.sender.send(IpcChannels.IS_DATA_EXIST, false);
     }
   });
 });

@@ -5,4 +5,5 @@ export enum IpcChannels {
   DELETE_DATA_IN_DATABASE = "delete-data-in-database",
   GET_ALL_DATA = "get-all-data",
   IS_DATA_EXIST = "is-data-exist",
+  UPLOAD_COMPLETE = "upload-complete"
 }
