@@ -2,6 +2,7 @@
 import {IpcChannels} from "../constants/ipcChannels";
 import {ref, onBeforeMount} from "vue";
 import TooltipComponent from "../components/TooltipComponent.vue";
+import LoadingComponent from "../components/LoadingComponent.vue";
 
 /* CHECK PATH OF URL */
 const pathUrl = ref("");
@@ -90,31 +91,11 @@ onBeforeMount(() => {
       >
         Delete Data
       </button>
-    </div>
 
-    <div v-else class="flex justify-center items-center">
-      <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-6 w-6"></div>
-      <span class="ml-2">Loading...</span>
+      <LoadingComponent v-if="isLoading"/>
     </div>
-
     <div v-if="insertedData > 0" class="text-green-500 mt-2">
       {{ insertedData }} records inserted successfully!
     </div>
   </div>
 </template>
-
-<style scoped>
-.loader {
-  border-top-color: #3498db;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-</style>
