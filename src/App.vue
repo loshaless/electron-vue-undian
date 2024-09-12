@@ -3,11 +3,11 @@ import UploadPage from "./pages/UploadPage.vue";
 import {ref} from "vue";
 import SettingsPage from "./pages/SettingsPage.vue";
 
-const selectedPage = ref("UPLOAD_PAGE")
 const PAGE = {
   UPLOAD_PAGE: "UPLOAD_PAGE",
   SETTINGS_PAGE: "SETTINGS_PAGE",
 }
+const selectedPage = ref(PAGE.SETTINGS_PAGE)
 </script>
 
 <template>

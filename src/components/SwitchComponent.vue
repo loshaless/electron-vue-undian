@@ -1,6 +1,7 @@
 <template>
   <div
     :class="[
+      'cursor-pointer',
       'relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-300',
       { 'bg-green-500': isChecked, 'bg-gray-300': !isChecked },
     ]"

@@ -1,10 +1,19 @@
 <script lang="ts" setup>
 import {ref} from "vue";
 import SwitchComponent from "../components/SwitchComponent.vue";
+import {IpcChannels} from "../constants/ipcChannels";
 
 const minBalance = ref(0)
 const numOfWinner = ref(0)
-const useAnimation = ref(false)
+const canControlRoller = ref(false)
+
+function startRoller() {
+  window.ipcRenderer.send(IpcChannels.START_ROLLING);
+}
+
+function stopAndSetWinner() {
+  window.ipcRenderer.send(IpcChannels.SET_A_WINNER)
+}
 </script>
 
 <template>
@@ -12,7 +21,7 @@ const useAnimation = ref(false)
     <div class="border p-3 shadow-sm border-gray-800 bg-blue-300">
       <h3 class="font-bold text-2xl">Winner Requirement</h3>
       <label>
-        Minimum Balance =
+        Min. Balance = Rp
       </label>
       <input
         v-model="minBalance"
@@ -23,7 +32,7 @@ const useAnimation = ref(false)
     </div>
     <div class="border p-3 shadow-sm border-gray-800 bg-amber-300">
       <!-- Num of Winner -->
-      <h3 class="font-bold text-2xl">Lottery Requirement</h3>
+      <h3 class="font-bold text-2xl">Lottery Settings</h3>
       <label>
         Num Of Winner =
       </label>
@@ -34,13 +43,26 @@ const useAnimation = ref(false)
         type="number"
       />
 
-      <!-- CAN HAS ANIMATION -->
       <div class="flex gap-3 mt-3">
         <switch-component
-          v-model:value="useAnimation"
-          @input="useAnimation = $event"
+          v-model:value="canControlRoller"
+          @input="canControlRoller = $event"
         />
-        <p>Use Animation</p>
+        <p>Can Control Roller ?</p>
+      </div>
+      <div v-if="canControlRoller" class="flex gap-3 mt-4">
+        <button
+          class="bg-green-500 hover:bg-green-300 p-2 rounded-md text-white"
+          @click="startRoller()"
+        >
+          Start Roller
+        </button>
+        <button
+          class="bg-red-500 text-white p-2 rounded-md hover:bg-red-300"
+          @click="stopAndSetWinner()"
+        >
+          Stop and Set Winner
+        </button>
       </div>
     </div>
   </div>

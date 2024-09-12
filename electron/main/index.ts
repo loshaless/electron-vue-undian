@@ -40,9 +40,11 @@ if (!app.requestSingleInstanceLock()) {
   process.exit(0);
 }
 
-let windows: BrowserWindow[] = [];
+let windows = {
+  main: null,
+  view: null
+};
 const preload = path.join(__dirname, "../preload/index.mjs");
-const indexHtml = path.join(RENDERER_DIST, "index.html");
 const DBSOURCE = "db.sqlite";
 
 let db = new sqlite3.Database(DBSOURCE, (err) => {
@@ -63,19 +65,16 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
   });
 });
 
-async function createWindow(html = "index.html") {
+async function createWindow(html = "index.html", referenceName = "main", x = 0, y = 0) {
   const win = new BrowserWindow({
     title: "Main window",
     icon: path.join(process.env.VITE_PUBLIC, "favicon.ico"),
     webPreferences: {
-      preload,
-      // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
-      // nodeIntegration: true,
-
-      // Consider using contextBridge.exposeInMainWorld
-      // Read more on https://www.electronjs.org/docs/latest/tutorial/context-isolation
-      // contextIsolation: false,
+      preload
     },
+    autoHideMenuBar: true,
+    x,
+    y
   });
 
   if (VITE_DEV_SERVER_URL) {
@@ -86,16 +85,17 @@ async function createWindow(html = "index.html") {
   } else {
     await win.loadFile(path.join(__dirname, `../../dist/${html}`));
   }
-  windows.push(win);
+  windows[referenceName] = win;
 }
 
 app.whenReady().then(() => {
   createWindow();
-  createWindow("secondWindow.html");
+  createWindow("secondWindow.html", "view", 300, 100);
 });
 
 app.on("window-all-closed", () => {
-  windows = null;
+  windows.main = null;
+  windows.view = null;
   if (process.platform !== "darwin") app.quit();
 });
 
@@ -210,4 +210,15 @@ ipcMain.on(IpcChannels.IS_DATA_EXIST, (event) => {
       event.sender.send(IpcChannels.IS_DATA_EXIST, row !== undefined);
     }
   });
+});
+
+ipcMain.on(IpcChannels.START_ROLLING, (event) => {
+  windows.view.webContents.send(IpcChannels.START_ROLLING);
+});
+
+ipcMain.on(IpcChannels.SET_A_WINNER, (event) => {
+  windows.view.webContents.send(IpcChannels.SET_A_WINNER, { 
+    name: 'John Doe',
+    winnerDigits: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+   });
 });
