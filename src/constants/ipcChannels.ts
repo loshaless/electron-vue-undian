@@ -12,4 +12,5 @@ export enum IpcChannels {
   GET_PRIZE = "get-prize",
   EDIT_PRIZE = "edit-prize",
   DELETE_PRIZE = "delete-prize",
+  PICK_WINNER = "pick-winner"
 }

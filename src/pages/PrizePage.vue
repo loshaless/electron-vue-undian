@@ -289,7 +289,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <div class="border-gray-800 rounded-md bg-blue-300 p-5 mt-5 mx-5 flex-col justify-center">
+    <div class="border-gray-800 rounded-md bg-black p-5 mt-5 mx-5 flex-col justify-center">
       <div class="flex gap-4 items-center justify-center">
         <button
           class="rounded-md bg-green-700 text-white hover:bg-amber-500 cursor-pointer py-3 px-8"
@@ -307,39 +307,39 @@ onMounted(() => {
 
       <!-- Table to display prizes -->
       <div class="overflow-auto max-h-96 mt-5">
-        <table class="table-auto w-full mt-5">
+        <table class="table-auto w-full text-white border-white">
           <thead>
           <tr>
-            <th class="px-4 py-2 border border-gray-800">ID</th>
-            <th class="px-4 py-2 border border-gray-800">Name</th>
-            <th class="px-4 py-2 border border-gray-800">Quota</th>
-            <th class="px-4 py-2 border border-gray-800">Action</th>
+            <th class="px-4 py-2 border">ID</th>
+            <th class="px-4 py-2 border">Name</th>
+            <th class="px-4 py-2 border">Quota</th>
+            <th class="px-4 py-2 border">Action</th>
           </tr>
           </thead>
           <tbody>
           <tr v-for="prize in prizes" :key="prize.id" class="text-center">
-            <td class="border px-4 py-2 border-gray-800">{{ prize.id }}</td>
-            <td class="border px-4 py-2 border-gray-800">{{ prize.name }}</td>
-            <td class="border px-4 py-2 border-gray-800">
+            <td class="border px-4 py-2">{{ prize.id }}</td>
+            <td class="border px-4 py-2">{{ prize.name }}</td>
+            <td class="border px-4 py-2">
               <ul>
                 <li v-for="(quota, index) in prize.detail" :key="index">
                   {{ quota.text }}: {{ quota.numOfItem }}
                 </li>
               </ul>
             </td>
-            <td class="border px-4 py-2 border-gray-800">
+            <td class="border px-4 py-2">
               <div
                 v-if="!isLoadingInAction"
                 class="flex gap-2 justify-center items-center"
               >
                 <button
-                  class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
                   @click="editPrize(prize)"
                 >
                   Edit
                 </button>
                 <button
-                  class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2"
+                  class="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded ml-2"
                   @click="deletePrize(prize.id)"
                 >
                   Delete

@@ -39,7 +39,6 @@ const selectedPage = ref(PAGE.SETTINGS_PAGE)
     </div>
     <UploadPage
       v-if="selectedPage === PAGE.UPLOAD_PAGE"
-      class="flex h-screen items-center justify-center"
     />
     <RollerPage
       v-if="selectedPage === PAGE.SETTINGS_PAGE"

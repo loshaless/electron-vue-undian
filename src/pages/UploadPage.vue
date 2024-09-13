@@ -52,7 +52,7 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <div>
+  <div class="flex h-screen justify-center items-center">
     <div v-if="!isLoading" class="flex flex-col gap-4">
       <button
         class="bg-blue-500 text-white p-2 rounded-md"
@@ -73,7 +73,7 @@ onBeforeMount(() => {
                 'bg-blue-500 cursor-pointer': !!pathUrl,
             }"
             :disabled="pathUrl === ''"
-            class="text-white p-2 rounded-md"
+            class="text-white p-2 rounded-md w-full"
             @click="uploadDataToDatabase"
           >
             Upload data to database
@@ -92,10 +92,16 @@ onBeforeMount(() => {
         Delete Data
       </button>
 
-      <LoadingComponent v-if="isLoading"/>
+      <div v-if="insertedData > 0" class="text-green-600 font-bold">
+        {{ insertedData }} records inserted successfully!
+      </div>
     </div>
-    <div v-if="insertedData > 0" class="text-green-500 mt-2">
-      {{ insertedData }} records inserted successfully!
+
+    <div v-if="isLoading" class="flex flex-col gap-1">
+      <LoadingComponent/>
+      <div v-if="insertedData > 0" class="text-green-500 mt-2">
+        {{ insertedData }} records inserted successfully!
+      </div>
     </div>
   </div>
 </template>

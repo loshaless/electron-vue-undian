@@ -4,6 +4,7 @@ import SwitchComponent from "../components/SwitchComponent.vue";
 import {IpcChannels} from "../constants/ipcChannels";
 import SelectComponent from "../components/SelectComponent.vue";
 import MultiSelectComponent from "../components/MultiSelectComponent.vue";
+import LoadingComponent from "../components/LoadingComponent.vue";
 
 const minBalance = ref(0)
 const canControlRoller = ref(false)
@@ -23,8 +24,18 @@ const categoryOptions = ref([
   }
 ])
 
+const isLoading = ref(false)
+
 function startRoller() {
-  window.ipcRenderer.send(IpcChannels.START_ROLLING);
+  selectedPrizeName.value.forEach((prize: Prize) => {
+    prize.detail.forEach(detail => {
+      window.ipcRenderer.send(IpcChannels.PICK_WINNER, {
+        minBalance: minBalance.value,
+        region: detail.text,
+        numOfWinner: detail.numOfItem
+      })
+    })
+  })
 }
 
 function stopAndSetWinner() {
@@ -39,8 +50,9 @@ interface Prize {
   id: number,
   name: string,
   detail: {
-    numOfItem: number
-  }
+    numOfItem: number,
+    text: string
+  }[]
 }
 
 const prizeList = ref<Prize[]>([])
@@ -68,7 +80,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <div class="my-3 mt-5 flex mx-5 gap-5">
+    <div class="my-5 flex mx-5 gap-5">
       <div class="border rounded-md p-5 shadow-sm border-gray-800 bg-blue-300 flex-1">
         <h3 class="font-bold text-2xl">Winner Requirement</h3>
         <!-- Min Balance -->
@@ -87,17 +99,15 @@ onMounted(() => {
           v-if="selectedPrizeName.length"
           class="overflow-auto max-h-96 mt-5"
         >
-          <table class="table-auto w-full mt-5">
+          <table class="table-auto w-full">
             <thead>
             <tr>
-              <th class="px-4 py-2 border border-gray-800">ID</th>
-              <th class="px-4 py-2 border border-gray-800">Name</th>
+              <th class="px-4 py-2 border border-gray-800">Nama Barang</th>
               <th class="px-4 py-2 border border-gray-800">Quota</th>
             </tr>
             </thead>
             <tbody>
             <tr v-for="prize in selectedPrizeName" :key="prize.id" class="text-center">
-              <td class="border px-4 py-2 border-gray-800">{{ prize.id }}</td>
               <td class="border px-4 py-2 border-gray-800">{{ prize.name }}</td>
               <td class="border px-4 py-2 border-gray-800">
                 <ul>
@@ -153,7 +163,9 @@ onMounted(() => {
           </button>
         </div>
         <div v-else class="mt-4 flex flex-col justify-end">
+          <loading-component v-if="isLoading"/>
           <button
+            v-else
             class="bg-green-500 hover:bg-green-300 p-2 rounded-md text-white"
             @click="startRoller()"
           >

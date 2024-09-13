@@ -245,7 +245,6 @@ ipcMain.on(IpcChannels.GET_PRIZE, (event) => {
     if (err) {
       console.error("Error fetching prize:", err.message);
     } else {
-      console.log("Prize fetched successfully", rows);
       event.sender.send(IpcChannels.GET_PRIZE, rows);  
     }
   });
@@ -272,3 +271,24 @@ ipcMain.on(IpcChannels.EDIT_PRIZE, (event, {id, name, detail}) => {
     }
   })
 })
+
+ipcMain.on(IpcChannels.PICK_WINNER, (event, {minBalance, region, numOfWinner}) => {
+  console.log(minBalance, region, numOfWinner);
+
+  const sql = `
+    SELECT * FROM data
+    WHERE balance >= ? AND region = ?
+    ORDER BY RANDOM()
+    LIMIT ?
+  `;
+
+  db.all(sql, [minBalance, region, numOfWinner], (err, rows) => {
+    if (err) {
+      console.error("Error picking winners:", err.message);
+      event.sender.send(IpcChannels.PICK_WINNER, { success: false, error: err.message });
+    } else {
+      console.log("Winners picked successfully", rows);
+      event.sender.send(IpcChannels.PICK_WINNER, { success: true, winners: rows });
+    }
+  });
+});
