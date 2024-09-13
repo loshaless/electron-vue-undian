@@ -53,20 +53,38 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
     return;
   }
   db.serialize(() => {
-    db.run(`CREATE TABLE IF NOT EXISTS data (
+    db.run(`CREATE TABLE IF NOT EXISTS customer (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       cif TEXT,
       account TEXT,
       name TEXT,
       branch TEXT,
       region TEXT,
       points INTEGER,
-      balance INTEGER
+      cumulative_points INTEGER,
+      balance INTEGER,
+      roll_id INTEGER
     )`);
 
     db.run(`CREATE TABLE IF NOT EXISTS prize (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT,
       detail TEXT
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS roll (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      customer_id INTEGER,
+      points INTEGER,
+      cumulative_points INTEGER
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS winner (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      prize_name TEXT,
+      account TEXT,
+      category TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`);
   });
 });
@@ -138,11 +156,12 @@ ipcMain.on(IpcChannels.UPLOAD_DATA_TO_DATABASE, async (event, filePath) => {
   const batchSize = 100; // Adjust the batch size as needed
   let batch = [];
   const insertPromises = [];
+  let cumulativePoints = 0
 
   for await (const line of rl) {
-    const [cif, account, name, branch, region, points, balance] =
-      line.split("|");
-    batch.push([cif, account, name, branch, region, points, balance]);
+    const [cif, account, name, branch, region, points, balance] = line.split("|");
+    cumulativePoints += parseInt(points)
+    batch.push([cif, account, name, branch, region, points, cumulativePoints, balance]);
 
     if (batch.length >= batchSize) {
       insertPromises.push(insertBatch(batch));
@@ -168,9 +187,9 @@ ipcMain.on(IpcChannels.UPLOAD_DATA_TO_DATABASE, async (event, filePath) => {
 
   async function insertBatch(batch) {
     return new Promise<void>((resolve, reject) => {
-      const placeholders = batch.map(() => "(?, ?, ?, ?, ?, ?, ?)").join(", ");
+      const placeholders = batch.map(() => "(?, ?, ?, ?, ?, ?, ?, ?)").join(", ");
       const values = batch.flat();
-      const sql = `INSERT INTO data (cif, account, name, branch, region, points, balance) VALUES ${placeholders}`;
+      const sql = `INSERT INTO customer (cif, account, name, branch, region, points, cumulative_points, balance) VALUES ${placeholders}`;
 
       db.run(sql, values, (err) => {
         if (err) {
@@ -186,29 +205,35 @@ ipcMain.on(IpcChannels.UPLOAD_DATA_TO_DATABASE, async (event, filePath) => {
 });
 
 ipcMain.on(IpcChannels.GET_ALL_DATA, (event) => {
-  db.all(`SELECT * FROM data`, (err, rows) => {
+  db.all(`SELECT * FROM customer`, (err, rows) => {
     if (err) {
       console.error("Error fetching data:", err.message);
     } else {
-      console.log("Data fetched successfully", rows);
       event.sender.send(IpcChannels.GET_ALL_DATA, rows);
     }
   });
 });
 
 ipcMain.on(IpcChannels.DELETE_DATA_IN_DATABASE, (event) => {
-  db.run(`DELETE FROM data`, (err) => {
+  db.run(`DELETE FROM customer`, (err) => {
     if (err) {
       console.error("Error deleting data:", err.message);
     } else {
       console.log("All data deleted successfully");
-      event.sender.send(IpcChannels.IS_DATA_EXIST, false);
+      db.run(`DELETE FROM sqlite_sequence WHERE name='customer'`, (err) => {
+        if (err) {
+          console.error("Error resetting sequence:", err.message);
+        } else {
+          console.log("ID sequence reset successfully");
+          event.sender.send(IpcChannels.IS_DATA_EXIST, false);
+        }
+      });
     }
   });
 });
 
 ipcMain.on(IpcChannels.IS_DATA_EXIST, (event) => {
-  db.get("SELECT name FROM data limit 1", (err, row) => {
+  db.get("SELECT name FROM customer limit 1", (err, row) => {
     if (err) {
       console.error("Error checking if data exists:", err.message);
       event.sender.send(IpcChannels.IS_DATA_EXIST, false);
