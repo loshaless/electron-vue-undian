@@ -7,5 +7,9 @@ export enum IpcChannels {
   IS_DATA_EXIST = "is-data-exist",
   UPLOAD_COMPLETE = "upload-complete",
   START_ROLLING = "start-rolling",
-  SET_A_WINNER = "set-a-winner"
+  SET_A_WINNER = "set-a-winner",
+  ADD_PRIZE = "add-prize",
+  GET_PRIZE = "get-prize",
+  EDIT_PRIZE = "edit-prize",
+  DELETE_PRIZE = "delete-prize",
 }

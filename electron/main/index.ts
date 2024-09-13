@@ -62,6 +62,12 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
       points INTEGER,
       balance INTEGER
     )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS prize (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT,
+      detail TEXT
+    )`);
   });
 });
 
@@ -222,3 +228,37 @@ ipcMain.on(IpcChannels.SET_A_WINNER, (event) => {
     winnerDigits: [1, 2, 3, 4, 5, 6, 7, 8, 9]
    });
 });
+
+ipcMain.on(IpcChannels.ADD_PRIZE, (event, {name, detail}) => {
+  db.run(`INSERT INTO prize (name, detail) VALUES (?, ?)`, [name, detail], (err) => {
+    if (err) {
+      console.error("Error adding prize:", err.message);
+    } else {
+      console.log("Prize added successfully");
+      event.sender.send(IpcChannels.ADD_PRIZE)
+    }
+  });
+});
+
+ipcMain.on(IpcChannels.GET_PRIZE, (event) => {
+  db.all(`SELECT * FROM prize`, (err, rows) => {
+    if (err) {
+      console.error("Error fetching prize:", err.message);
+    } else {
+      console.log("Prize fetched successfully", rows);
+      event.sender.send(IpcChannels.GET_PRIZE, rows);  
+    }
+  });
+});
+
+ipcMain.on(IpcChannels.DELETE_PRIZE, (event, id) => {
+  db.run(`DELETE FROM prize WHERE id = ?`, [id], (err) => {
+    if (err) {
+      console.error("Error deleting prize:", err.message);
+    } else {
+      console.log("Prize deleted successfully");
+      event.sender.send(IpcChannels.DELETE_PRIZE);
+    }
+  })
+})
+
