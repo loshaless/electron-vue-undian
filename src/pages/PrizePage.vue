@@ -1,16 +1,11 @@
 <script lang="ts" setup>
-import {computed, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import SelectComponent from "../components/SelectComponent.vue";
 import ModalComponent from "../components/ModalComponent.vue";
 import {IpcChannels} from "../constants/ipcChannels";
 import SwitchComponent from "../components/SwitchComponent.vue";
 
-const prizeName = ref("");
-const isModalOpen = ref(false)
-const isLoadingInModal = ref(false)
 const isLoadingInAction = ref(false)
-const isAllRegion = ref(true)
-const allRegionQuota = ref(1)
 
 interface Quota {
   value: string;
@@ -18,8 +13,24 @@ interface Quota {
   numOfItem: number;
 }
 
-const quotas = ref<Quota[]>([]);
+/* MODAL */
+const isModalOpen = ref(false)
+const isLoadingInModal = ref(false)
 
+function handleModalOpen(isOpen) {
+  if (isOpen == false) {
+    quotas.value = []
+    prizeName.value = ''
+    editedPrizeId.value = 0
+  }
+  isModalOpen.value = isOpen
+}
+
+/* ADD PRIZE */
+const prizeName = ref("");
+const isAllRegion = ref(true)
+const allRegionQuota = ref(1)
+const quotas = ref<Quota[]>([]);
 const provinces = [
   {
     value: 'Aceh',
@@ -187,10 +198,8 @@ function saveNewPrize() {
 }
 
 window.ipcRenderer.on(IpcChannels.ADD_PRIZE, (event) => {
-  quotas.value = []
-  prizeName.value = ''
-  isModalOpen.value = false
   isLoadingInModal.value = false
+  handleModalOpen(false)
   getPrize()
 })
 
@@ -198,6 +207,11 @@ interface Prize {
   id: number;
   name: string;
   detail: Quota[];
+}
+
+/* GET PRIZE DATA */
+function getPrize() {
+  window.ipcRenderer.send(IpcChannels.GET_PRIZE)
 }
 
 const prizes = ref<Prize[]>([])
@@ -213,15 +227,51 @@ window.ipcRenderer.on(IpcChannels.GET_PRIZE, (event, rows) => {
   }
 })
 
-function getPrize() {
-  window.ipcRenderer.send(IpcChannels.GET_PRIZE)
+/* EDIT PRIZE */
+const editedPrizeId = ref(0)
+
+function editPrize(prize: Prize) {
+  editedPrizeId.value = prize.id
+  quotas.value = prize.detail
+  prizeName.value = prize.name
+  isModalOpen.value = true
+
+  if (prize.detail[0].value === 'All Region') {
+    allRegionQuota.value = prize.detail[0].numOfItem
+  } else {
+    isAllRegion.value = false
+  }
 }
 
-function editPrize(id: number) {
-  // Implement the logic to edit the prize with the given id
-  console.log(`Edit prize with id: ${id}`);
+function saveEditedPrize() {
+  isLoadingInModal.value = true
+  isLoadingInAction.value =true
+
+  if (isAllRegion.value) {
+    quotas.value = [
+      {
+        value: 'All Region',
+        text: 'All Region',
+        numOfItem: allRegionQuota.value
+      }
+    ]
+  }
+
+  window.ipcRenderer.send(IpcChannels.EDIT_PRIZE, {
+    id: editedPrizeId.value,
+    name: prizeName.value,
+    detail: JSON.stringify(quotas.value)
+  })
 }
 
+window.ipcRenderer.on(IpcChannels.EDIT_PRIZE, () => {
+  isLoadingInModal.value = false
+  isLoadingInAction.value = false
+  handleModalOpen(false)
+  getPrize()
+})
+
+/* DELETE PRIZE */
 function deletePrize(id: number) {
   isLoadingInAction.value = true
   window.ipcRenderer.send(IpcChannels.DELETE_PRIZE, id)
@@ -229,6 +279,10 @@ function deletePrize(id: number) {
 
 window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
   isLoadingInAction.value = false
+  getPrize()
+})
+
+onMounted(() => {
   getPrize()
 })
 </script>
@@ -280,7 +334,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
               >
                 <button
                   class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                  @click="editPrize(prize.id)"
+                  @click="editPrize(prize)"
                 >
                   Edit
                 </button>
@@ -301,7 +355,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
     <modal-component
       :is-loading="isLoadingInModal"
       :is-open="isModalOpen"
-      @update:isOpen="isModalOpen = $event"
+      @update:isOpen="handleModalOpen($event)"
     >
       <div>
         <label>Prize Name : </label>
@@ -367,9 +421,9 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
       <div class="flex justify-center mt-8">
         <button
           class="rounded-md bg-green-700 text-white hover:bg-amber-500 cursor-pointer py-3 px-8 w-3/4"
-          @click="saveNewPrize()"
+          @click="editedPrizeId ? saveEditedPrize() : saveNewPrize()"
         >
-          Save
+          {{ editedPrizeId ? `Edit Prize ${editedPrizeId}` : 'Create New Prize' }}
         </button>
       </div>
     </modal-component>

@@ -262,3 +262,13 @@ ipcMain.on(IpcChannels.DELETE_PRIZE, (event, id) => {
   })
 })
 
+ipcMain.on(IpcChannels.EDIT_PRIZE, (event, {id, name, detail}) => {
+  db.run(`UPDATE prize SET name = ?, detail = ? WHERE id = ?`, [name, detail, id], (err) => {
+    if (err) {
+      console.error("Error editing prize:", err.message);
+    } else {
+      console.log("Prize edited successfully");
+      event.sender.send(IpcChannels.EDIT_PRIZE);
+    }
+  })
+})

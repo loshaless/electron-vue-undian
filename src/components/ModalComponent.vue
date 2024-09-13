@@ -2,7 +2,6 @@
   <div v-if="isOpen" class="fixed inset-0 flex items-center justify-center z-50">
     <div
       class="fixed inset-0 bg-black opacity-50"
-      @click="closeModal"
     >
     </div>
     <div class="bg-white rounded-lg shadow-lg pb-6 pl-6 pt-10 pr-10 z-10 relative">
@@ -46,7 +45,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-/* Add any additional styling if needed */
-</style>
