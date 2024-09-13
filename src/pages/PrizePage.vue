@@ -17,8 +17,8 @@ interface Quota {
 const isModalOpen = ref(false)
 const isLoadingInModal = ref(false)
 
-function handleModalOpen(isOpen) {
-  if (isOpen == false) {
+function handleModalOpen(isOpen: boolean) {
+  if (!isOpen) {
     quotas.value = []
     prizeName.value = ''
     editedPrizeId.value = 0
@@ -245,7 +245,7 @@ function editPrize(prize: Prize) {
 
 function saveEditedPrize() {
   isLoadingInModal.value = true
-  isLoadingInAction.value =true
+  isLoadingInAction.value = true
 
   if (isAllRegion.value) {
     quotas.value = [

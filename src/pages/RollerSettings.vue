@@ -1,8 +1,9 @@
 <script lang="ts" setup>
-import {ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import SwitchComponent from "../components/SwitchComponent.vue";
 import {IpcChannels} from "../constants/ipcChannels";
 import SelectComponent from "../components/SelectComponent.vue";
+import MultiSelectComponent from "../components/MultiSelectComponent.vue";
 
 const minBalance = ref(0)
 const canControlRoller = ref(false)
@@ -29,12 +30,46 @@ function startRoller() {
 function stopAndSetWinner() {
   window.ipcRenderer.send(IpcChannels.SET_A_WINNER)
 }
+
+function getPrizeList() {
+  window.ipcRenderer.send(IpcChannels.GET_PRIZE)
+}
+
+interface Prize {
+  id: number,
+  name: string,
+  detail: {
+    numOfItem: number
+  }
+}
+
+const prizeList = ref<Prize[]>([])
+window.ipcRenderer.on(IpcChannels.GET_PRIZE, (event, rows) => {
+  if (rows) {
+    prizeList.value = rows.map((row: any) => {
+      return {
+        id: row.id,
+        name: row.name,
+        detail: JSON.parse(row.detail)
+      }
+    })
+  }
+})
+
+const selectedPrizeId = ref<number[]>([])
+const selectedPrizeName = computed(() => {
+  return prizeList.value.filter((prize: Prize) => selectedPrizeId.value.includes(prize.id))
+})
+
+onMounted(() => {
+  getPrizeList()
+})
 </script>
 
 <template>
   <div>
     <div class="my-3 mt-5 flex mx-5 gap-5">
-      <div class="border rounded p-3 shadow-sm border-gray-800 bg-blue-300 flex-1">
+      <div class="border rounded-md p-5 shadow-sm border-gray-800 bg-blue-300 flex-1">
         <h3 class="font-bold text-2xl">Winner Requirement</h3>
         <!-- Min Balance -->
         <label>
@@ -46,8 +81,37 @@ function stopAndSetWinner() {
           placeholder="input balance"
           type="number"
         />
+
+        <!-- Table to display prizes -->
+        <div
+          v-if="selectedPrizeName.length"
+          class="overflow-auto max-h-96 mt-5"
+        >
+          <table class="table-auto w-full mt-5">
+            <thead>
+            <tr>
+              <th class="px-4 py-2 border border-gray-800">ID</th>
+              <th class="px-4 py-2 border border-gray-800">Name</th>
+              <th class="px-4 py-2 border border-gray-800">Quota</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="prize in selectedPrizeName" :key="prize.id" class="text-center">
+              <td class="border px-4 py-2 border-gray-800">{{ prize.id }}</td>
+              <td class="border px-4 py-2 border-gray-800">{{ prize.name }}</td>
+              <td class="border px-4 py-2 border-gray-800">
+                <ul>
+                  <li v-for="(quota, index) in prize.detail" :key="index">
+                    {{ quota.text }}: {{ quota.numOfItem }}
+                  </li>
+                </ul>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div class="border rounded p-3 shadow-sm border-gray-800 bg-amber-300 flex-1">
+      <div class="border rounded-md p-5 shadow-sm border-gray-800 bg-amber-300 flex-1">
         <!-- Num of Winner -->
         <h3 class="font-bold text-2xl">Lottery Settings</h3>
         <div class="flex gap-3 mt-3 items-center">
@@ -55,6 +119,15 @@ function stopAndSetWinner() {
           <SelectComponent
             v-model="selectedCategory"
             :options="categoryOptions"
+          />
+        </div>
+
+        <div class="flex gap-3 mt-3 items-center">
+          <span>Selected Prize: </span>
+          <multi-select-component
+            :options="prizeList"
+            placeholder="Select Prize"
+            @update:modelValue="selectedPrizeId = $event"
           />
         </div>
 
@@ -79,7 +152,7 @@ function stopAndSetWinner() {
             Stop and Set Winner
           </button>
         </div>
-        <div v-else class="mt-4">
+        <div v-else class="mt-4 flex flex-col justify-end">
           <button
             class="bg-green-500 hover:bg-green-300 p-2 rounded-md text-white"
             @click="startRoller()"
@@ -91,7 +164,3 @@ function stopAndSetWinner() {
     </div>
   </div>
 </template>
-
-<style scoped>
-
-</style>

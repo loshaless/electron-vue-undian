@@ -1,42 +1,40 @@
 <script lang="ts" setup>
 import {ref, computed} from 'vue';
 
-const options = ref([
-  {id: 1, name: 'Option 1'},
-  {id: 2, name: 'Option 2'},
-  {id: 3, name: 'Option 3'},
-]);
+const props = defineProps<{
+  options: { id: number, name: string }[],
+  placeholder?: string
+}>();
 
 const selectedOptions = ref<number[]>([]);
 const searchQuery = ref('');
 const isOpen = ref(false);
 
-const toggleOption = (id: number) => {
+const emit = defineEmits(['update:modelValue']);
+
+function toggleOption(id: number) {
   if (selectedOptions.value.includes(id)) {
     selectedOptions.value = selectedOptions.value.filter(optionId => optionId !== id);
   } else {
     selectedOptions.value.push(id);
   }
-};
+  emit('update:modelValue', selectedOptions.value);
+}
 
 const filteredOptions = computed(() => {
-  return options.value.filter(option => option.name.toLowerCase().includes(searchQuery.value.toLowerCase()));
+  return props.options.filter(option => option.name.toLowerCase().includes(searchQuery.value.toLowerCase()));
 });
 
-const removeOption = (id: number) => {
-  selectedOptions.value = selectedOptions.value.filter(optionId => optionId !== id);
-};
-
 const selectedOptionNames = computed(() => {
-  return selectedOptions.value.map(optionId => options.value.find(option => option.id === optionId)?.name).join(', ');
+  return selectedOptions.value.map(optionId => props.options.find(option => option.id === optionId)?.name).join(', ');
 });
 </script>
 
 <template>
-  <div class="w-full max-w-xs mx-auto">
+  <div class="w-full max-w-xs">
     <div class="relative">
       <div
-        class="border border-gray-500 rounded-md shadow-sm p-2 cursor-pointer"
+        class="border border-gray-500 rounded-md shadow-sm p-2 cursor-pointer bg-white"
         @click="isOpen = !isOpen"
       >
         <div
@@ -52,7 +50,7 @@ const selectedOptionNames = computed(() => {
             </span>
             <button
               class="text-red-500 font-medium text-md self-center "
-              @click.stop="removeOption(optionId)"
+              @click.stop="toggleOption(optionId)"
             >
               <div class="text-white bg-blue-700 rounded-full px-2 hover:bg-red-700">
                 X
@@ -64,7 +62,7 @@ const selectedOptionNames = computed(() => {
           v-else-if="!selectedOptions.length"
           class="text-gray-500"
         >
-          Select options...
+          {{ placeholder || 'Select options...' }}
         </div>
         <div
           v-else-if="!isOpen && selectedOptions.length"
