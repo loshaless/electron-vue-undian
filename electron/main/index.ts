@@ -1,11 +1,12 @@
 import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import os from "node:os";
 import { IpcChannels } from "../../src/constants/ipcChannels";
 import "./ipc/customerIpc";
 import "./ipc/prizeIpc";
 import "./ipc/viewIpc";
+import "./config/logger";
+import fs from "node:fs";
 import { dbAll, dbGet, dbRun } from "./database/init";
 import { deleteAllRollData } from "./database/rollDB";
 
@@ -31,8 +32,27 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
   ? path.join(process.env.APP_ROOT, "public")
   : RENDERER_DIST;
 
-// Disable GPU Acceleration for Windows 7
-if (os.release().startsWith("6.1")) app.disableHardwareAcceleration();
+// Create a writable stream to the log file
+const logFile = path.join(process.env.APP_ROOT || __dirname, "app.log");
+const logStream = fs.createWriteStream(logFile, { flags: 'a' });
+
+// Save the original console.log function
+const originalConsoleLog = console.log;
+
+// Override console.log to also write to the log file
+console.log = (...args) => {
+  // Get the current timestamp
+  const now = new Date();
+  const timestamp = now.toLocaleString('en-US', { timeZoneName: 'short' });
+
+  // Format the log message
+  const logMessage = args.map(arg => (typeof arg === 'object' ? JSON.stringify(arg) : arg)).join(' ');
+  const logEntry = `[${timestamp}] ${logMessage}\n`;
+
+  // Write to console and log file
+  originalConsoleLog(...args);
+  logStream.write(logEntry);
+};
 
 // Set application name for Windows 10+ notifications
 if (process.platform === "win32") app.setAppUserModelId(app.getName());
@@ -42,7 +62,7 @@ if (!app.requestSingleInstanceLock()) {
   process.exit(0);
 }
 
-let windows = {
+export const windows = {
   main: null,
   view: null
 };
@@ -79,7 +99,7 @@ app.whenReady().then(() => {
 app.on("window-all-closed", () => {
   windows.main = null;
   windows.view = null;
-  if (process.platform !== "darwin") app.quit();
+  app.quit();
 });
 
 app.on("activate", () => {
@@ -92,10 +112,6 @@ app.on("activate", () => {
 });
 
 // IPC HANDLER
-ipcMain.on(IpcChannels.START_ROLLING, (event) => {
-  windows.view.webContents.send(IpcChannels.START_ROLLING);
-});
-
 ipcMain.on(IpcChannels.PICK_WINNER, async (event, { minBalance, region, numOfWinner, prizeName }) => {
   try {
     const sql = `

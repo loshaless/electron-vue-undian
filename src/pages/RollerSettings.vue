@@ -26,6 +26,10 @@ const categoryOptions = ref([
 
 const isLoading = ref(false)
 
+function moveRoller() {
+  window.ipcRenderer.send(IpcChannels.START_ROLLING)
+}
+
 function startRoller() {
   selectedPrizeName.value.forEach((prize: Prize) => {
     prize.detail.forEach(detail => {
@@ -148,7 +152,7 @@ onMounted(() => {
         <div v-if="canControlRoller" class="flex gap-3 mt-4">
           <button
             class="bg-green-500 hover:bg-green-300 p-2 rounded-md text-white"
-            @click="startRoller()"
+            @click="moveRoller()"
           >
             Start Roller
           </button>
