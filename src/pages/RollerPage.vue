@@ -16,12 +16,6 @@ function startRolling() {
 window.ipcRenderer.on(IpcChannels.START_ROLLING, (event) => {
   startRolling()
 })
-window.ipcRenderer.on(IpcChannels.SET_A_WINNER, (event, {name, winnerDigits}) => {
-  stopRoller();
-  digits.value = winnerDigits
-  numDigits.value = winnerDigits.length
-  winnerName.value = name
-})
 
 function stopRoller() {
   winnerName.value = ''

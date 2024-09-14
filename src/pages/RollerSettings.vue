@@ -39,10 +39,6 @@ function startRoller() {
   })
 }
 
-function stopAndSetWinner() {
-  window.ipcRenderer.send(IpcChannels.SET_A_WINNER)
-}
-
 function getPrizeList() {
   window.ipcRenderer.send(IpcChannels.GET_PRIZE)
 }
@@ -158,7 +154,6 @@ onMounted(() => {
           </button>
           <button
             class="bg-red-500 text-white p-2 rounded-md hover:bg-red-300"
-            @click="stopAndSetWinner()"
           >
             Stop and Set Winner
           </button>

@@ -19,13 +19,13 @@ window.ipcRenderer.on(IpcChannels.SELECTED_FILE, (event, path) => {
 
 /* CHECK IS DATA EXIST */
 const isDataExist = ref(false);
-window.ipcRenderer.on(IpcChannels.IS_DATA_EXIST, (event, isExist) => {
+window.ipcRenderer.on(IpcChannels.IS_CUSTOMER_DATA_EXIST, (event, isExist) => {
   isDataExist.value = isExist;
 });
 
 /* DELETE DATA */
 function deleteData() {
-  window.ipcRenderer.send(IpcChannels.DELETE_DATA_IN_DATABASE);
+  window.ipcRenderer.send(IpcChannels.DELETE_CUSTOMER_IN_DATABASE);
 }
 
 /* UPLOADING DATA */
@@ -35,10 +35,10 @@ const isLoading = ref(false);
 function uploadDataToDatabase() {
   isLoading.value = true;
   insertedData.value = 0;
-  window.ipcRenderer.send(IpcChannels.UPLOAD_DATA_TO_DATABASE, pathUrl.value);
+  window.ipcRenderer.send(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, pathUrl.value);
 }
 
-window.ipcRenderer.on(IpcChannels.UPLOAD_DATA_TO_DATABASE, (event, inserted) => {
+window.ipcRenderer.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, (event, inserted) => {
   insertedData.value = inserted;
 });
 window.ipcRenderer.on(IpcChannels.UPLOAD_COMPLETE, (event, isDone) => {
@@ -47,7 +47,7 @@ window.ipcRenderer.on(IpcChannels.UPLOAD_COMPLETE, (event, isDone) => {
 })
 
 onBeforeMount(() => {
-  window.ipcRenderer.send(IpcChannels.IS_DATA_EXIST);
+  window.ipcRenderer.send(IpcChannels.IS_CUSTOMER_DATA_EXIST);
 });
 </script>
 
