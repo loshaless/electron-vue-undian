@@ -20,6 +20,7 @@ function openFileDialog() {
 window.ipcRenderer.on(IpcChannels.SELECTED_FILE, (event, path) => {
   if (path) {
     pathUrl.value = path;
+    isDialogOpen.value = false;
   }
 });
 

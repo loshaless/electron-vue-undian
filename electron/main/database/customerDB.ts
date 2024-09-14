@@ -20,9 +20,11 @@ export async function getCustomerDataByBalanceAndRegion(
   const sql = `
     SELECT id, points
     FROM customer
-    WHERE balance >= ? AND region = ? AND roll_id IS NULL
+    WHERE balance >= ? ${region === 'All Region' ? "": "AND region = ?"} AND roll_id IS NULL
   `;
-  return await dbAll(sql, [minBalance, region]);
+  
+  const params = region === 'All Region' ? [minBalance] : [minBalance, region];
+  return await dbAll(sql, params);
 }
 
 export async function findCustomerById(id: number) {
