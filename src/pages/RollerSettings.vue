@@ -32,7 +32,8 @@ function startRoller() {
       window.ipcRenderer.send(IpcChannels.PICK_WINNER, {
         minBalance: minBalance.value,
         region: detail.text,
-        numOfWinner: detail.numOfItem
+        numOfWinner: detail.numOfItem,
+        prizeName: prize.name
       })
     })
   })
