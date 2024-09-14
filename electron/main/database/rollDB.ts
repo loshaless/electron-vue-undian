@@ -1,4 +1,4 @@
-import { dbRun } from "./init";
+import { dbRun, dbGet } from "./init";
 
 export async function deleteAllRollData(){
   try{
@@ -15,4 +15,14 @@ export async function deleteAllRollData(){
     await dbRun("ROLLBACK");
     console.error("Error deleting roll data:", err.message);
   }
+}
+
+export async function getMaxCumulativePoints() {
+  const sql = `SELECT cumulative_points FROM roll ORDER BY id DESC LIMIT 1`;
+  return await dbGet(sql);
+}
+
+export async function findRollByCumulativePoints(cumulativePoints: number) {
+  const sql = `SELECT points, cumulative_points, customer_id FROM roll WHERE cumulative_points > ?`;
+  return await dbGet(sql, [cumulativePoints]);
 }

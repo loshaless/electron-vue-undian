@@ -13,6 +13,10 @@ ipcMain.on(IpcChannels.OPEN_FILE_DIALOG, (event) => {
   if (result?.length > 0) {
     event.sender.send(IpcChannels.SELECTED_FILE, result[0]);
   }
+  else {
+    console.log("Dialog was closed without selecting a file."); // Debug log for closed dialog
+    event.sender.send(IpcChannels.FILE_DIALOG_CLOSED);
+  }
 });
 
 ipcMain.on(IpcChannels.START_ROLLING, (event) => {

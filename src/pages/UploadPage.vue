@@ -7,7 +7,13 @@ import LoadingComponent from "../components/LoadingComponent.vue";
 /* CHECK PATH OF URL */
 const pathUrl = ref("");
 
+const isDialogOpen = ref(false);
+window.ipcRenderer.on(IpcChannels.FILE_DIALOG_CLOSED, (event) => {
+  isDialogOpen.value = false;
+})
 function openFileDialog() {
+  if (isDialogOpen.value) return;
+  isDialogOpen.value = true;
   window.ipcRenderer.send(IpcChannels.OPEN_FILE_DIALOG);
 }
 
