@@ -1,4 +1,4 @@
-import { dbAll, dbGet, dbRun } from "../database/init";
+import { dbRun } from "../database/init";
 import { IpcChannels } from "../../../src/constants/ipcChannels";
 import { ipcMain } from "electron";
 import { 
@@ -11,6 +11,7 @@ import {
   getCustomerDataByBalanceAndRegion, 
   updateCustomerRollId
 } from "../database/customerDB";
+import { dialog } from "electron";
 import { addWinner } from "../database/winnerDB";
 
 async function moveCustomerDataToRoll(insertData: any[]) {
@@ -32,7 +33,7 @@ async function moveCustomerDataToRoll(insertData: any[]) {
 }
 
 ipcMain.on(IpcChannels.PICK_WINNER, async (event, { minBalance, region, numOfWinner, prizeName }) => {
-  try {
+  try {    
     await dbRun("BEGIN TRANSACTION");
     const listOfCustomer = await getCustomerDataByBalanceAndRegion(minBalance, region);
 
@@ -69,7 +70,7 @@ ipcMain.on(IpcChannels.PICK_WINNER, async (event, { minBalance, region, numOfWin
     await dbRun("COMMIT");
   } catch (err) {
     await dbRun("ROLLBACK");
-    console.error("Error:", err.message);
+    dialog.showErrorBox("Error", `An error occurred: ${err.message}`);
   } finally {
     deleteAllRollData();
   }

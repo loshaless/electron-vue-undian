@@ -1,5 +1,5 @@
 import { IpcChannels } from "../../../src/constants/ipcChannels";
-import { ipcMain } from "electron";
+import { dialog, ipcMain } from "electron";
 import fs from "fs";
 import readline from "readline";
 import { db, dbRun } from "../database/init";
@@ -76,9 +76,8 @@ ipcMain.on(IpcChannels.DELETE_CUSTOMER_IN_DATABASE, async (event) => {
     await dbRun('COMMIT');
     event.sender.send(IpcChannels.IS_CUSTOMER_DATA_EXIST, false);
   } catch (err) {
-    console.error("Error:", err.message);
-    event.sender.send(IpcChannels.IS_CUSTOMER_DATA_EXIST, true);
     await dbRun('ROLLBACK');
+    dialog.showErrorBox("Error", `Delete Customer Data: ${err.message}`);
   }
 });
 
@@ -87,7 +86,6 @@ ipcMain.on(IpcChannels.IS_CUSTOMER_DATA_EXIST, async (event) => {
     const isExist = await isCustomerDataExist()
     event.sender.send(IpcChannels.IS_CUSTOMER_DATA_EXIST, isExist)
   } catch (error) {
-    console.error("Error checking if data exists:", error.message);
-    event.sender.send(IpcChannels.IS_CUSTOMER_DATA_EXIST, false);
+    dialog.showErrorBox("Error", `Error checking if data exists: ${error.message}`);
   }
 });
