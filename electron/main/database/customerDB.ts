@@ -18,7 +18,7 @@ export async function getCustomerDataByBalanceAndRegion(
   region: string
 ) {
   const sql = `
-    SELECT id, points
+    SELECT customer_id, points
     FROM customer
     WHERE balance >= ? ${region === 'All Region' ? "": "AND region = ?"} AND roll_id IS NULL
   `;
@@ -28,11 +28,11 @@ export async function getCustomerDataByBalanceAndRegion(
 }
 
 export async function findCustomerById(id: number) {
-  const sql = `SELECT * FROM customer WHERE id = ?`;
+  const sql = `SELECT * FROM customer WHERE customer_id = ?`;
   return await dbGet(sql, [id]);
 }
 
 export async function updateCustomerRollId(id: number, rollId: number) {
-  const sql = `UPDATE customer SET roll_id = ? WHERE id = ?`;
+  const sql = `UPDATE customer SET roll_id = ? WHERE customer_id = ?`;
   await dbRun(sql, [rollId, id]);
 }

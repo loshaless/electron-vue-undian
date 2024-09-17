@@ -11,7 +11,7 @@ export const db = new sqlite3.Database(DBSOURCE, (err) => {
 
   db.serialize(() => {
     db.run(`CREATE TABLE IF NOT EXISTS customer (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      customer_id INTEGER PRIMARY KEY AUTOINCREMENT,
       cif TEXT,
       account TEXT,
       name TEXT,

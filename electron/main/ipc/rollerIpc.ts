@@ -40,7 +40,7 @@ ipcMain.on(IpcChannels.PICK_WINNER, async (event, { minBalance, region, numOfWin
     let cumulativePoints = 0;
     const insertData = listOfCustomer.map(row => {
       cumulativePoints += row.points;
-      return [row.id, row.points, cumulativePoints];
+      return [row.customer_id, row.points, cumulativePoints];
     });
 
     await moveCustomerDataToRoll(insertData);
@@ -55,7 +55,9 @@ ipcMain.on(IpcChannels.PICK_WINNER, async (event, { minBalance, region, numOfWin
       console.log("Random roll number:", randomRollNumber);
 
       const winnerRoll = await findRollByCumulativePoints(randomRollNumber);
+      console.log("winnerRoll - ", winnerRoll);
       const winnerCustomer = await findCustomerById(winnerRoll.customer_id);
+      console.log("winnerCustomer - ", winnerCustomer);
 
       if(winnerCustomer.roll_id === null){
         const rollId = winnerCustomer.cumulative_points - (winnerRoll.cumulative_points - randomRollNumber)
