@@ -1,9 +1,9 @@
-import { ipcMain } from "electron";
-import { IpcChannels } from "../../../src/constants/ipcChannels";
-import { addPrize, getPrizes, deletePrize, editPrize } from "../database/prizeDB";
-import { dialog } from "electron";
+import {ipcMain} from "electron";
+import {IpcChannels} from "../../../src/constants/IpcChannels";
+import {addPrize, getPrizes, deletePrize, editPrize} from "../database/prizeDB";
+import {dialog} from "electron";
 
-ipcMain.on(IpcChannels.ADD_PRIZE, async (event, { name, detail }) => {
+ipcMain.on(IpcChannels.ADD_PRIZE, async (event, {name, detail}) => {
   try {
     await addPrize(name, detail);
     console.log("Prize added successfully");
@@ -32,7 +32,7 @@ ipcMain.on(IpcChannels.DELETE_PRIZE, async (event, id) => {
   }
 });
 
-ipcMain.on(IpcChannels.EDIT_PRIZE, async (event, { id, name, detail }) => {
+ipcMain.on(IpcChannels.EDIT_PRIZE, async (event, {id, name, detail}) => {
   try {
     await editPrize(id, name, detail);
     console.log("Prize edited successfully");

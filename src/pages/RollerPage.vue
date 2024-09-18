@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import {ref, onUnmounted} from "vue";
-import {IpcChannels} from "../constants/ipcChannels";
+import {IpcChannels} from "../constants/IpcChannels";
+import {WinnerView} from "../constants/WinnerView";
 
 const winnerName = ref("");
 const numDigits = ref(10);
@@ -14,7 +15,15 @@ function startRolling() {
 }
 
 window.ipcRenderer.on(IpcChannels.START_ROLLING, (event) => {
+  winnerName.value = ''
   startRolling()
+})
+
+/* SHOW WINNER */
+window.ipcRenderer.on(IpcChannels.STOP_ROLLING, (event, winnerData: WinnerView) => {
+  stopRoller()
+  digits.value = winnerData.rollId.toString().split('').map(Number);
+  winnerName.value = winnerData.winnerName
 })
 
 function stopRoller() {

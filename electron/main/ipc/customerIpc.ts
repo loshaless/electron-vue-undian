@@ -1,9 +1,9 @@
-import { IpcChannels } from "../../../src/constants/ipcChannels";
-import { dialog, ipcMain } from "electron";
+import {IpcChannels} from "../../../src/constants/IpcChannels";
+import {dialog, ipcMain} from "electron";
 import fs from "fs";
 import readline from "readline";
-import { db, dbRun } from "../database/init";
-import { deleteCustomerData, resetCustomerSequence, isCustomerDataExist } from "../database/customerDB";
+import {db, dbRun} from "../database/init";
+import {deleteCustomerData, resetCustomerSequence, isCustomerDataExist} from "../database/customerDB";
 
 ipcMain.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, async (event, filePath) => {
   const rl = readline.createInterface({

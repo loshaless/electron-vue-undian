@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, Ref, ref} from "vue";
 import SwitchComponent from "../components/SwitchComponent.vue";
-import {IpcChannels} from "../constants/ipcChannels";
+import {IpcChannels} from "../constants/IpcChannels";
 import SelectComponent from "../components/SelectComponent.vue";
 import MultiSelectComponent from "../components/MultiSelectComponent.vue";
 import LoadingComponent from "../components/LoadingComponent.vue";
-import { winnerRequirement } from "../constants/winnerRequirement";
+import {winnerRequirement} from "../constants/WinnerRequirement";
+import {WinnerView} from "../constants/WinnerView";
 
 const minBalance = ref(0)
 const canControlRoller = ref(false)
@@ -27,11 +28,9 @@ const categoryOptions = ref([
 
 const isLoading = ref(false)
 
-function moveRoller() {
-  window.ipcRenderer.send(IpcChannels.START_ROLLING)
-}
-
-function startRoller() {
+/* INITIATE ROLLER */
+function findWinner() {
+  isLoading.value = true
   const requirementList: winnerRequirement[] = []
 
   selectedPrizeName.value.forEach((prize: Prize) => {
@@ -46,9 +45,30 @@ function startRoller() {
     })
   })
 
-  window.ipcRenderer.send(IpcChannels.PICK_WINNER, requirementList)
+  window.ipcRenderer.send(IpcChannels.INITIATE_WINNER, requirementList)
 }
 
+window.ipcRenderer.on(IpcChannels.INITIATE_WINNER, (event, winners: WinnerView[]) => {
+  isLoading.value = false
+  listOfWinner.value = winners
+})
+
+/* START & STOP ROLLER */
+const listOfWinner: Ref<WinnerView[]> = ref([])
+const isRollerStart: Ref<Boolean> = ref(false)
+
+function moveRoller() {
+  isRollerStart.value = true
+  window.ipcRenderer.send(IpcChannels.START_ROLLING)
+}
+
+function stopRoller() {
+  isRollerStart.value = false
+  const winner = listOfWinner.value.shift()
+  window.ipcRenderer.send(IpcChannels.STOP_ROLLING, JSON.parse(JSON.stringify(winner)))
+}
+
+/*  PRIZE  */
 function getPrizeList() {
   window.ipcRenderer.send(IpcChannels.GET_PRIZE)
 }
@@ -148,35 +168,47 @@ onMounted(() => {
           />
         </div>
 
-        <div class="flex gap-3 mt-3">
+        <div class="flex gap-3 my-3">
           <switch-component
             v-model:value="canControlRoller"
             @input="canControlRoller = $event"
           />
           <p>Can Control Roller ?</p>
         </div>
-        <div v-if="canControlRoller" class="flex gap-3 mt-4">
+        <loading-component v-if="isLoading" class="my-3"/>
+        <div v-else>
           <button
-            class="bg-green-500 hover:bg-green-300 p-2 rounded-md text-white"
-            @click="moveRoller()"
+            v-if="!listOfWinner.length"
+            class="bg-green-500 hover:bg-green-300 py-2 px-5 rounded-md text-white"
+            @click="findWinner()"
           >
-            Start Roller
+            Initiate Roller
           </button>
-          <button
-            class="bg-red-500 text-white p-2 rounded-md hover:bg-red-300"
-          >
-            Stop and Set Winner
-          </button>
-        </div>
-        <div v-else class="mt-4 flex flex-col justify-end">
-          <loading-component v-if="isLoading"/>
-          <button
-            v-else
-            class="bg-green-500 hover:bg-green-300 p-2 rounded-md text-white"
-            @click="startRoller()"
-          >
-            Start Roller Without Stopper
-          </button>
+          <div v-else-if="listOfWinner.length">
+            <div v-if="canControlRoller" class="flex gap-3 mt-4">
+              <button
+                v-if="!isRollerStart"
+                class="bg-green-500 hover:bg-green-300 p-2 rounded-md text-white"
+                @click="moveRoller()"
+              >
+                Start Roller
+              </button>
+              <button
+                v-else
+                class="bg-red-500 text-white p-2 rounded-md hover:bg-red-300"
+                @click="stopRoller()"
+              >
+                Stop and Set Winner
+              </button>
+            </div>
+            <div v-else class="mt-4 flex flex-col justify-end">
+              <button
+                class="bg-green-500 hover:bg-green-300 p-2 rounded-md text-white"
+              >
+                Start Roller Without Stopper
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

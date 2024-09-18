@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {IpcChannels} from "../constants/ipcChannels";
+import {IpcChannels} from "../constants/IpcChannels";
 import {ref, onBeforeMount} from "vue";
 import TooltipComponent from "../components/TooltipComponent.vue";
 import LoadingComponent from "../components/LoadingComponent.vue";
@@ -11,6 +11,7 @@ const isDialogOpen = ref(false);
 window.ipcRenderer.on(IpcChannels.FILE_DIALOG_CLOSED, (event) => {
   isDialogOpen.value = false;
 })
+
 function openFileDialog() {
   if (isDialogOpen.value) return;
   isDialogOpen.value = true;

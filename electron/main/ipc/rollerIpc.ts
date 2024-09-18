@@ -1,5 +1,5 @@
 import {dbRun} from "../database/init";
-import {IpcChannels} from "../../../src/constants/ipcChannels";
+import {IpcChannels} from "../../../src/constants/IpcChannels";
 import {ipcMain} from "electron";
 import {
   deleteAllRollData,
@@ -12,7 +12,8 @@ import {
 } from "../database/customerDB";
 import {dialog} from "electron";
 import {addWinner} from "../database/winnerDB";
-import {winnerRequirement} from "../../../src/constants/winnerRequirement"
+import {winnerRequirement} from "../../../src/constants/WinnerRequirement"
+import {WinnerView} from "../../../src/constants/WinnerView";
 
 async function migrateCustomerToRollByBalanceAndRegionThenReturnCumulativePoints(minBalance: number, region: string): Promise<number> {
   try {
@@ -39,8 +40,9 @@ async function migrateCustomerToRollByBalanceAndRegionThenReturnCumulativePoints
   }
 }
 
-async function createWinner(requirement: winnerRequirement) {
+async function createWinner(requirement: winnerRequirement): Promise<WinnerView[]> {
   const {minBalance, region, numOfWinner, prizeName, category} = requirement
+  const winner: WinnerView[] = []
 
   try {
     await dbRun('BEGIN TRANSACTION');
@@ -62,6 +64,10 @@ async function createWinner(requirement: winnerRequirement) {
       if (winnerCustomer.roll_id === null) {
         const rollId = winnerCustomer.cumulative_points - (winnerRoll.cumulative_points - randomRollNumber)
         await updateCustomerRollId(winnerRoll.customer_id, rollId);
+
+        winner.push({
+          prizeName, rollId, winnerName: winnerCustomer.name, category
+        })
         await addWinner(prizeName, rollId, winnerCustomer.name, winnerCustomer.region, category);
       } else {
         console.log("Winner already picked");
@@ -69,6 +75,8 @@ async function createWinner(requirement: winnerRequirement) {
       }
     }
     await dbRun("COMMIT");
+
+    return winner
   } catch (err) {
     await dbRun("ROLLBACK");
     throw new Error(`err createWinner: ${err}`)
@@ -77,12 +85,17 @@ async function createWinner(requirement: winnerRequirement) {
   }
 }
 
-ipcMain.on(IpcChannels.PICK_WINNER, async (event, requirement: winnerRequirement[]) => {
+ipcMain.on(IpcChannels.INITIATE_WINNER, async (event, requirement: winnerRequirement[]) => {
   try {
+    let listOfWinner: WinnerView[] = []
     for (let i = 0; i < requirement.length; i++) {
-      await createWinner(requirement[i])
+      const winner = await createWinner(requirement[i])
+      listOfWinner = [...winner]
     }
+
+    event.sender.send(IpcChannels.INITIATE_WINNER, listOfWinner);
   } catch (error) {
+    event.sender.send(IpcChannels.INITIATE_WINNER, []);
     dialog.showErrorBox("Error", `An error occurred: ${error.message}`);
   }
 });

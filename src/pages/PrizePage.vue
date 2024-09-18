@@ -2,7 +2,7 @@
 import {computed, onMounted, ref} from "vue";
 import SelectComponent from "../components/SelectComponent.vue";
 import ModalComponent from "../components/ModalComponent.vue";
-import {IpcChannels} from "../constants/ipcChannels";
+import {IpcChannels} from "../constants/IpcChannels";
 import SwitchComponent from "../components/SwitchComponent.vue";
 
 const isLoadingInAction = ref(false)
