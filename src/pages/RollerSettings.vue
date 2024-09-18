@@ -40,7 +40,8 @@ function startRoller() {
         minBalance: minBalance.value,
         region: detail.text,
         numOfWinner: detail.numOfItem,
-        prizeName: prize.name
+        prizeName: prize.name,
+        category: selectedCategory.value
       })
     })
   })
