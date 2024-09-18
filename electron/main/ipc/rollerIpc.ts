@@ -34,14 +34,14 @@ async function migrateCustomerToRollByBalanceAndRegionThenReturnCumulativePoints
       console.log(`Processed ${customers.length} customers.`);
     }
   } catch (error) {
-    deleteAllRollData()
-    console.error('Migration failed:', error);
+    throw new Error(`Migration failed: , ${error}`);
   }
 }
 
-ipcMain.on(IpcChannels.PICK_WINNER, async (event, { minBalance, region, numOfWinner, prizeName }) => {
+async function createWinner(requirement: winnerRequirement) {
+ const {minBalance, region, numOfWinner, prizeName} = requirement
   try {    
-    await dbRun('BEGIN TRANSACTION')
+    await dbRun('BEGIN TRANSACTION');
 
     // Get max cumulative points
     const maxCumulativePoints 
@@ -70,8 +70,25 @@ ipcMain.on(IpcChannels.PICK_WINNER, async (event, { minBalance, region, numOfWin
     await dbRun("COMMIT");
   } catch (err) {
     await dbRun("ROLLBACK");
-    dialog.showErrorBox("Error", `An error occurred: ${err.message}`);
+    throw new Error(`err createWinner: ${err}`)
   } finally {
-    deleteAllRollData();
+    await deleteAllRollData();
+  }
+}
+
+interface winnerRequirement {
+  minBalance: number,
+  region: string,
+  numOfWinner: number,
+  prizeName: string
+}
+
+ipcMain.on(IpcChannels.PICK_WINNER, async (event, requirement: winnerRequirement[]) => {
+  try {
+    for (let i = 0; i < requirement.length; i++) {
+      await createWinner(requirement[i])
+    }
+  } catch (error) {
+    dialog.showErrorBox("Error", `An error occurred: ${error.message}`);
   }
 });

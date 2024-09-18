@@ -31,9 +31,11 @@ function moveRoller() {
 }
 
 function startRoller() {
+  const requirementList: any[] = []
+
   selectedPrizeName.value.forEach((prize: Prize) => {
     prize.detail.forEach(detail => {
-      window.ipcRenderer.send(IpcChannels.PICK_WINNER, {
+      requirementList.push({
         minBalance: minBalance.value,
         region: detail.text,
         numOfWinner: detail.numOfItem,
@@ -41,6 +43,8 @@ function startRoller() {
       })
     })
   })
+
+  window.ipcRenderer.send(IpcChannels.PICK_WINNER, requirementList)
 }
 
 function getPrizeList() {
