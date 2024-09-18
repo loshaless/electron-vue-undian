@@ -50,7 +50,7 @@ window.ipcRenderer.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, (event, inse
   insertedData.value = inserted;
 });
 window.ipcRenderer.on(IpcChannels.UPLOAD_COMPLETE, (event, isDone) => {
-  isLoading.value = false;
+  isLoading.value = !isDone;
   pathUrl.value = ''
 })
 

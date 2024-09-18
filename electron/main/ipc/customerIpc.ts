@@ -41,7 +41,7 @@ ipcMain.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, async (event, filePath)
   await Promise.all(insertPromises);
 
   console.log("File processing complete");
-  event.sender.send(IpcChannels.UPLOAD_COMPLETE, inserted);
+  event.sender.send(IpcChannels.UPLOAD_COMPLETE, true);
   event.sender.send(IpcChannels.IS_CUSTOMER_DATA_EXIST, true);
 
   async function insertBatch(batch) {

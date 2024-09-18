@@ -1,15 +1,21 @@
 <script lang="ts" setup>
 import UploadPage from "./pages/UploadPage.vue";
-import {ref} from "vue";
+import {Ref, ref} from "vue";
 import RollerPage from "./pages/RollerSettings.vue";
 import PrizePage from "./pages/PrizePage.vue";
+import {IpcChannels} from "./constants/IpcChannels";
 
 const PAGE = {
   UPLOAD_PAGE: "UPLOAD_PAGE",
   PRIZE_PAGE: "PRIZE_PAGE",
   SETTINGS_PAGE: "SETTINGS_PAGE",
 }
-const selectedPage = ref(PAGE.SETTINGS_PAGE)
+const selectedPage = ref(PAGE.UPLOAD_PAGE)
+
+const isCustomerDataExist: Ref<Boolean> = ref(false)
+window.ipcRenderer.on(IpcChannels.IS_CUSTOMER_DATA_EXIST, (event, isDataExist) => {
+  isCustomerDataExist.value = isDataExist;
+})
 </script>
 
 <template>
@@ -30,6 +36,7 @@ const selectedPage = ref(PAGE.SETTINGS_PAGE)
         Prize Settings
       </p>
       <p
+        v-if="isCustomerDataExist"
         :class="{'!bg-green-500': selectedPage === PAGE.SETTINGS_PAGE}"
         class="navbar"
         @click="selectedPage = PAGE.SETTINGS_PAGE"
@@ -41,7 +48,7 @@ const selectedPage = ref(PAGE.SETTINGS_PAGE)
       v-if="selectedPage === PAGE.UPLOAD_PAGE"
     />
     <RollerPage
-      v-if="selectedPage === PAGE.SETTINGS_PAGE"
+      v-if="selectedPage === PAGE.SETTINGS_PAGE && isCustomerDataExist"
     />
     <PrizePage
       v-if="selectedPage === PAGE.PRIZE_PAGE"
