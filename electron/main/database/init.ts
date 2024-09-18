@@ -29,6 +29,7 @@ export const db = new sqlite3.Database(DBSOURCE, (err) => {
       detail TEXT
     )`);
 
+    db.run(`drop table roll`)
     db.run(`CREATE TABLE IF NOT EXISTS roll (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       customer_id INTEGER,
@@ -36,6 +37,7 @@ export const db = new sqlite3.Database(DBSOURCE, (err) => {
       cumulative_points INTEGER
     )`);
 
+    db.run(`drop table winner`)
     db.run(`CREATE TABLE IF NOT EXISTS winner (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       prize_name TEXT,

@@ -5,6 +5,7 @@ import {IpcChannels} from "../constants/ipcChannels";
 import SelectComponent from "../components/SelectComponent.vue";
 import MultiSelectComponent from "../components/MultiSelectComponent.vue";
 import LoadingComponent from "../components/LoadingComponent.vue";
+import { winnerRequirement } from "../constants/winnerRequirement";
 
 const minBalance = ref(0)
 const canControlRoller = ref(false)
@@ -31,7 +32,7 @@ function moveRoller() {
 }
 
 function startRoller() {
-  const requirementList: any[] = []
+  const requirementList: winnerRequirement[] = []
 
   selectedPrizeName.value.forEach((prize: Prize) => {
     prize.detail.forEach(detail => {

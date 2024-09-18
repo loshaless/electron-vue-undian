@@ -12,6 +12,7 @@ import {
 } from "../database/customerDB";
 import { dialog } from "electron";
 import { addWinner } from "../database/winnerDB";
+import { winnerRequirement } from "../../../src/constants/winnerRequirement"
 
 async function migrateCustomerToRollByBalanceAndRegionThenReturnCumulativePoints(minBalance:number, region: string): Promise<number>{
   try {
@@ -74,13 +75,6 @@ async function createWinner(requirement: winnerRequirement) {
   } finally {
     await deleteAllRollData();
   }
-}
-
-interface winnerRequirement {
-  minBalance: number,
-  region: string,
-  numOfWinner: number,
-  prizeName: string
 }
 
 ipcMain.on(IpcChannels.PICK_WINNER, async (event, requirement: winnerRequirement[]) => {
