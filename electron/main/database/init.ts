@@ -42,7 +42,7 @@ export const db = new sqlite3.Database(DBSOURCE, (err) => {
       roll_id INTEGER,
       customer_name TEXT,
       region TEXT,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT (DATETIME('now', 'localtime'))
     )`);
   });
 });

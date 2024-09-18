@@ -4,7 +4,6 @@ import { ipcMain } from "electron";
 import { 
   deleteAllRollData, 
   findRollByCumulativePoints, 
-  getMaxCumulativePoints 
 } from "../database/rollDB";
 import { 
   findCustomerById, 
@@ -14,46 +13,45 @@ import {
 import { dialog } from "electron";
 import { addWinner } from "../database/winnerDB";
 
-async function moveCustomerDataToRoll(insertData: any[]) {
-  // Insert data in batches
-  const batchSize = 100; // Adjust the batch size as needed
-  const totalBatches = Math.ceil(insertData.length / batchSize);
-  console.log(totalBatches);
-  
-  for (let i = 0; i < totalBatches; i++) {
-    const batch = insertData.slice(i * batchSize, (i + 1) * batchSize);
-    const placeholders = batch.map(() => "(?, ?, ?)").join(", ");
-    const values = batch.flat();
-    const rollSql = `
-      INSERT INTO roll (customer_id, points, cumulative_points) VALUES ${placeholders}
-    `;
-    await dbRun(rollSql, values);
+async function migrateCustomerToRollByBalanceAndRegionThenReturnCumulativePoints(minBalance:number, region: string): Promise<number>{
+  try {
+    const batchSize = 10000; // adjust based on memory constraints
+    let offset = 0
+    let cumulativePoints = 0;
+
+    while(true) {
+      const customers = await getCustomerDataByBalanceAndRegion(minBalance, region, batchSize, offset)
+      if(customers.length === 0) return cumulativePoints
+
+      // Prepare the INSERT statement
+      const insertPromises = customers.map(customer => {
+        cumulativePoints += customer.points; // Update cumulative points
+        return dbRun(`INSERT INTO roll (customer_id, points, cumulative_points) VALUES (?, ?, ?)`, [customer.customer_id, customer.points, cumulativePoints]);
+      });
+
+      await Promise.all(insertPromises);
+      offset += batchSize;
+      console.log(`Processed ${customers.length} customers.`);
+    }
+  } catch (error) {
+    deleteAllRollData()
+    console.error('Migration failed:', error);
   }
-  console.log("Roll data inserted successfully");
 }
 
 ipcMain.on(IpcChannels.PICK_WINNER, async (event, { minBalance, region, numOfWinner, prizeName }) => {
   try {    
-    await dbRun("BEGIN TRANSACTION");
-    const listOfCustomer = await getCustomerDataByBalanceAndRegion(minBalance, region);
-
-    let cumulativePoints = 0;
-    const insertData = listOfCustomer.map(row => {
-      cumulativePoints += row.points;
-      return [row.customer_id, row.points, cumulativePoints];
-    });
-
-    await moveCustomerDataToRoll(insertData);
+    await dbRun('BEGIN TRANSACTION')
 
     // Get max cumulative points
-    const {cumulative_points: maxCumulativePoints} = await getMaxCumulativePoints();
+    const maxCumulativePoints 
+    = await migrateCustomerToRollByBalanceAndRegionThenReturnCumulativePoints(minBalance, region);
     console.log("Max cumulative points:", maxCumulativePoints);
 
     // Get random winners
     for (let i = 0; i < numOfWinner; i++) {
       const randomRollNumber = Math.floor(Math.random() * maxCumulativePoints) + 1;
       console.log("Random roll number:", randomRollNumber);
-
       const winnerRoll = await findRollByCumulativePoints(randomRollNumber);
       console.log("winnerRoll - ", winnerRoll);
       const winnerCustomer = await findCustomerById(winnerRoll.customer_id);

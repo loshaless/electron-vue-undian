@@ -15,15 +15,21 @@ export async function isCustomerDataExist() {
 
 export async function getCustomerDataByBalanceAndRegion(
   minBalance: number, 
-  region: string
+  region: string,
+  limit: number,
+  offset: number
 ) {
   const sql = `
     SELECT customer_id, points
     FROM customer
-    WHERE balance >= ? ${region === 'All Region' ? "": "AND region = ?"} AND roll_id IS NULL
+    WHERE balance >= ? 
+    ${region === 'All Region' ? "": "AND region = ?"}
+    AND roll_id IS NULL
+    ORDER BY customer_id
+    LIMIT ? OFFSET ?
   `;
   
-  const params = region === 'All Region' ? [minBalance] : [minBalance, region];
+  const params = region === 'All Region' ? [minBalance, limit, offset] : [minBalance, region, limit, offset];
   return await dbAll(sql, params);
 }
 
