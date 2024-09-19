@@ -178,7 +178,7 @@ onMounted(() => {
         <loading-component v-if="isLoading" class="my-3"/>
         <div v-else>
           <button
-            v-if="!listOfWinner.length"
+            v-if="!listOfWinner.length && selectedPrizeName.length"
             class="bg-green-500 hover:bg-green-300 py-2 px-5 rounded-md text-white"
             @click="findWinner()"
           >

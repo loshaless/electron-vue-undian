@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import {ref, onUnmounted} from "vue";
+import {ref, onUnmounted, onMounted} from "vue";
 import {IpcChannels} from "../constants/IpcChannels";
 import {WinnerView} from "../constants/WinnerView";
 
 const winnerName = ref("");
-const numDigits = ref(10);
+const numDigits = ref(3);
 const digits = ref(Array(numDigits.value).fill(0));
 let intervalId: any;
 
@@ -22,8 +22,17 @@ window.ipcRenderer.on(IpcChannels.START_ROLLING, (event) => {
 /* SHOW WINNER */
 window.ipcRenderer.on(IpcChannels.STOP_ROLLING, (event, winnerData: WinnerView) => {
   stopRoller()
-  digits.value = winnerData.rollId.toString().split('').map(Number);
+  const rollIdString = winnerData.rollId.toString()
+  const numOfZero = numDigits.value - rollIdString.length
+
+  // IF ROLLID = 123 => it will genberate new digit = 0000123
+  const newDigits = Array(numOfZero).fill(0)
+  for (let i = 0; i < rollIdString.length; i++) {
+    newDigits.push(rollIdString[i])
+  }
+
   winnerName.value = winnerData.winnerName
+  digits.value = newDigits
 })
 
 function stopRoller() {
@@ -34,6 +43,20 @@ function stopRoller() {
 onUnmounted(() => {
   stopRoller();
 });
+
+/* GET TOTQAL POINTS */
+function getTotalPoints(){
+  window.ipcRenderer.send(IpcChannels.GET_TOTAL_CUMULATIVE_POINTS)
+}
+
+window.ipcRenderer.on(IpcChannels.GET_TOTAL_CUMULATIVE_POINTS, (event, points: number) => {
+  numDigits.value = String(points).length
+  digits.value = Array(numDigits.value).fill(0)
+})
+
+onMounted(() => {
+  getTotalPoints()
+})
 </script>
 
 <template>

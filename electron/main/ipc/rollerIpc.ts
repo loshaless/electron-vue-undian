@@ -89,8 +89,8 @@ ipcMain.on(IpcChannels.INITIATE_WINNER, async (event, requirement: winnerRequire
   try {
     let listOfWinner: WinnerView[] = []
     for (let i = 0; i < requirement.length; i++) {
-      const winner = await createWinner(requirement[i])
-      listOfWinner = [...winner]
+      const winner: WinnerView[] = await createWinner(requirement[i])
+      listOfWinner = [...listOfWinner, ...winner]
     }
 
     event.sender.send(IpcChannels.INITIATE_WINNER, listOfWinner);

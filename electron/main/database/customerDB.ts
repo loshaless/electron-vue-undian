@@ -42,3 +42,14 @@ export async function updateCustomerRollId(id: number, rollId: number) {
   const sql = `UPDATE customer SET roll_id = ? WHERE customer_id = ?`;
   await dbRun(sql, [rollId, id]);
 }
+
+export async function getTotalCumulativePoints(): Promise<number> {
+  const sql = `
+    SELECT cumulative_points 
+    FROM customer
+    ORDER BY customer_id DESC
+    limit 1
+  `
+  const result = await dbGet(sql)
+  return result.cumulative_points
+}

@@ -3,7 +3,7 @@ import {dialog, ipcMain} from "electron";
 import fs from "fs";
 import readline from "readline";
 import {db, dbRun} from "../database/init";
-import {deleteCustomerData, resetCustomerSequence, isCustomerDataExist} from "../database/customerDB";
+import {deleteCustomerData, resetCustomerSequence, isCustomerDataExist, getTotalCumulativePoints} from "../database/customerDB";
 
 ipcMain.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, async (event, filePath) => {
   const rl = readline.createInterface({
@@ -89,3 +89,13 @@ ipcMain.on(IpcChannels.IS_CUSTOMER_DATA_EXIST, async (event) => {
     dialog.showErrorBox("Error", `Error checking if data exists: ${error.message}`);
   }
 });
+
+ipcMain.on(IpcChannels.GET_TOTAL_CUMULATIVE_POINTS, async (event) => {
+  try {
+    const points = await getTotalCumulativePoints()
+    event.sender.send(IpcChannels.GET_TOTAL_CUMULATIVE_POINTS, points)
+  }
+  catch (error) {
+    dialog.showErrorBox("Error", `Get total cumulative points: ${error.message}`);
+  }
+})
