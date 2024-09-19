@@ -56,7 +56,29 @@ window.ipcRenderer.on(IpcChannels.INITIATE_WINNER, (event, winners: WinnerView[]
 /* START & STOP ROLLER */
 const listOfWinner: Ref<WinnerView[]> = ref([])
 const isRollerStart: Ref<Boolean> = ref(false)
+  
+  /* AUTOMATIC ROLLER */
+const rollAnimationTime = ref(1)
+const showWinnerTime = ref(1)
+const shouldContinueRolling = ref(true);
+const isAutomaticRollerStart = ref(false)
 
+async function startRollerWithoutStopper() {
+  isAutomaticRollerStart.value = true
+
+  while(listOfWinner.value.length && shouldContinueRolling.value) {
+    moveRoller()
+    await new Promise(resolve => setTimeout(resolve, rollAnimationTime.value*1000))
+
+    if (shouldContinueRolling.value) {
+      stopRoller()
+      await new Promise(resolve => setTimeout(resolve, showWinnerTime.value*1000))
+    }
+  }
+  isAutomaticRollerStart.value = false
+}
+
+/* MANUAL ROLLER */
 function moveRoller() {
   isRollerStart.value = true
   window.ipcRenderer.send(IpcChannels.START_ROLLING)
@@ -196,18 +218,47 @@ onMounted(() => {
               <button
                 v-else
                 class="bg-red-500 text-white p-2 rounded-md hover:bg-red-300"
-                @click="stopRoller()"
+                @click="stopRoller(); shouldContinueRolling = false"
               >
                 Stop and Set Winner
               </button>
             </div>
-            <div v-else class="mt-4 flex flex-col justify-end">
+            <div 
+              v-else-if="!isAutomaticRollerStart"
+              class="mt-4 flex flex-col justify-end"
+            >
+              <div class="flex gap-3 items-center mb-3">
+                <label for="showWinnerTime">Roll Animation Time: </label>
+                <input
+                  id="showWinnerTime"
+                  v-model="rollAnimationTime"
+                  class="mt-4 p-2 border border-gray-800 rounded"
+                  placeholder="input animation time in second"
+                  min="1"
+                  type="number"
+                />
+              </div>
+              <div class="flex gap-3 items-center mb-3">
+                <label for="showWinnerTime">Time to show winner: </label>
+                <input
+                  id="showWinnerTime"
+                  v-model="showWinnerTime"
+                  class="mt-4 p-2 border border-gray-800 rounded"
+                  placeholder="input show winner time in second"
+                  min="1"
+                  type="number"
+                />
+              </div>
+              
               <button
+                v-if="showWinnerTime > 0 && rollAnimationTime > 0"
+                @click="startRollerWithoutStopper()"
                 class="bg-green-500 hover:bg-green-300 p-2 rounded-md text-white"
               >
                 Start Roller Without Stopper
               </button>
             </div>
+            <loading-component v-else-if="isAutomaticRollerStart" class="my-3"/>
           </div>
         </div>
       </div>

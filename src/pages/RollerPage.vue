@@ -9,6 +9,7 @@ const digits = ref(Array(numDigits.value).fill(0));
 let intervalId: any;
 
 function startRolling() {
+  stopRoller()
   intervalId = setInterval(() => {
     digits.value = digits.value.map(() => Math.floor(Math.random() * 10));
   }, 100);
@@ -71,5 +72,3 @@ onMounted(() => {
     </p>
   </div>
 </template>
-
-<style scoped></style>
