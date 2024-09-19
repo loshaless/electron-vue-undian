@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import UploadPage from "./pages/UploadPage.vue";
+import ReportPage from "./pages/ReportSettings.vue";
 import {Ref, ref} from "vue";
 import RollerPage from "./pages/RollerSettings.vue";
 import PrizePage from "./pages/PrizePage.vue";
@@ -9,8 +10,9 @@ const PAGE = {
   UPLOAD_PAGE: "UPLOAD_PAGE",
   PRIZE_PAGE: "PRIZE_PAGE",
   SETTINGS_PAGE: "SETTINGS_PAGE",
+  REPORT_PAGE: "REPORT_PAGE",
 }
-const selectedPage = ref(PAGE.UPLOAD_PAGE)
+const selectedPage = ref(PAGE.SETTINGS_PAGE)
 
 const isCustomerDataExist: Ref<Boolean> = ref(false)
 window.ipcRenderer.on(IpcChannels.IS_CUSTOMER_DATA_EXIST, (event, isDataExist) => {
@@ -19,7 +21,7 @@ window.ipcRenderer.on(IpcChannels.IS_CUSTOMER_DATA_EXIST, (event, isDataExist) =
 </script>
 
 <template>
-  <div class="h-screen overflow-y-hidden">
+  <div>
     <div class="container mx-auto flex justify-around items-center mt-3 gap-3.5">
       <p
         :class="{'!bg-green-500': selectedPage === PAGE.UPLOAD_PAGE}"
@@ -43,6 +45,13 @@ window.ipcRenderer.on(IpcChannels.IS_CUSTOMER_DATA_EXIST, (event, isDataExist) =
       >
         Roller Settings
       </p>
+      <p
+        :class="{'!bg-green-500': selectedPage === PAGE.REPORT_PAGE}"
+        class="navbar"
+        @click="selectedPage = PAGE.REPORT_PAGE"
+      >
+        Report Settings
+      </p>
     </div>
     <UploadPage
       v-if="selectedPage === PAGE.UPLOAD_PAGE"
@@ -52,6 +61,9 @@ window.ipcRenderer.on(IpcChannels.IS_CUSTOMER_DATA_EXIST, (event, isDataExist) =
     />
     <PrizePage
       v-if="selectedPage === PAGE.PRIZE_PAGE"
+    />
+    <ReportPage
+      v-if="selectedPage === PAGE.REPORT_PAGE"
     />
   </div>
 </template>
