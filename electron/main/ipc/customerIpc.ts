@@ -4,6 +4,7 @@ import fs from "fs";
 import readline from "readline";
 import {db, dbRun} from "../database/init";
 import {deleteCustomerData, resetCustomerSequence, isCustomerDataExist, getTotalCumulativePoints} from "../database/customerDB";
+import { windows } from "..";
 
 ipcMain.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, async (event, filePath) => {
   const rl = readline.createInterface({
@@ -43,6 +44,9 @@ ipcMain.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, async (event, filePath)
   console.log("File processing complete");
   event.sender.send(IpcChannels.UPLOAD_COMPLETE, true);
   event.sender.send(IpcChannels.IS_CUSTOMER_DATA_EXIST, true);
+
+  const points = await getTotalCumulativePoints()
+  windows.view.webContents.send(IpcChannels.GET_TOTAL_CUMULATIVE_POINTS, points);
 
   async function insertBatch(batch) {
     return new Promise<void>((resolve, reject) => {
@@ -92,8 +96,11 @@ ipcMain.on(IpcChannels.IS_CUSTOMER_DATA_EXIST, async (event) => {
 
 ipcMain.on(IpcChannels.GET_TOTAL_CUMULATIVE_POINTS, async (event) => {
   try {
-    const points = await getTotalCumulativePoints()
-    event.sender.send(IpcChannels.GET_TOTAL_CUMULATIVE_POINTS, points)
+    const customerDataExists = await isCustomerDataExist()
+    if (customerDataExists) {
+      const points = await getTotalCumulativePoints()
+      event.sender.send(IpcChannels.GET_TOTAL_CUMULATIVE_POINTS, points)
+    }
   }
   catch (error) {
     dialog.showErrorBox("Error", `Get total cumulative points: ${error.message}`);
