@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue'
+import {ref} from 'vue'
 import MultiSelectComponent from '../components/MultiSelectComponent.vue';
-import html2pdf from "html2pdf.js"; // Import html2pdf.js
 import {IpcChannels} from '../constants/IpcChannels';
 
 const selectedPrizeId = ref<number[]>([])
@@ -15,7 +14,11 @@ const categoryOptions = ref([
     name: 'Premium Prize'
   }
 ])
+
+/* TITLE */
 const title = ref('Pemenang Lucky Draw Festival Fantasi Junior Indie')
+const todayDate = new Date().toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'})
+const subtitle = ref(todayDate)
 
 /* NAME INPUT */
 const notaris = ref('R.Kusmartono SH')
@@ -26,11 +29,15 @@ const cimbLeft = ref('Lilyana Setiawan')
 const cimbRight = ref('Tia Septiani Thamrin')
 const globe = ref('Susana K. Wijaya, SE')
 
+/* DATE INPUT */
+const placeAndDate = ref(`Jakarta, ${todayDate}`)
+
+/* GENERATE PDF */
 function generatePDF() {
   const element = document.getElementById('pdf-content');
   if (element) {
     const htmlContent = element.outerHTML;
-    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const blob = new Blob([htmlContent], {type: 'text/html'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -56,7 +63,8 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
 <template>
   <div class="mt-8">
     <!-- SETTINGS -->
-    <div class="rounded-md border-2 border-gray-300 p-3 m-3">
+    <div class="rounded-md border-2 border-gray-300 p-3 my-3 mx-5">
+      <p class="font-bold text-center bg-red-500 text-white p-2 rounded-md mb-3">Header Settings</p>
       <div class="flex gap-3 items-center">
         <p class="font-bold">Winner Category :</p>
         <multi-select-component
@@ -65,7 +73,7 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
           @update:modelValue="selectedPrizeId = $event"
         />
         <button
-          class="ml-3 bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
+          class="ml-3 bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 hover:scale-110"
           @click="fillBody()"
         >
           apply settings
@@ -75,9 +83,17 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
         <p class="font-bold">Title: </p>
         <input v-model="title" class="border-2 border-gray-300 rounded-md p-1 w-1/2" type="text"/>
       </div>
-      <div class="mt-3">
-        <p class="font-bold">Footer Settings</p>
-        <hr class="my-3">
+      <div class="flex gap-3 my-3 items-center">
+        <p class="font-bold">Subtitle: </p>
+        <input v-model="subtitle" class="border-2 border-gray-300 rounded-md p-1 w-1/2" type="text"/>
+      </div>
+      
+      <div class="mt-8">
+        <p class="font-bold text-center bg-red-500 text-white p-2 rounded-md mb-3">Footer Settings</p>
+        <div class="flex gap-3 items-center">
+          <p class="font-bold">Place and Date: </p>
+          <input v-model="placeAndDate" class="border-2 border-gray-300 rounded-md p-1 w-1/2" type="text"/>
+        </div>
 
         <!-- MENTERI SOSIAL DAN NOTATIS       -->
         <div class="flex m-3 gap-72">
@@ -121,7 +137,7 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
 
     <div class="flex justify-center my-3">
       <button
-        class="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
+        class="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 hover:scale-110"
         @click="generatePDF"
       >
         Generate File
@@ -129,17 +145,18 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
     </div>
 
     <!-- DEM0 -->
-    <div class="rounded-md border-2 border-gray-300 p-8 mb-5">
-      <div id="pdf-content" style="font-size: 10px;">
+    <div class="rounded-md border-2 border-gray-300 p-8 mb-5 mx-5">
+      <div id="pdf-content" style="font-size: 12px; margin-left: 5rem; margin-right: 5rem;">
         <!-- BODY -->
 
-        <p style="margin-bottom: 0.75rem; font-weight: bold; font-size: 0.875rem;">{{ title }}</p>
+        <p style="font-weight: bold; font-size: 0.9rem;">{{ title }}</p>
+        <p style="margin-bottom: 0.75rem; font-weight: bold; font-size: 0.875rem;">{{ subtitle }}</p>
         <!-- table to show winners -->
         <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 2rem;">
 
           <table style="width: 100%; border-collapse: collapse; border-color: #D1D5DB;">
             <thead>
-            <tr>
+            <tr style="color: white;">
               <th style="padding: 0.25rem; border: 1px solid; background-color: #6B21A8;">No</th>
               <th style="padding: 0.25rem; border: 1px solid; background-color: #6B21A8;">Prize</th>
               <th style="padding: 0.25rem; border: 1px solid; background-color: #6B21A8;">RollId</th>
@@ -163,6 +180,9 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
         </div>
 
         <!-- FOOTER -->
+        <div style="display: flex;">
+          <p style="font-weight: bold;">{{ placeAndDate }}</p>
+        </div>
         <!-- MENTERI SOSIAL DAN NOTATIS  -->
         <div style="display: flex; justify-content: space-around; text-align: center;">
           <div style="display: flex; flex-direction: column; gap: 4rem;">
@@ -175,7 +195,6 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
               <p>{{ kementerianSosialLeft }}</p>
               <p>{{ kementerianSosialRight }}</p>
             </div>
-
           </div>
         </div>
 
@@ -205,9 +224,3 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
     </div>
   </div>
 </template>
-
-<style scoped>
-.small-text {
-  font-size: 10px;
-}
-</style>
