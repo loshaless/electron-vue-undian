@@ -29,13 +29,14 @@ const globe = ref('Susana K. Wijaya, SE')
 function generatePDF() {
   const element = document.getElementById('pdf-content');
   if (element) {
-    const opt = {
-      margin: [0.5, 0.5, 0.5, 0.5], // top, left, bottom, right margins in inches
-      image: {type: 'jpeg', quality: 1},
-      html2canvas: {scale: 2},
-      jsPDF: {unit: 'in', format: 'letter', orientation: 'portrait'}
-    };
-    html2pdf().set(opt).from(element).save();
+    const htmlContent = element.outerHTML;
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'report.html';
+    a.click();
+    URL.revokeObjectURL(url);
   }
 }
 
@@ -123,37 +124,39 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
         class="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
         @click="generatePDF"
       >
-        Generate PDF
+        Generate File
       </button>
     </div>
 
     <!-- DEM0 -->
     <div class="rounded-md border-2 border-gray-300 p-8 mb-5">
-      <div id="pdf-content" class="small-text">
+      <div id="pdf-content" style="font-size: 10px;">
         <!-- BODY -->
 
-        <p class="mb-3 font-bold text-sm">{{ title }}</p>
+        <p style="margin-bottom: 0.75rem; font-weight: bold; font-size: 0.875rem;">{{ title }}</p>
         <!-- table to show winners -->
-        <div class="flex justify-center items-center mb-8">
-          <table class="table-auto w-full border-gray-300">
+        <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 2rem;">
+
+          <table style="width: 100%; border-collapse: collapse; border-color: #D1D5DB;">
             <thead>
             <tr>
-              <th class="p-1 border bg-purple-500">No</th>
-              <th class="p-1 border bg-purple-500">Prize</th>
-              <th class="p-1 border bg-purple-500">RollId</th>
-              <th class="p-1 border bg-purple-500">Customer Name</th>
-              <th class="p-1 border bg-purple-500">Area</th>
-              <th class="p-1 border bg-purple-500">Time</th>
+              <th style="padding: 0.25rem; border: 1px solid; background-color: #6B21A8;">No</th>
+              <th style="padding: 0.25rem; border: 1px solid; background-color: #6B21A8;">Prize</th>
+              <th style="padding: 0.25rem; border: 1px solid; background-color: #6B21A8;">RollId</th>
+              <th style="padding: 0.25rem; border: 1px solid; background-color: #6B21A8;">Customer Name</th>
+              <th style="padding: 0.25rem; border: 1px solid; background-color: #6B21A8;">Area</th>
+              <th style="padding: 0.25rem; border: 1px solid; background-color: #6B21A8;">Time</th>
             </tr>
             </thead>
             <tbody>
+
             <tr v-for="(winner, index) in winners" :key="winner.id">
-              <td class="border text-center">{{ index + 1 }}</td>
-              <td class="border text-center">{{ winner.prize_name }}</td>
-              <td class="border text-center">{{ winner.roll_id }}</td>
-              <td class="border text-center">{{ winner.customer_name }}</td>
-              <td class="border text-center">{{ winner.region }}</td>
-              <td class="border text-center">{{ winner.created_at }}</td>
+              <td style="border: 1px solid; text-align: center;">{{ index + 1 }}</td>
+              <td style="border: 1px solid; text-align: center;">{{ winner.prize_name }}</td>
+              <td style="border: 1px solid; text-align: center;">{{ winner.roll_id }}</td>
+              <td style="border: 1px solid; text-align: center;">{{ winner.customer_name }}</td>
+              <td style="border: 1px solid; text-align: center;">{{ winner.region }}</td>
+              <td style="border: 1px solid; text-align: center;">{{ winner.created_at }}</td>
             </tr>
             </tbody>
           </table>
@@ -161,29 +164,30 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
 
         <!-- FOOTER -->
         <!-- MENTERI SOSIAL DAN NOTATIS  -->
-        <div class="flex justify-around text-center">
-          <div class="flex flex-col gap-16">
-            <p class="font-bold">NOTARIS</p>
+        <div style="display: flex; justify-content: space-around; text-align: center;">
+          <div style="display: flex; flex-direction: column; gap: 4rem;">
+            <p style="font-weight: bold;">NOTARIS</p>
             <p>{{ notaris }}</p>
           </div>
-          <div class="flex flex-col gap-16">
-            <p class="font-bold">KEMENTERIAN SOSIAL RI</p>
-            <div class="flex gap-12">
+          <div style="display: flex; flex-direction: column; gap: 4rem;">
+            <p style="font-weight: bold;">KEMENTERIAN SOSIAL RI</p>
+            <div style="display: flex; gap: 3rem;">
               <p>{{ kementerianSosialLeft }}</p>
               <p>{{ kementerianSosialRight }}</p>
             </div>
+
           </div>
         </div>
 
         <!--DINAS SOSIAL DAN CIMB       -->
-        <div class="flex justify-around mt-8 text-center">
-          <div class="flex flex-col gap-16">
-            <p class="font-bold">DINAS SOSIAL PROV DKI JAKARTA</p>
+        <div style="display: flex; justify-content: space-around; margin-top: 2rem; text-align: center;">
+          <div style="display: flex; flex-direction: column; gap: 4rem;">
+            <p style="font-weight: bold;">DINAS SOSIAL PROV DKI JAKARTA</p>
             <p>{{ dinasSosial }}</p>
           </div>
-          <div class="flex flex-col gap-16">
-            <p class="font-bold">KPT. Bank CIMB Niaga Tbk</p>
-            <div class="flex gap-12">
+          <div style="display: flex; flex-direction: column; gap: 4rem;">
+            <p style="font-weight: bold;">KPT. Bank CIMB Niaga Tbk</p>
+            <div style="display: flex; gap: 3rem;">
               <p>{{ cimbLeft }}</p>
               <p>{{ cimbRight }}</p>
             </div>
@@ -191,9 +195,9 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
         </div>
 
         <!-- GLOBE PROMOTION SERVICE-->
-        <div class="flex justify-around text-center my-8">
-          <div class="flex flex-col gap-16">
-            <p class="font-bold">GLOBE PROMOTION SERVICE</p>
+        <div style="display: flex; justify-content: space-around; text-align: center; margin: 2rem 0;">
+          <div style="display: flex; flex-direction: column; gap: 4rem;">
+            <p style="font-weight: bold;">GLOBE PROMOTION SERVICE</p>
             <p>{{ globe }}</p>
           </div>
         </div>

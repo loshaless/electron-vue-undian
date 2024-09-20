@@ -39,7 +39,6 @@
     "vue-tsc": "^2.0.6"
   },
   "dependencies": {
-    "html2pdf.js": "^0.10.2",
     "sqlite3": "5.1.6"
   }
 }
