@@ -21,13 +21,50 @@ const todayDate = new Date().toLocaleDateString('id-ID', {day: '2-digit', month:
 const subtitle = ref(todayDate)
 
 /* NAME INPUT */
-const notaris = ref('R.Kusmartono SH')
-const kementerianSosialLeft = ref('Dini Afria Puspita')
-const kementerianSosialRight = ref('Nur Umaini Afidah')
-const dinasSosial = ref('Rita Indah Yulistanti')
-const cimbLeft = ref('Lilyana Setiawan')
-const cimbRight = ref('Tia Septiani Thamrin')
-const globe = ref('Susana K. Wijaya, SE')
+interface Signer {
+  position: string
+  name: string[]
+}
+
+const signers = ref<Signer[]>(
+  [
+    {
+      position: 'NOTARIS',
+      name: ['R.Kusmartono SH']
+    },
+    {
+      position: 'KEMENTERIAN SOSIAL RI',
+      name: ['Dini Afria Puspita', 'Nur Umaini Afidah']
+    },
+    {
+      position: 'DINAS SOSIAL PROV DKI JAKARTA',
+      name: ['Rita Indah Yulistanti']
+    },
+    {
+      position: 'KPT. Bank CIMB Niaga Tbk',
+      name: ['Lilyana Setiawan', 'Tia Septiani Thamrin']
+    },
+    {
+      position: 'GLOBE PROMOTION SERVICE',
+      name: ['Susana K. Wijaya, SE']
+    }
+  ]
+)
+
+function addSigner() {
+  signers.value.push({
+    position: 'position name',
+    name: ['signer name']
+  })
+}
+
+function addName(indexSigner: number) {
+  signers.value[indexSigner].name.push('signer name')
+}
+
+function removeName(indexSigner: number) {
+  signers.value[indexSigner].name.pop()
+}
 
 /* DATE INPUT */
 const placeAndDate = ref(`Jakarta, ${todayDate}`)
@@ -64,7 +101,7 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
   <div class="mt-8">
     <!-- SETTINGS -->
     <div class="rounded-md border-2 border-gray-300 p-3 my-3 mx-5">
-      <p class="font-bold text-center bg-red-500 text-white p-2 rounded-md mb-3">Header Settings</p>
+      <p class="font-bold text-center bg-purple-500 text-white p-2 rounded-md mb-3">Header Settings</p>
       <div class="flex gap-3 items-center">
         <p class="font-bold">Winner Category :</p>
         <multi-select-component
@@ -87,49 +124,61 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
         <p class="font-bold">Subtitle: </p>
         <input v-model="subtitle" class="border-2 border-gray-300 rounded-md p-1 w-1/2" type="text"/>
       </div>
-      
+
       <div class="mt-8">
-        <p class="font-bold text-center bg-red-500 text-white p-2 rounded-md mb-3">Footer Settings</p>
+        <p class="font-bold text-center bg-purple-500 text-white p-2 rounded-md mb-3">Footer Settings</p>
         <div class="flex gap-3 items-center">
           <p class="font-bold">Place and Date: </p>
           <input v-model="placeAndDate" class="border-2 border-gray-300 rounded-md p-1 w-1/2" type="text"/>
         </div>
 
-        <!-- MENTERI SOSIAL DAN NOTATIS       -->
-        <div class="flex m-3 gap-72">
-          <div class="flex flex-col gap-24">
-            <p class="text-sm font-bold">NOTARIS</p>
-            <input v-model="notaris" class="border-2 border-gray-300 rounded-md p-1" type="text"/>
-          </div>
-          <div class="flex flex-col gap-24">
-            <p class="text-sm font-bold">KEMENTERIAN SOSIAL RI</p>
-            <div class="flex gap-3">
-              <input v-model="kementerianSosialLeft" class="border-2 border-gray-300 rounded-md p-1" type="text"/>
-              <input v-model="kementerianSosialRight" class="border-2 border-gray-300 rounded-md p-1" type="text"/>
+        <div class="w-full flex flex-wrap mb-12 box-border">
+          <div
+            v-for="(signer, indexSigner) in signers"
+            :key="indexSigner"
+            class="w-1/2 flex box-border mt-6"
+          >
+            <div class="flex flex-col gap-10 w-full">
+              <input
+                v-model="signer.position"
+                class="border-2 border-gray-300 rounded-md p-1 font-bold mr-4"
+                type="text"
+              />
+              <div class="flex gap-3">
+                <button
+                  v-if="signer.name.length > 1"
+                  class="w-max-1/2 bg-red-500 text-white p-2 rounded-md hover:bg-red-600 hover:scale-105"
+                  @click="removeName(indexSigner)"
+                >
+                  Remove Signer Name
+                </button>
+                <button
+                  v-if="signer.name.length < 4"
+                  class="bg-green-500 text-white p-2 rounded-md hover:bg-green-600 hover:scale-105"
+                  @click="addName(indexSigner)"
+                >
+                  Add Signer Name
+                </button>
+              </div>
+              <div class="flex">
+                <input
+                  v-for="(name, indexName) in signer.name"
+                  :key="indexName"
+                  v-model="signer.name[indexName]"
+                  class="w-1/4 border-2 border-gray-300 rounded-md p-1 mr-3"
+                  type="text"
+                >
+              </div>
             </div>
           </div>
-        </div>
-
-        <!--DINAS SOSIAL DAN CIMB       -->
-        <div class="flex m-3 gap-64 mt-8">
-          <div class="flex flex-col gap-24">
-            <p class="text-sm font-bold">DINAS SOSIAL PROV DKI JAKARTA</p>
-            <input v-model="dinasSosial" class="border-2 border-gray-300 rounded-md p-1" type="text"/>
-          </div>
-          <div class="flex flex-col gap-24">
-            <p class="text-sm font-bold">KPT. Bank CIMB Niaga Tbk</p>
-            <div class="flex gap-3">
-              <input v-model="cimbLeft" class="border-2 border-gray-300 rounded-md p-1" type="text"/>
-              <input v-model="cimbRight" class="border-2 border-gray-300 rounded-md p-1" type="text"/>
+          <div
+            class="min-h-32 w-1/4 flex box-border mt-6 items-center justify-center bg-gray-300 cursor-pointer rounded-lg hover:bg-gray-400 hover:scale-105"
+            @click="addSigner"
+          >
+            <div
+              class="rounded-full bg-purple-800 text-white w-8 h-8 flex items-center justify-center font-bold text-xl">
+              +
             </div>
-          </div>
-        </div>
-
-        <!-- GLOBE PROMOTION SERVICE-->
-        <div class="flex m-3 mt-8">
-          <div class="flex flex-col gap-24">
-            <p class="text-sm font-bold">GLOBE PROMOTION SERVICE</p>
-            <input v-model="globe" class="border-2 border-gray-300 rounded-md p-1" type="text"/>
           </div>
         </div>
       </div>
@@ -137,7 +186,7 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
 
     <div class="flex justify-center my-3">
       <button
-        class="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 hover:scale-110"
+        class="bg-blue-500 text-white py-2 px-32 rounded-md hover:bg-blue-600 hover:scale-110"
         @click="generatePDF"
       >
         Generate File
@@ -146,9 +195,8 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
 
     <!-- DEM0 -->
     <div class="rounded-md border-2 border-gray-300 p-8 mb-5 mx-5">
-      <div id="pdf-content" style="font-size: 12px; margin-left: 5rem; margin-right: 5rem;">
+      <div id="pdf-content" style="font-size: 12px; margin-left: 5rem; margin-right: 5rem; margin-top: 3rem;">
         <!-- BODY -->
-
         <p style="font-weight: bold; font-size: 0.9rem;">{{ title }}</p>
         <p style="margin-bottom: 0.75rem; font-weight: bold; font-size: 0.875rem;">{{ subtitle }}</p>
         <!-- table to show winners -->
@@ -180,44 +228,29 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
         </div>
 
         <!-- FOOTER -->
-        <div style="display: flex;">
+        <!-- PLACE AND DATE -->
+        <div style="display: flex; margin-bottom: 0.5rem;">
           <p style="font-weight: bold;">{{ placeAndDate }}</p>
         </div>
-        <!-- MENTERI SOSIAL DAN NOTATIS  -->
-        <div style="display: flex; justify-content: space-around; text-align: center;">
-          <div style="display: flex; flex-direction: column; gap: 4rem;">
-            <p style="font-weight: bold;">NOTARIS</p>
-            <p>{{ notaris }}</p>
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 4rem;">
-            <p style="font-weight: bold;">KEMENTERIAN SOSIAL RI</p>
-            <div style="display: flex; gap: 3rem;">
-              <p>{{ kementerianSosialLeft }}</p>
-              <p>{{ kementerianSosialRight }}</p>
+        
+        <!-- SIGNERS -->
+        <div style="width: 100%; display: flex; flex-wrap: wrap; margin-bottom: 3rem;">
+          <div
+            v-for="(signer, indexSigner) in signers"
+            :key="indexSigner"
+            style="width: 50%; display: flex; box-sizing: border-box; margin-bottom: 1rem;"
+          >
+            <div style="flex-direction: column; display: flex; gap: 4.5rem;">
+              <p style="font-weight: bold;">{{ signer.position }}</p>
+              <div style="display: flex; gap: 3rem;">
+                <p
+                  v-for="(name, indexName) in signer.name"
+                  :key="indexName"
+                >
+                  {{ name }}
+                </p>
+              </div>
             </div>
-          </div>
-        </div>
-
-        <!--DINAS SOSIAL DAN CIMB       -->
-        <div style="display: flex; justify-content: space-around; margin-top: 2rem; text-align: center;">
-          <div style="display: flex; flex-direction: column; gap: 4rem;">
-            <p style="font-weight: bold;">DINAS SOSIAL PROV DKI JAKARTA</p>
-            <p>{{ dinasSosial }}</p>
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 4rem;">
-            <p style="font-weight: bold;">KPT. Bank CIMB Niaga Tbk</p>
-            <div style="display: flex; gap: 3rem;">
-              <p>{{ cimbLeft }}</p>
-              <p>{{ cimbRight }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- GLOBE PROMOTION SERVICE-->
-        <div style="display: flex; justify-content: space-around; text-align: center; margin: 2rem 0;">
-          <div style="display: flex; flex-direction: column; gap: 4rem;">
-            <p style="font-weight: bold;">GLOBE PROMOTION SERVICE</p>
-            <p>{{ globe }}</p>
           </div>
         </div>
       </div>
