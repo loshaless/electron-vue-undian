@@ -12,7 +12,7 @@ export enum IpcChannels {
   GET_PRIZE = "get-prize",
   EDIT_PRIZE = "edit-prize",
   DELETE_PRIZE = "delete-prize",
-  GET_ALL_WINNER_DATA = "get-all-winner-data",
   FILE_DIALOG_CLOSED = "file-dialog-closed",
-  GET_TOTAL_CUMULATIVE_POINTS = "get-total-cumulative-points"
+  GET_TOTAL_CUMULATIVE_POINTS = "get-total-cumulative-points",
+  GET_WINNER_BY_CATEGORY = "get-winner-by-category"
 }

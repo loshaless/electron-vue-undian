@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import {ref} from 'vue'
+import {onMounted, ref} from 'vue'
 import MultiSelectComponent from '../components/MultiSelectComponent.vue';
 import html2pdf from "html2pdf.js"; // Import html2pdf.js
+import {IpcChannels} from '../constants/IpcChannels';
 
 const selectedPrizeId = ref<number[]>([])
 const categoryOptions = ref([
@@ -14,6 +15,7 @@ const categoryOptions = ref([
     name: 'Premium Prize'
   }
 ])
+const title = ref('Pemenang Lucky Draw Festival Fantasi Junior Indie')
 
 /* NAME INPUT */
 const notaris = ref('R.Kusmartono SH')
@@ -28,18 +30,25 @@ function generatePDF() {
   const element = document.getElementById('pdf-content');
   if (element) {
     const opt = {
-      filename: 'RollerSettings.pdf',
-      image: {type: 'jpeg', quality: 1.0},
-      html2canvas: {scale: 5},
+      margin: [0.5, 0.5, 0.5, 0.5], // top, left, bottom, right margins in inches
+      image: {type: 'jpeg', quality: 1},
+      html2canvas: {scale: 2},
       jsPDF: {unit: 'in', format: 'letter', orientation: 'portrait'}
     };
     html2pdf().set(opt).from(element).save();
   }
 }
 
+/* GET WINNER BY CATEGORY */
+const winners = ref<any>([])
+
 function fillBody() {
-  window.ipcRenderer.send('get-winner-by-category', selectedPrizeId.value)
+  window.ipcRenderer.send(IpcChannels.GET_WINNER_BY_CATEGORY, [...selectedPrizeId.value])
 }
+
+window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) => {
+  winners.value = listOfWinner
+})
 
 </script>
 
@@ -55,12 +64,15 @@ function fillBody() {
           @update:modelValue="selectedPrizeId = $event"
         />
         <button
-          class="ml-3 bg-blue-500 text-white px-4 py-2 rounded-md"
+          class="ml-3 bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
           @click="fillBody()"
         >
           apply settings
         </button>
-        <button class="bg-blue-500 text-white px-4 py-2 rounded-md" @click="generatePDF">Generate PDF</button>
+      </div>
+      <div class="flex gap-3 my-3 items-center">
+        <p class="font-bold">Title: </p>
+        <input v-model="title" class="border-2 border-gray-300 rounded-md p-1 w-1/2" type="text"/>
       </div>
       <div class="mt-3">
         <p class="font-bold">Footer Settings</p>
@@ -106,10 +118,47 @@ function fillBody() {
       </div>
     </div>
 
+    <div class="flex justify-center my-3">
+      <button
+        class="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
+        @click="generatePDF"
+      >
+        Generate PDF
+      </button>
+    </div>
+
     <!-- DEM0 -->
-    <div class="rounded-md border-2 border-gray-300 p-3 my-8 mx-3">
+    <div class="rounded-md border-2 border-gray-300 p-8 mb-5">
       <div id="pdf-content" class="small-text">
         <!-- BODY -->
+
+        <p class="mb-3 font-bold text-sm">{{ title }}</p>
+        <!-- table to show winners -->
+        <div class="flex justify-center items-center mb-8">
+          <table class="table-auto w-full border-gray-300">
+            <thead>
+            <tr>
+              <th class="p-1 border bg-purple-500">No</th>
+              <th class="p-1 border bg-purple-500">Prize</th>
+              <th class="p-1 border bg-purple-500">RollId</th>
+              <th class="p-1 border bg-purple-500">Customer Name</th>
+              <th class="p-1 border bg-purple-500">Area</th>
+              <th class="p-1 border bg-purple-500">Time</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(winner, index) in winners" :key="winner.id">
+              <td class="border text-center">{{ index + 1 }}</td>
+              <td class="border text-center">{{ winner.prize_name }}</td>
+              <td class="border text-center">{{ winner.roll_id }}</td>
+              <td class="border text-center">{{ winner.customer_name }}</td>
+              <td class="border text-center">{{ winner.region }}</td>
+              <td class="border text-center">{{ winner.created_at }}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
         <!-- FOOTER -->
         <!-- MENTERI SOSIAL DAN NOTATIS  -->
         <div class="flex justify-around text-center">
@@ -155,6 +204,6 @@ function fillBody() {
 
 <style scoped>
 .small-text {
-  font-size: 8px;
+  font-size: 10px;
 }
 </style>
