@@ -293,12 +293,6 @@ onMounted(() => {
       <div class="flex gap-4 items-center justify-center">
         <button
           class="rounded-md bg-green-700 text-white hover:bg-amber-500 cursor-pointer py-3 px-8"
-          @click="getPrize()"
-        >
-          Get Prize
-        </button>
-        <button
-          class="rounded-md bg-green-700 text-white hover:bg-amber-500 cursor-pointer py-3 px-8"
           @click="isModalOpen = true"
         >
           Create New Prize

@@ -17,7 +17,7 @@ import {WinnerView} from "../../../src/constants/WinnerView";
 
 async function migrateCustomerToRollByBalanceAndRegionThenReturnCumulativePoints(minBalance: number, region: string): Promise<number> {
   try {
-    const batchSize = 10000; // adjust based on memory constraints
+    const batchSize = 4000; // adjust based on memory constraints
     let offset = 0
     let cumulativePoints = 0;
 
@@ -33,7 +33,7 @@ async function migrateCustomerToRollByBalanceAndRegionThenReturnCumulativePoints
 
       await Promise.all(insertPromises);
       offset += batchSize;
-      console.log(`Processed ${customers.length} customers.`);
+      console.log(`Processed ${offset} customers.`);
     }
   } catch (error) {
     throw new Error(`Migration failed: , ${error}`);

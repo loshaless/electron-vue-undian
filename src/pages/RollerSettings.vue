@@ -232,7 +232,7 @@ onMounted(() => {
                 <input
                   id="showWinnerTime"
                   v-model="rollAnimationTime"
-                  class="mt-4 p-2 border border-gray-800 rounded"
+                  class="p-2 border border-gray-800 rounded"
                   placeholder="input animation time in second"
                   min="1"
                   type="number"
@@ -243,7 +243,7 @@ onMounted(() => {
                 <input
                   id="showWinnerTime"
                   v-model="showWinnerTime"
-                  class="mt-4 p-2 border border-gray-800 rounded"
+                  class="p-2 border border-gray-800 rounded"
                   placeholder="input show winner time in second"
                   min="1"
                   type="number"

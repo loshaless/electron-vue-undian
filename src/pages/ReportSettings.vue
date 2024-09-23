@@ -12,6 +12,10 @@ const categoryOptions = ref([
   {
     id: 2,
     name: 'Premium Prize'
+  },
+  {
+    id: 3,
+    name: 'Lucky Prize'
   }
 ])
 

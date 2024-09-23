@@ -1,11 +1,22 @@
 import { dbRun, dbGet, dbAll } from "../database/init";
 
-export async function deleteCustomerData() {
-  await dbRun(`DELETE FROM customer`);
+export async function dropCustomerTable() {
+  await dbRun(`DROP TABLE customer`);
 }
 
-export async function resetCustomerSequence() {
-  await dbRun(`DELETE FROM sqlite_sequence WHERE name='customer'`);
+export async function createCustomerTable() {
+  await dbRun(`CREATE TABLE IF NOT EXISTS customer (
+      customer_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      cif VARCHAR(255),
+      account VARCHAR(100),
+      name VARCHAR(100),
+      branch VARCHAR(100),
+      region VARCHAR(100),
+      points INTEGER,
+      cumulative_points INTEGER,
+      balance INTEGER,
+      roll_id INTEGER
+    )`);
 }
 
 export async function isCustomerDataExist() {

@@ -3,7 +3,7 @@ import {dialog, ipcMain} from "electron";
 import fs from "fs";
 import readline from "readline";
 import {db, dbRun} from "../database/init";
-import {deleteCustomerData, resetCustomerSequence, isCustomerDataExist, getTotalCumulativePoints} from "../database/customerDB";
+import {dropCustomerTable, createCustomerTable, isCustomerDataExist, getTotalCumulativePoints} from "../database/customerDB";
 import { windows } from "..";
 
 ipcMain.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, async (event, filePath) => {
@@ -71,11 +71,11 @@ ipcMain.on(IpcChannels.DELETE_CUSTOMER_IN_DATABASE, async (event) => {
   try {
     await dbRun('BEGIN TRANSACTION');
 
-    await deleteCustomerData();
-    console.log("All data deleted successfully");
+    await dropCustomerTable();
+    console.log("All customerdata drop successfully");
 
-    await resetCustomerSequence();
-    console.log("ID sequence reset successfully");
+    await createCustomerTable();
+    console.log("customer table created successfully");
 
     await dbRun('COMMIT');
     event.sender.send(IpcChannels.IS_CUSTOMER_DATA_EXIST, false);

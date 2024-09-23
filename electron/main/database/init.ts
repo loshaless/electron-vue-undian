@@ -1,6 +1,7 @@
 import sqlite3 from "sqlite3";
 import { promisify } from 'util';
 const DBSOURCE = "db.sqlite";
+import { createCustomerTable } from "./customerDB";
 
 export const db = new sqlite3.Database(DBSOURCE, (err) => {
   if (err) {
@@ -10,26 +11,14 @@ export const db = new sqlite3.Database(DBSOURCE, (err) => {
   console.log("init database");
 
   db.serialize(() => {
-    db.run(`CREATE TABLE IF NOT EXISTS customer (
-      customer_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      cif TEXT,
-      account TEXT,
-      name TEXT,
-      branch TEXT,
-      region TEXT,
-      points INTEGER,
-      cumulative_points INTEGER,
-      balance INTEGER,
-      roll_id INTEGER
-    )`);
+    createCustomerTable()
 
     db.run(`CREATE TABLE IF NOT EXISTS prize (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT,
+      name VARCHAR(255),
       detail TEXT
     )`);
 
-    db.run(`drop table roll`)
     db.run(`CREATE TABLE IF NOT EXISTS roll (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       customer_id INTEGER,
@@ -37,14 +26,13 @@ export const db = new sqlite3.Database(DBSOURCE, (err) => {
       cumulative_points INTEGER
     )`);
 
-    db.run(`drop table winner`)
     db.run(`CREATE TABLE IF NOT EXISTS winner (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      prize_name TEXT,
+      prize_name VARCHAR(255),
       roll_id INTEGER,
-      customer_name TEXT,
-      region TEXT,
-      category INTEGER,
+      customer_name VARCHAR(100),
+      region VARCHAR(100),
+      category VARCHAR(100),
       created_at TIMESTAMP DEFAULT (DATETIME('now', 'localtime'))
     )`);
   });
