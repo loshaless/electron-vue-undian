@@ -13,7 +13,7 @@ ipcMain.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, async (event, filePath)
   });
 
   let inserted = 0;
-  const batchSize = 100; // Adjust the batch size as needed
+  const batchSize = 4000; // Adjust the batch size as needed
   let batch = [];
   const insertPromises = [];
   let cumulativePoints = 0
