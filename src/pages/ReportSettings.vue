@@ -58,12 +58,16 @@ function addSigner() {
   })
 }
 
+function removeSigner(indexSigner: number) {
+  signers.value.splice(indexSigner, 1)
+}
+
 function addName(indexSigner: number) {
   signers.value[indexSigner].name.push('signer name')
 }
 
-function removeName(indexSigner: number) {
-  signers.value[indexSigner].name.pop()
+function removeName(indexSigner: number, indexName: number) {
+  signers.value[indexSigner].name.splice(indexName, 1)
 }
 
 /* DATE INPUT */
@@ -138,36 +142,47 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
             :key="indexSigner"
             class="w-1/2 flex box-border mt-6"
           >
-            <div class="flex flex-col gap-10 w-full">
-              <input
-                v-model="signer.position"
-                class="border-2 border-gray-300 rounded-md p-1 font-bold mr-4"
-                type="text"
-              />
-              <div class="flex gap-3">
-                <button
-                  v-if="signer.name.length > 1"
-                  class="w-max-1/2 bg-red-500 text-white p-2 rounded-md hover:bg-red-600 hover:scale-105"
-                  @click="removeName(indexSigner)"
-                >
-                  Remove Signer Name
-                </button>
-                <button
-                  v-if="signer.name.length < 4"
-                  class="bg-green-500 text-white p-2 rounded-md hover:bg-green-600 hover:scale-105"
-                  @click="addName(indexSigner)"
-                >
-                  Add Signer Name
-                </button>
-              </div>
-              <div class="flex">
+            <div class="flex flex-col gap-20 w-full">
+              <div class="border-2 border-gray-300 rounded-md p-1 font-bold mr-4 flex gap-3">
                 <input
+                  class="w-full"
+                  v-model="signer.position"
+                  type="text"
+                />
+                <!-- close icon -->
+                 <div 
+                  class="rounded-full bg-red-500 flex items-center justify-center text-white px-2 cursor-pointer hover:bg-red-600 hover:scale-110"
+                  @click="removeSigner(indexSigner)"
+                >
+                  X
+                 </div>
+              </div>
+              <div class="flex w-full items-center">
+                <div 
                   v-for="(name, indexName) in signer.name"
                   :key="indexName"
-                  v-model="signer.name[indexName]"
-                  class="w-1/4 border-2 border-gray-300 rounded-md p-1 mr-3"
-                  type="text"
+                  class="border-2 border-gray-300 rounded-md p-1 flex gap-2 w-1/4 mr-2"
                 >
+                  <input
+                    class="w-3/4"
+                    v-model="signer.name[indexName]"
+                    type="text"
+                  >
+                  <div 
+                    v-if="signer.name.length > 1"
+                    class="rounded-full bg-gray-600 text-white m-auto cursor-pointer hover:bg-red-600 hover:scale-110 px-2"
+                    @click="removeName(indexSigner, indexName)"
+                  >
+                    X
+                  </div>
+                </div>
+                <div
+                  v-if="signer.name.length < 4"
+                  @click="addName(indexSigner)"
+                  class="rounded-full bg-purple-800 text-white flex items-center justify-center font-bold text-xl cursor-pointer hover:bg-purple-900 hover:scale-110 px-2"
+                >
+                  +
+                </div>
               </div>
             </div>
           </div>
