@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import {computed, onMounted, ref} from "vue";
-import SelectComponent from "../components/SelectComponent.vue";
+import {onMounted, ref} from "vue";
+import MultiSelectComponent from "../components/MultiSelectComponent.vue";
 import ModalComponent from "../components/ModalComponent.vue";
 import {IpcChannels} from "../constants/IpcChannels";
 import SwitchComponent from "../components/SwitchComponent.vue";
@@ -8,8 +8,8 @@ import SwitchComponent from "../components/SwitchComponent.vue";
 const isLoadingInAction = ref(false)
 
 interface Quota {
-  value: string;
-  text: string;
+  value: string[];
+  text: string[];
   numOfItem: number;
 }
 
@@ -18,6 +18,8 @@ const isModalOpen = ref(false)
 const isLoadingInModal = ref(false)
 
 function handleModalOpen(isOpen: boolean) {
+  getPrize()
+  
   if (!isOpen) {
     quotas.value = []
     prizeName.value = ''
@@ -33,147 +35,147 @@ const allRegionQuota = ref(1)
 const quotas = ref<Quota[]>([]);
 const provinces = [
   {
-    value: 'Aceh',
-    text: 'Aceh'
+    id: 'Aceh',
+    name: 'Aceh'
   },
   {
-    value: 'Sumatera Utara',
-    text: 'Sumatera Utara'
+    id: 'Sumatera Utara',
+    name: 'Sumatera Utara'
   },
   {
-    value: 'Sumatera Barat',
-    text: 'Sumatera Barat'
+    id: 'Sumatera Barat',
+    name: 'Sumatera Barat'
   },
   {
-    value: 'Riau',
-    text: 'Riau'
+    id: 'Riau',
+    name: 'Riau'
   },
   {
-    value: 'Jambi',
-    text: 'Jambi'
+    id: 'Jambi',
+    name: 'Jambi'
   },
   {
-    value: 'Sumatera Selatan',
-    text: 'Sumatera Selatan'
+    id: 'Sumatera Selatan',
+    name: 'Sumatera Selatan'
   },
   {
-    value: 'Bengkulu',
-    text: 'Bengkulu'
+    id: 'Bengkulu',
+    name: 'Bengkulu'
   },
   {
-    value: 'Lampung',
-    text: 'Lampung'
+    id: 'Lampung',
+    name: 'Lampung'
   },
   {
-    value: 'Kepulauan Bangka Belitung',
-    text: 'Kepulauan Bangka Belitung'
+    id: 'Kepulauan Bangka Belitung',
+    name: 'Kepulauan Bangka Belitung'
   },
   {
-    value: 'Kepulauan Riau',
-    text: 'Kepulauan Riau'
+    id: 'Kepulauan Riau',
+    name: 'Kepulauan Riau'
   },
   {
-    value: 'DKI Jakarta',
-    text: 'DKI Jakarta'
+    id: 'DKI Jakarta',
+    name: 'DKI Jakarta'
   },
   {
-    value: 'Jawa Barat',
-    text: 'Jawa Barat'
+    id: 'Jawa Barat',
+    name: 'Jawa Barat'
   },
   {
-    value: 'Jawa Tengah',
-    text: 'Jawa Tengah'
+    id: 'Jawa Tengah',
+    name: 'Jawa Tengah'
   },
   {
-    value: 'DI Yogyakarta',
-    text: 'DI Yogyakarta'
+    id: 'DI Yogyakarta',
+    name: 'DI Yogyakarta'
   },
   {
-    value: 'Jawa Timur',
-    text: 'Jawa Timur'
+    id: 'Jawa Timur',
+    name: 'Jawa Timur'
   },
   {
-    value: 'Banten',
-    text: 'Banten'
+    id: 'Banten',
+    name: 'Banten'
   },
   {
-    value: 'Bali',
-    text: 'Bali'
+    id: 'Bali',
+    name: 'Bali'
   },
   {
-    value: 'Nusa Tenggara Barat',
-    text: 'Nusa Tenggara Barat'
+    id: 'Nusa Tenggara Barat',
+    name: 'Nusa Tenggara Barat'
   },
   {
-    value: 'Nusa Tenggara Timur',
-    text: 'Nusa Tenggara Timur'
+    id: 'Nusa Tenggara Timur',
+    name: 'Nusa Tenggara Timur'
   },
   {
-    value: 'Kalimantan Barat',
-    text: 'Kalimantan Barat'
+    id: 'Kalimantan Barat',
+    name: 'Kalimantan Barat'
   },
   {
-    value: 'Kalimantan Tengah',
-    text: 'Kalimantan Tengah'
+    id: 'Kalimantan Tengah',
+    name: 'Kalimantan Tengah'
   },
   {
-    value: 'Kalimantan Selatan',
-    text: 'Kalimantan Selatan'
+    id: 'Kalimantan Selatan',
+    name: 'Kalimantan Selatan'
   },
   {
-    value: 'Kalimantan Timur',
-    text: 'Kalimantan Timur'
+    id: 'Kalimantan Timur',
+    name: 'Kalimantan Timur'
   },
   {
-    value: 'Kalimantan Utara',
-    text: 'Kalimantan Utara'
+    id: 'Kalimantan Utara',
+    name: 'Kalimantan Utara'
   },
   {
-    value: 'Sulawesi Utara',
-    text: 'Sulawesi Utara'
+    id: 'Sulawesi Utara',
+    name: 'Sulawesi Utara'
   },
   {
-    value: 'Sulawesi Tengah',
-    text: 'Sulawesi Tengah'
+    id: 'Sulawesi Tengah',
+    name: 'Sulawesi Tengah'
   },
   {
-    value: 'Sulawesi Selatan',
-    text: 'Sulawesi Selatan'
+    id: 'Sulawesi Selatan',
+    name: 'Sulawesi Selatan'
   },
   {
-    value: 'Sulawesi Tenggara',
-    text: 'Sulawesi Tenggara'
+    id: 'Sulawesi Tenggara',
+    name: 'Sulawesi Tenggara'
   },
   {
-    value: 'Gorontalo',
-    text: 'Gorontalo'
+    id: 'Gorontalo',
+    name: 'Gorontalo'
   },
   {
-    value: 'Sulawesi Barat',
-    text: 'Sulawesi Barat'
+    id: 'Sulawesi Barat',
+    name: 'Sulawesi Barat'
   },
   {
-    value: 'Maluku',
-    text: 'Maluku'
+    id: 'Maluku',
+    name: 'Maluku'
   },
   {
-    value: 'Maluku Utara',
-    text: 'Maluku Utara'
+    id: 'Maluku Utara',
+    name: 'Maluku Utara'
   },
   {
-    value: 'Papua',
-    text: 'Papua'
+    id: 'Papua',
+    name: 'Papua'
   },
   {
-    value: 'Papua Barat',
-    text: 'Papua Barat'
+    id: 'Papua Barat',
+    name: 'Papua Barat'
   }
 ]
 
 function addRow() {
   quotas.value.push({
-    value: 'DKI Jakarta',
-    text: 'DKI Jakarta',
+    value: ['DKI Jakarta'],
+    text: ['DKI Jakarta'],
     numOfItem: 1
   },)
 }
@@ -184,8 +186,8 @@ function saveNewPrize() {
   if (isAllRegion.value) {
     quotas.value = [
       {
-        value: 'All Region',
-        text: 'All Region',
+        value: ['All Region'],
+        text: ['All Region'],
         numOfItem: allRegionQuota.value
       }
     ]
@@ -232,13 +234,15 @@ const editedPrizeId = ref(0)
 
 function editPrize(prize: Prize) {
   editedPrizeId.value = prize.id
-  quotas.value = prize.detail
   prizeName.value = prize.name
   isModalOpen.value = true
 
-  if (prize.detail[0].value === 'All Region') {
+  if (prize.detail[0].value[0] === 'All Region') {
+    quotas.value = prize.detail
+    isAllRegion.value = true
     allRegionQuota.value = prize.detail[0].numOfItem
   } else {
+    quotas.value = []
     isAllRegion.value = false
   }
 }
@@ -250,8 +254,8 @@ function saveEditedPrize() {
   if (isAllRegion.value) {
     quotas.value = [
       {
-        value: 'All Region',
-        text: 'All Region',
+        value: ['All Region'],
+        text: ['All Region'],
         numOfItem: allRegionQuota.value
       }
     ]
@@ -388,17 +392,17 @@ onMounted(() => {
 
         <div
           v-for="(item, index) in quotas"
-          :id="item.value"
+          :key="index"
           class="flex gap-3 items-center mt-3"
         >
-          <select-component
-            :id="index"
-            :model-value="quotas[index].value"
+          <multi-select-component
             :options="provinces"
-            @update:model-value="quotas[index].text = $event; quotas[index].value = $event"
+            placeholder="Select Province"
+            :selected-options="item.value"
+            @update:modelValue="item.text = $event; item.value = $event"
           />
           <input
-            v-model="quotas[index].numOfItem"
+            v-model="item.numOfItem"
             class="border-gray-300 rounded p-2 border"
             placeholder="total pemenang"
             type="text"

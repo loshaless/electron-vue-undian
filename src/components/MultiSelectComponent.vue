@@ -2,11 +2,12 @@
 import {ref, computed} from 'vue';
 
 const props = defineProps<{
-  options: { id: number, name: string }[],
-  placeholder?: string
+  options: { id: any, name: string }[],
+  placeholder?: string,
+  selectedOptions: any[]
 }>();
 
-const selectedOptions = ref<number[]>([]);
+const selectedOptions = ref<number[]>(props.selectedOptions);
 const searchQuery = ref('');
 const isOpen = ref(false);
 
@@ -82,7 +83,7 @@ const selectedOptionNames = computed(() => {
           v-for="option in filteredOptions"
           :key="option.id"
           class="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
-          @click="toggleOption(option.id)"
+          @click="toggleOption(option.id);"
         >
           <input
             :id="`option-${option.id}`"
@@ -99,7 +100,3 @@ const selectedOptionNames = computed(() => {
     </div>
   </div>
 </template>
-
-<style scoped>
-/* Add any additional styles here */
-</style>
