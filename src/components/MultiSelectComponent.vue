@@ -1,11 +1,15 @@
 <script lang="ts" setup>
-import {ref, computed} from 'vue';
+import {ref, computed, watch} from 'vue';
 
 const props = defineProps<{
   options: { id: any, name: string }[],
   placeholder?: string,
   selectedOptions?: any[]
 }>();
+
+watch(() => props.selectedOptions || [], (newVal) => {
+  selectedOptions.value = newVal
+})
 
 const selectedOptions = ref<number[]>(props.selectedOptions || []);
 const searchQuery = ref('');

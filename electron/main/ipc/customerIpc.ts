@@ -5,8 +5,11 @@ import readline from "readline";
 import {db, dbRun} from "../database/init";
 import {dropCustomerTable, createCustomerTable, isCustomerDataExist, getTotalCumulativePoints} from "../database/customerDB";
 import { windows } from "..";
+import { CustomerTable } from "../../../src/constants/types/CustomerTable";
 
-ipcMain.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, async (event, filePath) => {
+ipcMain.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, async (event, filePath, listOfCustomerTable: CustomerTable[]) => {
+  console.log(listOfCustomerTable);
+  
   const rl = readline.createInterface({
     input: fs.createReadStream(filePath),
     crlfDelay: Infinity,

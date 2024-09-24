@@ -2,6 +2,7 @@ import sqlite3 from "sqlite3";
 import { promisify } from 'util';
 const DBSOURCE = "db.sqlite";
 import { createCustomerTable } from "./customerDB";
+import { createCategoryTable } from "./categoryDB";
 
 export const db = new sqlite3.Database(DBSOURCE, (err) => {
   if (err) {
@@ -25,6 +26,8 @@ export const db = new sqlite3.Database(DBSOURCE, (err) => {
       points INTEGER,
       cumulative_points INTEGER
     )`);
+
+    createCategoryTable()
 
     db.run(`CREATE TABLE IF NOT EXISTS winner (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
