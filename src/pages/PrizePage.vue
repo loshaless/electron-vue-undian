@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {onMounted, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import MultiSelectComponent from "../components/MultiSelectComponent.vue";
 import ModalComponent from "../components/ModalComponent.vue";
 import {IpcChannels} from "../constants/IpcChannels";
@@ -8,31 +8,54 @@ import SwitchComponent from "../components/SwitchComponent.vue";
 const isLoadingInAction = ref(false)
 
 interface Quota {
-  value: string[];
-  text: string[];
+  id: string[];
+  name: string[];
   numOfItem: number;
 }
 
 /* MODAL */
-const isModalOpen = ref(false)
-const isLoadingInModal = ref(false)
+const modalPrizeState = reactive({
+  isOpen: false,
+  isLoading: false,
+  name: "",
+  quotas: [] as Quota[]
+})
 
-function handleModalOpen(isOpen: boolean) {
-  getPrize()
-  
-  if (!isOpen) {
-    quotas.value = []
-    prizeName.value = ''
-    editedPrizeId.value = 0
-  }
-  isModalOpen.value = isOpen
+function openModalCreatePrize(isOpen: boolean) {
+  modalPrizeState.isOpen = isOpen
+  modalPrizeState.name = ""
+  editedPrizeId.value = 0
+  modalPrizeState.quotas = []
+  allRegionState.isActive = true
+  allRegionState.quota = 1
 }
 
-/* ADD PRIZE */
-const prizeName = ref("");
-const isAllRegion = ref(true)
-const allRegionQuota = ref(1)
-const quotas = ref<Quota[]>([]);
+function openModalEditPrize(prize: Prize) {
+  modalPrizeState.isOpen = true
+  modalPrizeState.name = prize.name
+  editedPrizeId.value = prize.id
+
+  if (prize.detail[0]?.id[0] === 'All Region') {
+    allRegionState.isActive = true
+    allRegionState.quota = prize.detail[0].numOfItem
+  }
+  else {
+    allRegionState.isActive = false
+    modalPrizeState.quotas = JSON.parse(JSON.stringify(prize.detail))
+  }
+}
+
+/* SWITCH ALL REGION */
+const allRegionState = reactive({
+  isActive: true,
+  quota: 1
+})
+
+function switchAllRegion(isActive: boolean) {
+  allRegionState.isActive = isActive
+}
+
+/* ADD PRIZE FOR CERTAIN REGION */
 const provinces = [
   {
     id: 'Aceh',
@@ -173,35 +196,38 @@ const provinces = [
 ]
 
 function addRow() {
-  quotas.value.push({
-    value: ['DKI Jakarta'],
-    text: ['DKI Jakarta'],
+  modalPrizeState.quotas.push({
+    id: ['DKI Jakarta'],
+    name: ['DKI Jakarta'],
     numOfItem: 1
   },)
 }
 
 function saveNewPrize() {
-  isLoadingInModal.value = true
+  modalPrizeState.isLoading = true
 
-  if (isAllRegion.value) {
-    quotas.value = [
-      {
-        value: ['All Region'],
-        text: ['All Region'],
-        numOfItem: allRegionQuota.value
-      }
-    ]
+  if (allRegionState.isActive) {
+    window.ipcRenderer.send(IpcChannels.ADD_PRIZE, {
+      name: modalPrizeState.name,
+      detail: JSON.stringify([{
+        id: ['All Region'],
+        name: ['All Region'],
+        numOfItem: allRegionState.quota
+      }])
+    })
   }
 
-  window.ipcRenderer.send(IpcChannels.ADD_PRIZE, {
-    name: prizeName.value,
-    detail: JSON.stringify(quotas.value)
-  })
+  else {
+    window.ipcRenderer.send(IpcChannels.ADD_PRIZE, {
+      name: modalPrizeState.name,
+      detail: JSON.stringify(modalPrizeState.quotas)
+    })
+  }
 }
 
 window.ipcRenderer.on(IpcChannels.ADD_PRIZE, (event) => {
-  isLoadingInModal.value = false
-  handleModalOpen(false)
+  modalPrizeState.isLoading = false
+  modalPrizeState.isOpen = false
   getPrize()
 })
 
@@ -232,46 +258,34 @@ window.ipcRenderer.on(IpcChannels.GET_PRIZE, (event, rows) => {
 /* EDIT PRIZE */
 const editedPrizeId = ref(0)
 
-function editPrize(prize: Prize) {
-  editedPrizeId.value = prize.id
-  prizeName.value = prize.name
-  isModalOpen.value = true
-
-  if (prize.detail[0].value[0] === 'All Region') {
-    quotas.value = prize.detail
-    isAllRegion.value = true
-    allRegionQuota.value = prize.detail[0].numOfItem
-  } else {
-    quotas.value = []
-    isAllRegion.value = false
-  }
-}
-
 function saveEditedPrize() {
-  isLoadingInModal.value = true
+  modalPrizeState.isLoading = true
   isLoadingInAction.value = true
 
-  if (isAllRegion.value) {
-    quotas.value = [
-      {
-        value: ['All Region'],
-        text: ['All Region'],
-        numOfItem: allRegionQuota.value
-      }
-    ]
+  if (allRegionState.isActive) {
+    window.ipcRenderer.send(IpcChannels.EDIT_PRIZE, {
+      id: editedPrizeId.value,
+      name: modalPrizeState.name,
+      detail: JSON.stringify([{
+        id: ['All Region'],
+        name: ['All Region'],
+        numOfItem: allRegionState.quota
+      }])
+    })
   }
-
-  window.ipcRenderer.send(IpcChannels.EDIT_PRIZE, {
-    id: editedPrizeId.value,
-    name: prizeName.value,
-    detail: JSON.stringify(quotas.value)
-  })
+  else {
+    window.ipcRenderer.send(IpcChannels.EDIT_PRIZE, {
+      id: editedPrizeId.value,
+      name: modalPrizeState.name,
+      detail: JSON.stringify(modalPrizeState.quotas)
+    })
+  }
 }
 
 window.ipcRenderer.on(IpcChannels.EDIT_PRIZE, () => {
-  isLoadingInModal.value = false
+  modalPrizeState.isLoading = false
   isLoadingInAction.value = false
-  handleModalOpen(false)
+  modalPrizeState.isOpen = false
   getPrize()
 })
 
@@ -282,8 +296,8 @@ function deletePrize(id: number) {
 }
 
 window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
-  isLoadingInAction.value = false
   getPrize()
+  isLoadingInAction.value = false
 })
 
 onMounted(() => {
@@ -297,7 +311,7 @@ onMounted(() => {
       <div class="flex gap-4 items-center justify-center">
         <button
           class="rounded-md bg-green-700 text-white hover:bg-amber-500 cursor-pointer py-3 px-8"
-          @click="isModalOpen = true"
+          @click="openModalCreatePrize(true)"
         >
           Create New Prize
         </button>
@@ -321,7 +335,7 @@ onMounted(() => {
             <td class="border px-4 py-2">
               <ul>
                 <li v-for="(quota, index) in prize.detail" :key="index">
-                  {{ quota.text }}: {{ quota.numOfItem }}
+                  {{ quota.name }}: {{ quota.numOfItem }}
                 </li>
               </ul>
             </td>
@@ -332,7 +346,7 @@ onMounted(() => {
               >
                 <button
                   class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
-                  @click="editPrize(prize)"
+                  @click="openModalEditPrize(prize)"
                 >
                   Edit
                 </button>
@@ -351,14 +365,14 @@ onMounted(() => {
     </div>
 
     <modal-component
-      :is-loading="isLoadingInModal"
-      :is-open="isModalOpen"
-      @update:isOpen="handleModalOpen($event)"
+      :is-loading="modalPrizeState.isLoading"
+      :is-open="modalPrizeState.isOpen"
+      @update:isOpen="modalPrizeState.isOpen = $event"
     >
       <div>
         <label>Prize Name : </label>
         <input
-          v-model="prizeName"
+          v-model="modalPrizeState.name"
           class="border-gray-300 rounded p-2 border"
           placeholder="prize name"
           type="text"
@@ -367,19 +381,19 @@ onMounted(() => {
 
       <div class="flex gap-3 mt-3 items-center">
         <switch-component
-          v-model:value="isAllRegion"
-          @input="isAllRegion = $event"
+          v-model:value="allRegionState.isActive"
+          @input="switchAllRegion($event)"
         />
         <p>For All Region?</p>
         <input
-          v-if="isAllRegion"
-          v-model="allRegionQuota"
+          v-if="allRegionState.isActive"
+          v-model="allRegionState.quota"
           class="border-gray-300 rounded p-2 border"
           placeholder="prize quota"
           type="number"
         >
       </div>
-      <div v-if="!isAllRegion">
+      <div v-if="!allRegionState.isActive">
         <div class="mt-3 flex items-center gap-3">
           <p>Quota Detail : </p>
           <button
@@ -391,15 +405,15 @@ onMounted(() => {
         </div>
 
         <div
-          v-for="(item, index) in quotas"
+          v-for="(item, index) in modalPrizeState.quotas"
           :key="index"
           class="flex gap-3 items-center mt-3"
         >
           <multi-select-component
             :options="provinces"
             placeholder="Select Province"
-            :selected-options="item.value"
-            @update:modelValue="item.text = $event; item.value = $event"
+            :selected-options="item.id"
+            @update:modelValue="item.id = $event; item.name = $event"
           />
           <input
             v-model="item.numOfItem"
@@ -408,11 +422,12 @@ onMounted(() => {
             type="text"
           >
           <span
+            v-if="modalPrizeState.quotas.length > 1"
             class="rounded-full bg-red-700 hover:bg-orange-700 cursor-pointer px-3 py-1 text-white hover:scale-110"
-            @click="quotas.splice(index, 1)"
+            @click="modalPrizeState.quotas.splice(index, 1)"
           >
-          X
-        </span>
+            X
+          </span>
         </div>
       </div>
 
@@ -421,7 +436,7 @@ onMounted(() => {
           class="rounded-md bg-green-700 text-white hover:bg-amber-500 cursor-pointer py-3 px-8 w-3/4"
           @click="editedPrizeId ? saveEditedPrize() : saveNewPrize()"
         >
-          {{ editedPrizeId ? `Edit Prize ${editedPrizeId}` : 'Create New Prize' }}
+          {{ editedPrizeId ? `Edit Prize Id: ${editedPrizeId}` : 'Create New Prize' }}
         </button>
       </div>
     </modal-component>
