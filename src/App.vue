@@ -4,7 +4,7 @@ import ReportPage from "./pages/ReportSettings.vue";
 import {Ref, ref} from "vue";
 import RollerPage from "./pages/RollerSettings.vue";
 import PrizePage from "./pages/PrizePage.vue";
-import {IpcChannels} from "./constants/IpcChannels";
+import {IpcChannels} from "./constants/enum/IpcChannels";
 
 const PAGE = {
   UPLOAD_PAGE: "UPLOAD_PAGE",

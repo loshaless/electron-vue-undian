@@ -1,8 +1,9 @@
 <script lang="ts" setup>
-import {IpcChannels} from "../constants/IpcChannels";
-import {ref, onBeforeMount} from "vue";
+import {IpcChannels} from "../constants/enum/IpcChannels";
+import {ref, onBeforeMount, onMounted} from "vue";
 import TooltipComponent from "../components/TooltipComponent.vue";
 import LoadingComponent from "../components/LoadingComponent.vue";
+import { Prize } from "../constants/types/Prize";
 
 /* CHECK PATH OF URL */
 const pathUrl = ref("");
@@ -30,6 +31,9 @@ const isDataExist = ref(false);
 window.ipcRenderer.on(IpcChannels.IS_CUSTOMER_DATA_EXIST, (event, isExist) => {
   isDataExist.value = isExist;
 });
+onBeforeMount(() => {
+  window.ipcRenderer.send(IpcChannels.IS_CUSTOMER_DATA_EXIST);
+});
 
 /* DELETE DATA */
 function deleteData() {
@@ -54,9 +58,23 @@ window.ipcRenderer.on(IpcChannels.UPLOAD_COMPLETE, (event, isDone) => {
   pathUrl.value = ''
 })
 
-onBeforeMount(() => {
-  window.ipcRenderer.send(IpcChannels.IS_CUSTOMER_DATA_EXIST);
-});
+/* GET LIST OF PRIZE */
+onMounted(() => {
+  window.ipcRenderer.send(IpcChannels.GET_PRIZE)
+})
+
+const prizes = ref<Prize[]>([])
+window.ipcRenderer.on(IpcChannels.GET_PRIZE, (event, rows) => {
+  if (rows) {
+    prizes.value = rows.map((row: any) => {
+      return {
+        id: row.id,
+        name: row.name,
+        detail: JSON.parse(row.detail)
+      }
+    })
+  }
+})
 </script>
 
 <template>

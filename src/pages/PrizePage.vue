@@ -2,17 +2,13 @@
 import {onMounted, reactive, ref} from "vue";
 import MultiSelectComponent from "../components/MultiSelectComponent.vue";
 import ModalComponent from "../components/ModalComponent.vue";
-import {IpcChannels} from "../constants/IpcChannels";
+import {IpcChannels} from "../constants/enum/IpcChannels";
 import SwitchComponent from "../components/SwitchComponent.vue";
-import { provinces } from "../constants/provinces";
+import { provinces } from "../constants/data/provinces";
+import { Quota } from "../constants/types/Quota";
+import { Prize } from "../constants/types/Prize";
 
 const isLoadingInAction = ref(false)
-
-interface Quota {
-  id: string[];
-  name: string[];
-  numOfItem: number;
-}
 
 /* MODAL */
 const modalPrizeState = reactive({
@@ -92,12 +88,6 @@ window.ipcRenderer.on(IpcChannels.ADD_PRIZE, (event) => {
   modalPrizeState.isOpen = false
   getPrize()
 })
-
-interface Prize {
-  id: number;
-  name: string;
-  detail: Quota[];
-}
 
 /* GET PRIZE DATA */
 function getPrize() {

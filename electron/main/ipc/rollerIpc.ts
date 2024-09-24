@@ -1,5 +1,5 @@
 import {dbRun} from "../database/init";
-import {IpcChannels} from "../../../src/constants/IpcChannels";
+import {IpcChannels} from "../../../src/constants/enum/IpcChannels";
 import {ipcMain} from "electron";
 import {
   deleteAllRollData,
@@ -12,8 +12,8 @@ import {
 } from "../database/customerDB";
 import {dialog} from "electron";
 import {addWinner} from "../database/winnerDB";
-import {WinnerRequirement} from "../../../src/constants/WinnerRequirement"
-import {WinnerView} from "../../../src/constants/WinnerView";
+import {WinnerRequirement} from "../../../src/constants/types/WinnerRequirement"
+import {WinnerView} from "../../../src/constants/types/WinnerView";
 
 async function migrateCustomerToRollByBalanceAndRegionThenReturnCumulativePoints(minBalance: number, region: string): Promise<number> {
   try {

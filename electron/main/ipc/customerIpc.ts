@@ -1,4 +1,4 @@
-import {IpcChannels} from "../../../src/constants/IpcChannels";
+import {IpcChannels} from "../../../src/constants/enum/IpcChannels";
 import {dialog, ipcMain} from "electron";
 import fs from "fs";
 import readline from "readline";

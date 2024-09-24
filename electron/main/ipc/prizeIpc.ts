@@ -1,5 +1,5 @@
 import {ipcMain} from "electron";
-import {IpcChannels} from "../../../src/constants/IpcChannels";
+import {IpcChannels} from "../../../src/constants/enum/IpcChannels";
 import {addPrize, getPrizes, deletePrize, editPrize} from "../database/prizeDB";
 import {dialog} from "electron";
 

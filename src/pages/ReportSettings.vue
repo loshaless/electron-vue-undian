@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import {ref} from 'vue'
 import MultiSelectComponent from '../components/MultiSelectComponent.vue';
-import {IpcChannels} from '../constants/IpcChannels';
+import {IpcChannels} from '../constants/enum/IpcChannels';
 
 const selectedPrizeId = ref<number[]>([])
 const categoryOptions = ref([

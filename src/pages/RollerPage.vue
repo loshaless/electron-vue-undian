@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import {ref, onUnmounted, onMounted} from "vue";
-import {IpcChannels} from "../constants/IpcChannels";
-import {WinnerView} from "../constants/WinnerView";
+import {IpcChannels} from "../constants/enum/IpcChannels";
+import {WinnerView} from "../constants/types/WinnerView";
 
 const winnerName = ref("");
 const numDigits = ref(3);

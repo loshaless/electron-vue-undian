@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import {computed, onMounted, Ref, ref} from "vue";
 import SwitchComponent from "../components/SwitchComponent.vue";
-import {IpcChannels} from "../constants/IpcChannels";
+import {IpcChannels} from "../constants/enum/IpcChannels";
 import SelectComponent from "../components/SelectComponent.vue";
 import MultiSelectComponent from "../components/MultiSelectComponent.vue";
 import LoadingComponent from "../components/LoadingComponent.vue";
-import {WinnerRequirement} from "../constants/WinnerRequirement";
-import {WinnerView} from "../constants/WinnerView";
-import {prizeCategory} from "../constants/prizeCategory";
+import {WinnerRequirement} from "../constants/types/WinnerRequirement";
+import {WinnerView} from "../constants/types/WinnerView";
+import {prizeCategory} from "../constants/data/prizeCategory";
 
 const minBalance = ref(0)
 const canControlRoller = ref(false)

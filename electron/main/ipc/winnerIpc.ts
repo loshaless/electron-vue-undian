@@ -1,5 +1,5 @@
 import { ipcMain } from "electron";
-import { IpcChannels } from "../../../src/constants/IpcChannels";
+import { IpcChannels } from "../../../src/constants/enum/IpcChannels";
 import { getWinnerByCategory } from "../database/winnerDB";
 import { dialog } from "electron";
 
