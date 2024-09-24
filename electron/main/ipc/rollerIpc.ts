@@ -12,7 +12,7 @@ import {
 } from "../database/customerDB";
 import {dialog} from "electron";
 import {addWinner} from "../database/winnerDB";
-import {winnerRequirement} from "../../../src/constants/WinnerRequirement"
+import {WinnerRequirement} from "../../../src/constants/WinnerRequirement"
 import {WinnerView} from "../../../src/constants/WinnerView";
 
 async function migrateCustomerToRollByBalanceAndRegionThenReturnCumulativePoints(minBalance: number, region: string): Promise<number> {
@@ -40,7 +40,7 @@ async function migrateCustomerToRollByBalanceAndRegionThenReturnCumulativePoints
   }
 }
 
-async function createWinner(requirement: winnerRequirement): Promise<WinnerView[]> {
+async function createWinner(requirement: WinnerRequirement): Promise<WinnerView[]> {
   const {minBalance, region, numOfWinner, prizeName, category} = requirement
   const winner: WinnerView[] = []
 
@@ -85,7 +85,7 @@ async function createWinner(requirement: winnerRequirement): Promise<WinnerView[
   }
 }
 
-ipcMain.on(IpcChannels.INITIATE_WINNER, async (event, requirement: winnerRequirement[]) => {
+ipcMain.on(IpcChannels.INITIATE_WINNER, async (event, requirement: WinnerRequirement[]) => {
   try {
     let listOfWinner: WinnerView[] = []
     for (let i = 0; i < requirement.length; i++) {

@@ -4,10 +4,10 @@ import {ref, computed} from 'vue';
 const props = defineProps<{
   options: { id: any, name: string }[],
   placeholder?: string,
-  selectedOptions: any[]
+  selectedOptions?: any[]
 }>();
 
-const selectedOptions = ref<number[]>(props.selectedOptions);
+const selectedOptions = ref<number[]>(props.selectedOptions || []);
 const searchQuery = ref('');
 const isOpen = ref(false);
 

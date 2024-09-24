@@ -1,4 +1,4 @@
-export interface winnerRequirement {
+export interface WinnerRequirement {
     minBalance: number,
     region: string,
     numOfWinner: number,

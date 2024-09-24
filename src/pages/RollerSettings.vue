@@ -5,33 +5,20 @@ import {IpcChannels} from "../constants/IpcChannels";
 import SelectComponent from "../components/SelectComponent.vue";
 import MultiSelectComponent from "../components/MultiSelectComponent.vue";
 import LoadingComponent from "../components/LoadingComponent.vue";
-import {winnerRequirement} from "../constants/WinnerRequirement";
+import {WinnerRequirement} from "../constants/WinnerRequirement";
 import {WinnerView} from "../constants/WinnerView";
+import {prizeCategory} from "../constants/prizeCategory";
 
 const minBalance = ref(0)
 const canControlRoller = ref(false)
 const selectedCategory = ref(1);
-const categoryOptions = ref([
-  {
-    value: 1,
-    text: 'Grand Prize'
-  },
-  {
-    value: 2,
-    text: 'Premium Prize'
-  },
-  {
-    value: 3,
-    text: 'Lucky Prize'
-  }
-])
 
 const isLoading = ref(false)
 
 /* INITIATE ROLLER */
 function findWinner() {
   isLoading.value = true
-  const requirementList: winnerRequirement[] = []
+  const requirementList: WinnerRequirement[] = []
 
   selectedPrizeName.value.forEach((prize: Prize) => {
     prize.detail.forEach(detail => {
@@ -177,7 +164,7 @@ onMounted(() => {
           <span>Category: </span>
           <SelectComponent
             v-model="selectedCategory"
-            :options="categoryOptions"
+            :options="prizeCategory"
           />
         </div>
 
