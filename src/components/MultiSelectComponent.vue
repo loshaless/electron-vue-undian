@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import {ref, computed, watch} from 'vue';
+import { nextTick } from 'vue';
 
 const props = defineProps<{
   options: { id: any, name: string }[],
@@ -20,6 +21,7 @@ watch(() => props.selectedOptions || [], (newVal) => {
 
 const searchQuery = ref('');
 const isOpen = ref(false);
+const dropdownPosition = ref('bottom');
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -38,6 +40,20 @@ const filteredOptions = computed(() => {
 
 const selectedOptionNames = computed(() => {
   return selectedOptions.value.map(optionId => props.options.find(option => option.id === optionId)?.name).join(', ');
+});
+
+watch(isOpen, async (newVal) => {
+  if (newVal) {
+    await nextTick(); // Wait for the DOM to update
+    const dropdown = document.querySelector('.dropdown-menu');
+
+    if (dropdown) {
+      const rect = dropdown.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+
+      dropdownPosition.value = spaceBelow < 10 ? 'top' : 'bottom';
+    }
+  }
 });
 </script>
 
@@ -88,7 +104,11 @@ const selectedOptionNames = computed(() => {
         </div>
       </div>
       <!-- DROPDOWN MENU AND SEARCH INPUT -->
-      <div v-if="isOpen" class="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1">
+      <div
+        v-if="isOpen"
+        :class="['absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto', dropdownPosition === 'top' ? 'bottom-full mb-1' : 'mt-1']"
+        class="dropdown-menu"
+      >
         <input
           v-model="searchQuery"
           class="w-full p-2 border-b border-gray-300"
