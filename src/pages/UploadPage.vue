@@ -179,7 +179,7 @@ window.ipcRenderer.on(IpcChannels.UPLOAD_COMPLETE, (event, isDone) => {
 <template>
   <div>
     <div 
-      v-if="canShowCategory"
+      v-if="canShowCategory && !isDataExist"
       class="rounded border border-gray-400 p-4 m-3"
     >
       <table class="table-auto w-full border-white">
