@@ -10,7 +10,7 @@ export async function createTable(tableName: string) {
 }
 
 export async function dropTable(tableName: string) {
-    await dbRun(`DROP TABLE ${tableName}`);
+    await dbRun(`DROP TABLE IF EXISTS ${tableName}`);
 }
 
 export async function massInsert(tableName: string, data: any[]) {

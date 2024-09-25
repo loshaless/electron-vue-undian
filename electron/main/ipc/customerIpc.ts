@@ -64,41 +64,54 @@ ipcMain.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, async (event, filePath,
   })
 
   let inserted = 0
-  const batchSize = 4000
+  const batchSize = 3000
   let batch = []
   const insertPromises = []
   let cumulativePoints = 0
 
   let index = 0
-  for await (const line of rl) {
-    index++
-    const [cif, account, name, branch, region, points, balance] = line.split("|");
-    cumulativePoints += parseInt(points)
-    batch.push([index, cif, account, name, branch, region, parseInt(points), cumulativePoints, parseInt(balance)]);
 
-    if (batch.length >= batchSize) {
+  try {
+    await dbRun('BEGIN TRANSACTION'); // Start transaction
+
+    for await (const line of rl) {
+      index++
+      const [cif, account, name, branch, region, points, balance] = line.split("|");
+      cumulativePoints += parseInt(points)
+      batch.push([index, cif, account, name, branch, region, parseInt(points), cumulativePoints, parseInt(balance)]);
+
+      if (batch.length >= batchSize) {
+        insertPromises.push(await insertBatch(batch, listOfCustomerTable));
+        inserted += batch.length;
+        event.sender.send(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, inserted);
+        batch = [];
+      }
+    }
+
+    // Insert any remaining records in the last batch
+    if (batch.length > 0) {
       insertPromises.push(await insertBatch(batch, listOfCustomerTable));
       inserted += batch.length;
       event.sender.send(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, inserted);
-      batch = [];
     }
+
+    await Promise.all(insertPromises);
+
+    await dbRun('COMMIT'); // Commit transaction
+
+    console.log("File processing complete");
+    event.sender.send(IpcChannels.UPLOAD_COMPLETE, true);
+    event.sender.send(IpcChannels.IS_CUSTOMER_DATA_EXIST, true);
+
+    const points = await getTotalCumulativePoints()
+    windows.view.webContents.send(IpcChannels.GET_TOTAL_CUMULATIVE_POINTS, points);
+
+  } catch (error) {
+    await dbRun('ROLLBACK'); // Rollback transaction on error
+    console.error("Error processing file:", error);
+    dialog.showErrorBox("Error", `Error processing file: ${error.message}`);
   }
 
-  // Insert any remaining records in the last batch
-  if (batch.length > 0) {
-    insertPromises.push(await insertBatch(batch, listOfCustomerTable));
-    inserted += batch.length;
-    event.sender.send(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, inserted);
-  }
-
-  await Promise.all(insertPromises);
-
-  console.log("File processing complete");
-  event.sender.send(IpcChannels.UPLOAD_COMPLETE, true);
-  event.sender.send(IpcChannels.IS_CUSTOMER_DATA_EXIST, true);
-
-  const points = await getTotalCumulativePoints()
-  windows.view.webContents.send(IpcChannels.GET_TOTAL_CUMULATIVE_POINTS, points);
 })
 
 ipcMain.on(IpcChannels.DELETE_CUSTOMER_IN_DATABASE, async (event) => {
