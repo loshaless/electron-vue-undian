@@ -182,7 +182,7 @@ window.ipcRenderer.on(IpcChannels.UPLOAD_COMPLETE, (event, isDone) => {
       v-if="canShowCategory && !isDataExist"
       class="rounded border border-gray-400 p-4 m-3"
     >
-      <table class="table-auto w-full border-white">
+      <table class="table-auto w-full border-white text-center">
         <thead>
           <tr>
             <th class="px-4 py-2 border">Category</th>
@@ -204,6 +204,7 @@ window.ipcRenderer.on(IpcChannels.UPLOAD_COMPLETE, (event, isDone) => {
             </td>
             <td class="border px-4 py-2">
               <multi-select-component
+                :isViewMode="!saveCategoryState.isEdit"
                 :options="prizes"
                 placeholder="Select Prizes"
                 :selectedOptions="category.prize ?? []"  
@@ -240,10 +241,10 @@ window.ipcRenderer.on(IpcChannels.UPLOAD_COMPLETE, (event, isDone) => {
       </div>
     </div>
 
-    <div class="rounded border border-gray-400 p-4 mx-3 my-8">
+    <div class="rounded border border-gray-400 p-4 mx-3 my-8 flex justify-center">
       <div v-if="!isLoading" class="flex flex-col gap-4">
       <button
-        class="bg-blue-500 text-white p-2 rounded-md"
+        class="bg-blue-500 text-white py-2 rounded-md px-4 hover:bg-blue-600 hover:scale-105"
         @click="openFileDialog"
       >
         {{ (pathUrl && isDataExist) ? "Change File" : "Select New File" }}

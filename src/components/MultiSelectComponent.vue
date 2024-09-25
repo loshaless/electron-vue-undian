@@ -4,14 +4,20 @@ import {ref, computed, watch} from 'vue';
 const props = defineProps<{
   options: { id: any, name: string }[],
   placeholder?: string,
-  selectedOptions?: any[]
+  selectedOptions?: any[],
+  isViewMode?: boolean
 }>();
 
+const isViewMode = ref(!!props.isViewMode)
+watch(() => props.isViewMode, (newVal) => {
+  isViewMode.value = newVal
+})
+
+const selectedOptions = ref<number[]>(props.selectedOptions || []);
 watch(() => props.selectedOptions || [], (newVal) => {
   selectedOptions.value = newVal
 })
 
-const selectedOptions = ref<number[]>(props.selectedOptions || []);
 const searchQuery = ref('');
 const isOpen = ref(false);
 
@@ -36,12 +42,13 @@ const selectedOptionNames = computed(() => {
 </script>
 
 <template>
-  <div class="w-full max-w-xs">
-    <div class="relative">
+  <div class="w-full">
+    <div v-if="!isViewMode" class="relative">
       <div
         class="border border-gray-500 rounded-md shadow-sm p-2 cursor-pointer bg-white"
         @click="isOpen = !isOpen"
       >
+        <!-- SELECTED OPTIONS -->
         <div
           v-if="selectedOptions.length && isOpen"
           class="flex flex-wrap gap-2"
@@ -63,12 +70,16 @@ const selectedOptionNames = computed(() => {
             </button>
           </div>
         </div>
+
+        <!-- PLACEHOLDER WHEN SELECTED OPTIONS IS EMPTY -->
         <div
           v-else-if="!selectedOptions.length"
           class="text-gray-500"
         >
           {{ placeholder || 'Select options...' }}
         </div>
+
+        <!-- PLACEHOLDER WHEN SELECTED OPTIONS IS NOT EMPTY -->
         <div
           v-else-if="!isOpen && selectedOptions.length"
           class="text-gray-500"
@@ -76,6 +87,7 @@ const selectedOptionNames = computed(() => {
           {{ selectedOptionNames }}
         </div>
       </div>
+      <!-- DROPDOWN MENU AND SEARCH INPUT -->
       <div v-if="isOpen" class="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1">
         <input
           v-model="searchQuery"
@@ -101,6 +113,11 @@ const selectedOptionNames = computed(() => {
           </p>
         </div>
       </div>
+    </div>
+
+    <!-- VIEW MODE -->
+    <div class="text-center" v-else>
+      {{ selectedOptionNames }}
     </div>
   </div>
 </template>

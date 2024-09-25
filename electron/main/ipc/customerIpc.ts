@@ -64,7 +64,7 @@ ipcMain.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, async (event, filePath,
   })
 
   let inserted = 0
-  const batchSize = 100
+  const batchSize = 4000
   let batch = []
   const insertPromises = []
   let cumulativePoints = 0

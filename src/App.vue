@@ -24,18 +24,18 @@ window.ipcRenderer.on(IpcChannels.IS_CUSTOMER_DATA_EXIST, (event, isDataExist) =
   <div>
     <div class="container mx-auto flex justify-around items-center mt-3 gap-3.5">
       <p
-        :class="{'!bg-green-500': selectedPage === PAGE.UPLOAD_PAGE}"
-        class="navbar"
-        @click="selectedPage = PAGE.UPLOAD_PAGE"
-      >
-        Upload
-      </p>
-      <p
         :class="{'!bg-green-500': selectedPage === PAGE.PRIZE_PAGE}"
         class="navbar"
         @click="selectedPage = PAGE.PRIZE_PAGE"
       >
         Prize Settings
+      </p>
+      <p
+        :class="{'!bg-green-500': selectedPage === PAGE.UPLOAD_PAGE}"
+        class="navbar"
+        @click="selectedPage = PAGE.UPLOAD_PAGE"
+      >
+        Upload
       </p>
       <p
         v-if="isCustomerDataExist"

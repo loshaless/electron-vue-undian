@@ -159,7 +159,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
 
 <template>
   <div>
-    <div class="border-gray-800 rounded-md bg-black p-5 mt-5 mx-5 flex-col justify-center">
+    <div class="border-gray-800 rounded-md bg-black p-5 my-5 mx-5 flex-col justify-center">
       <div class="flex gap-4 items-center justify-center">
         <button
           class="rounded-md bg-green-700 text-white hover:bg-amber-500 cursor-pointer py-3 px-8"
@@ -170,7 +170,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
       </div>
 
       <!-- Table to display prizes -->
-      <div class="overflow-auto max-h-96 mt-5">
+      <div class="mt-5">
         <table class="table-auto w-full text-white border-white">
           <thead>
           <tr>
