@@ -104,6 +104,8 @@ window.ipcRenderer.on(IpcChannels.GET_PRIZE, (event, rows) => {
         detail: JSON.parse(row.detail)
       }
     })
+
+    isLoadingInAction.value = false
   }
 })
 
@@ -140,7 +142,6 @@ function saveEditedPrize() {
 
 window.ipcRenderer.on(IpcChannels.EDIT_PRIZE, () => {
   modalPrizeState.isLoading = false
-  isLoadingInAction.value = false
   modalPrizeState.isOpen = false
   getPrize()
 })
@@ -153,7 +154,6 @@ function deletePrize(id: number) {
 
 window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
   getPrize()
-  isLoadingInAction.value = false
 })
 </script>
 

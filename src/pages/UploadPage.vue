@@ -52,7 +52,7 @@ window.ipcRenderer.on(IpcChannels.GET_CATEGORY, (event, rows) => {
       listOfCategory.push({
         name: row.name,
         minBalance: row.min_balance,
-        prize: JSON.parse(row.prize)
+        prize: JSON.parse(row.prize).filter((prize: number) => prizes.value.some((p: Prize) => p.id === prize))
       })
     })
   }
@@ -79,6 +79,9 @@ const saveCategoryState = reactive({
   isEdit: false
 })
 
+const canSaveCategory = computed(() => {
+  return listOfCategory.every((category: Category) => category.prize?.length)
+})
 function saveCategory() {
   window.ipcRenderer.send(
     IpcChannels.SAVE_CATEGORY, 
@@ -232,8 +235,10 @@ window.ipcRenderer.on(IpcChannels.UPLOAD_COMPLETE, (event, isDone) => {
             Cancel
           </button>
           <button
-            class="bg-green-500 text-white py-2 rounded-md px-12 hover:bg-green-600 hover:scale-105"
+            :disabled="!canSaveCategory"
             @click="saveCategory"
+            :class="{'cursor-not-allowed': !canSaveCategory, 'cursor-pointer': canSaveCategory}"
+            class="bg-green-500 text-white py-2 rounded-md px-12 hover:bg-green-600 hover:scale-105"
           >
             Save
           </button>
