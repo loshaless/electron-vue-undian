@@ -1,12 +1,12 @@
-import {dialog, ipcMain} from "electron";
-import {IpcChannels} from "../../../src/constants/enum/IpcChannels";
-import {windows} from "../index";
-import {WinnerView} from "../../../src/constants/types/WinnerView";
+import { dialog, ipcMain } from "electron";
+import { IpcChannels } from "../../../src/constants/enum/IpcChannels";
+import { windows } from "../index";
+import { WinnerView } from "../../../src/constants/types/WinnerView";
 
 ipcMain.on(IpcChannels.OPEN_FILE_DIALOG, (event) => {
   const result = dialog.showOpenDialogSync({
     properties: ["openFile"],
-    filters: [{name: "Text Files", extensions: ["txt"]}],
+    filters: [{ name: "Text Files", extensions: ["txt"] }],
   });
 
   console.log("Dialog result:", result); // Debug log

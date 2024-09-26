@@ -1,59 +1,24 @@
-import {dbRun} from "../database/init";
-import {ipcMain} from "electron";
-import {
-  deleteAllRollData,
-  findRollByCumulativePoints,
-} from "../database/rollDB";
+import { dbRun } from "../database/init";
+import { ipcMain } from "electron";
 import {
   findCustomerById,
   getCustomerDataByBalanceAndRegion,
   updateCustomerRollId
 } from "../database/customerDB";
-import {addWinner} from "../database/winnerDB";
-import {WinnerView} from "../../../src/constants/types/WinnerView";
+import { getMaxCumulativePoints, findCustomerByCumulativePoints } from "../database/dynamicDB";
+import { addWinner } from "../database/winnerDB";
+import { WinnerView } from "../../../src/constants/types/WinnerView";
+import { IpcChannels } from "../../../src/constants/enum/IpcChannels";
 
-async function migrateCustomerToRollByBalanceAndRegionThenReturnCumulativePoints(minBalance: number, region: string): Promise<number> {
-  try {
-    const batchSize = 4000; // adjust based on memory constraints
-    let offset = 0
-    let cumulativePoints = 0;
-
-    while (true) {
-      const customers = await getCustomerDataByBalanceAndRegion(minBalance, region, batchSize, offset)
-      if (customers.length === 0) return cumulativePoints
-
-      // Prepare the INSERT statement
-      const insertPromises = customers.map(customer => {
-        cumulativePoints += customer.points; // Update cumulative points
-        return dbRun(`INSERT INTO roll (customer_id, points, cumulative_points) VALUES (?, ?, ?)`, [customer.customer_id, customer.points, cumulativePoints]);
-      });
-
-      await Promise.all(insertPromises);
-      offset += batchSize;
-      console.log(`Processed ${offset} customers.`);
-    }
-  } catch (error) {
-    throw new Error(`Migration failed: , ${error}`);
-  }
-}
-
-async function createWinner(requirement: WinnerRequirement): Promise<WinnerView[]> {
-  const {minBalance, region, numOfWinner, prizeName, category} = requirement
-  const winner: WinnerView[] = []
-
+ipcMain.on(IpcChannels.GET_A_WINNER, async (event, winnerView: WinnerView, database: string) => {
   try {
     await dbRun('BEGIN TRANSACTION');
+    const maxCumulativePoints = await getMaxCumulativePoints(database);
 
-    // Get max cumulative points
-    const maxCumulativePoints
-      = await migrateCustomerToRollByBalanceAndRegionThenReturnCumulativePoints(minBalance, region);
-    console.log("Max cumulative points:", maxCumulativePoints);
-
-    // Get random winners
-    for (let i = 0; i < numOfWinner; i++) {
+    while (true) {
       const randomRollNumber = Math.floor(Math.random() * maxCumulativePoints) + 1;
       console.log("Random roll number:", randomRollNumber);
-      const winnerRoll = await findRollByCumulativePoints(randomRollNumber);
+      const winnerRoll = await findCustomerByCumulativePoints(database, randomRollNumber);
       console.log("winnerRoll - ", winnerRoll);
       const winnerCustomer = await findCustomerById(winnerRoll.customer_id);
       console.log("winnerCustomer - ", winnerCustomer);
@@ -62,22 +27,20 @@ async function createWinner(requirement: WinnerRequirement): Promise<WinnerView[
         const rollId = winnerCustomer.cumulative_points - (winnerRoll.cumulative_points - randomRollNumber)
         await updateCustomerRollId(winnerRoll.customer_id, rollId);
 
-        winner.push({
-          prizeName, rollId, winnerName: winnerCustomer.name, category
-        })
-        await addWinner(prizeName, rollId, winnerCustomer.name, winnerCustomer.region, category);
-      } else {
+        winnerView.rollId = rollId
+        winnerView.winnerName = winnerCustomer.name
+        await addWinner(winnerView.prizeName, winnerView.rollId, winnerView.winnerName, winnerCustomer.region, winnerView.category)
+        await dbRun("COMMIT");
+
+        event.reply(IpcChannels.GET_A_WINNER, winnerView)
+        break
+      }
+      else {
         console.log("Winner already picked");
-        i -= 1;
       }
     }
-    await dbRun("COMMIT");
-
-    return winner
-  } catch (err) {
+  } catch (error) {
     await dbRun("ROLLBACK");
-    throw new Error(`err createWinner: ${err}`)
-  } finally {
-    await deleteAllRollData();
+    throw new Error(`err createWinner: ${error}`)
   }
-}
+})

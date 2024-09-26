@@ -15,5 +15,6 @@ export enum IpcChannels {
   GET_TOTAL_CUMULATIVE_POINTS = "get-total-cumulative-points",
   GET_WINNER_BY_CATEGORY = "get-winner-by-category",
   SAVE_CATEGORY = "save_category",
-  GET_CATEGORY = "get_category"
+  GET_CATEGORY = "get_category",
+  GET_A_WINNER = "get-a-winner"
 }

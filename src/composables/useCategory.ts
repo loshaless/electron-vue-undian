@@ -32,7 +32,7 @@ export function useCategory(prizes: Ref<Prize[]>) {
     } else {
       prizeCategory.forEach((prize, index) => {
         listOfCategory.push({
-          id: index+1,
+          id: index + 1,
           name: prize.text,
           minBalance: 0,
           prize: null,
