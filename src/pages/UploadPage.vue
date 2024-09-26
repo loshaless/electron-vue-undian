@@ -4,10 +4,13 @@ import {ref, onBeforeMount, onMounted, reactive, computed} from "vue";
 import TooltipComponent from "../components/TooltipComponent.vue";
 import LoadingComponent from "../components/LoadingComponent.vue";
 import { Prize } from "../constants/types/Prize";
-import { prizeCategory } from "../constants/data/prizeCategory";
 import MultiSelectComponent from "../components/MultiSelectComponent.vue";
 import { Quota } from "../constants/types/Quota";
 import { CustomerTable } from "../constants/types/CustomerTable";
+import { useCategory } from "../composables/useCategory";
+import { Category } from "../constants/types/Category";
+import { replaceSpaceWithUnderscore } from "../utils/generalUtils";
+import { formatNumber } from "../utils/generalUtils";
 
 /* GET LIST OF PRIZE */
 onMounted(() => {
@@ -29,44 +32,7 @@ window.ipcRenderer.on(IpcChannels.GET_PRIZE, (event, rows) => {
 
 /* INIT CATEGORY */
 const canShowCategory = ref(true)
-
-interface Category {
-  name: string;
-  minBalance: number;
-  prize: number[] | null;
-}
-const listOfCategory = reactive<Category[]>([])
-
-function getCategory() {
-  window.ipcRenderer.send(IpcChannels.GET_CATEGORY)
-}
-onMounted(() => {
-  getCategory()
-})
-
-window.ipcRenderer.on(IpcChannels.GET_CATEGORY, (event, rows) => {
-  if (rows.length > 0) {
-    listOfCategory.splice(0, listOfCategory.length)
-    
-    rows.forEach((row: any) => {
-      listOfCategory.push({
-        name: row.name,
-        minBalance: row.min_balance,
-        prize: JSON.parse(row.prize).filter((prize: number) => prizes.value.some((p: Prize) => p.id === prize))
-      })
-    })
-  }
-
-  else {
-    prizeCategory.forEach((prize) => {
-      listOfCategory.push({
-        name: prize.text,
-        minBalance: 0,
-        prize: null
-      })
-    })
-  }
-})
+const { listOfCategory, getCategory } = useCategory(prizes);
 
 /* SETTING CATEGORY PRIZE */
 function handleUpdatePrize(index: number, prize: number[]) {
@@ -139,10 +105,6 @@ function deleteData() {
 const insertedData = ref(0);
 const isLoading = ref(false);
 
-function replaceSpaceWithUnderscore(str: string) {
-  return str.replace(/\s+/g, '_').toLowerCase()
-}
-
 function generateListOfCustomerTable(): CustomerTable[] {
   const result: CustomerTable[] = []
   listOfCategory.forEach((category: Category) => {
@@ -203,7 +165,7 @@ window.ipcRenderer.on(IpcChannels.UPLOAD_COMPLETE, (event, isDone) => {
                 class="w-full p-2 rounded-md border"
                 v-model="category.minBalance"
               >
-              <p v-else>{{ category.minBalance }}</p>
+              <p v-else>{{ formatNumber(category.minBalance) }}</p>
             </td>
             <td class="border px-4 py-2">
               <multi-select-component

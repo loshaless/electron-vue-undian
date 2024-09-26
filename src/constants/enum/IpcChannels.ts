@@ -5,7 +5,6 @@ export enum IpcChannels {
   DELETE_CUSTOMER_IN_DATABASE = "delete-customer-in-database",
   IS_CUSTOMER_DATA_EXIST = "is-customer-data-exist",
   UPLOAD_COMPLETE = "upload-complete",
-  INITIATE_WINNER = "initiate-winner",
   START_ROLLING = "start-rolling",
   STOP_ROLLING = "stop-rolling",
   ADD_PRIZE = "add-prize",

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import UploadPage from "./pages/UploadPage.vue";
 import ReportPage from "./pages/ReportSettings.vue";
-import {Ref, ref} from "vue";
+import {Ref, ref, onMounted} from "vue";
 import RollerPage from "./pages/RollerSettings.vue";
 import PrizePage from "./pages/PrizePage.vue";
 import {IpcChannels} from "./constants/enum/IpcChannels";
@@ -12,11 +12,15 @@ const PAGE = {
   SETTINGS_PAGE: "SETTINGS_PAGE",
   REPORT_PAGE: "REPORT_PAGE",
 }
-const selectedPage = ref(PAGE.PRIZE_PAGE)
+const selectedPage = ref(PAGE.SETTINGS_PAGE)
 
 const isCustomerDataExist: Ref<Boolean> = ref(false)
 window.ipcRenderer.on(IpcChannels.IS_CUSTOMER_DATA_EXIST, (event, isDataExist) => {
   isCustomerDataExist.value = isDataExist;
+})
+
+onMounted(() => {
+  window.ipcRenderer.send(IpcChannels.IS_CUSTOMER_DATA_EXIST)
 })
 </script>
 

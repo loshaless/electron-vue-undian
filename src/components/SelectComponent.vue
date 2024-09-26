@@ -3,7 +3,7 @@ import {ref} from 'vue';
 
 const props = defineProps({
   options: {
-    type: Array as () => Array<{ value: string | number, text: string }>,
+    type: Array as () => Array<{ id: string | number, name: string }>,
     required: true
   },
   modelValue: {
@@ -30,8 +30,8 @@ const updateValue = (event: Event) => {
       class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
       @change="updateValue"
     >
-      <option v-for="option in props.options" :key="option.value" :value="option.value">
-        {{ option.text }}
+      <option v-for="option in props.options" :key="option.id" :value="option.id">
+        {{ option.name }}
       </option>
     </select>
   </div>

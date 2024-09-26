@@ -1,50 +1,88 @@
 <script lang="ts" setup>
-import {computed, onMounted, Ref, ref} from "vue";
+import {computed, onMounted, reactive, Ref, ref} from "vue";
 import SwitchComponent from "../components/SwitchComponent.vue";
 import {IpcChannels} from "../constants/enum/IpcChannels";
 import SelectComponent from "../components/SelectComponent.vue";
-import MultiSelectComponent from "../components/MultiSelectComponent.vue";
 import LoadingComponent from "../components/LoadingComponent.vue";
-import {WinnerRequirement} from "../constants/types/WinnerRequirement";
 import {WinnerView} from "../constants/types/WinnerView";
-import {prizeCategory} from "../constants/data/prizeCategory";
+import {useCategory} from "../composables/useCategory";
+import {Prize} from "../constants/types/Prize";
+import {Category} from "../constants/types/Category";
+import {Quota} from "../constants/types/Quota";
+import ModalComponent from "../components/ModalComponent.vue";
+import {formatNumber} from "../utils/generalUtils";
 
-const minBalance = ref(0)
 const canControlRoller = ref(false)
-const selectedCategory = ref(1);
-
 const isLoading = ref(false)
 
-/* INITIATE ROLLER */
-function findWinner() {
-  isLoading.value = true
-  const requirementList: WinnerRequirement[] = []
+/*  PRIZE  */
+function getPrizeList() {
+  window.ipcRenderer.send(IpcChannels.GET_PRIZE)
+}
 
-  selectedPrizeName.value.forEach((prize: Prize) => {
-    prize.detail.forEach(detail => {
-      requirementList.push({
-        minBalance: minBalance.value,
-        region: detail.text,
-        numOfWinner: detail.numOfItem,
-        prizeName: prize.name,
-        category: selectedCategory.value
-      })
+const prizeList = ref<Prize[]>([])
+window.ipcRenderer.on(IpcChannels.GET_PRIZE, (event, rows) => {
+  if (rows) {
+    prizeList.value = rows.map((row: any) => {
+      return {
+        id: row.id,
+        name: row.name,
+        detail: JSON.parse(row.detail)
+      }
+    })
+  }
+})
+
+onMounted(() => {
+  getPrizeList()
+})
+
+/* SELECTED CATEGORY */
+const {listOfCategory, getCategory} = useCategory(prizeList);
+const selectedCategory = ref(1);
+
+const selectedCategoryData = computed(() => {
+  const result = {
+    categoryName: '',
+    minBalance: 0,
+    totalWinner: 0,
+    prize: [] as {
+      prizeName: string,
+      regions: string[],
+      numOfItem: number
+    }[]
+  }
+
+  const category: Category | undefined = listOfCategory.find((category) => category.id == selectedCategory.value);
+  result.categoryName = category?.name ?? ''
+  result.minBalance = category?.minBalance ?? 0
+
+  category?.prize?.forEach((prizeId: number) => {
+    const prizeDetail = prizeList.value.find((p: Prize) => p.id === prizeId)
+    prizeDetail?.detail.forEach((quota: Quota) => {
+      result.totalWinner += +quota.numOfItem
+
+      return result.prize.push({
+        prizeName: prizeDetail?.name,
+        regions: quota.name,
+        numOfItem: quota.numOfItem
+      });
     })
   })
 
-  window.ipcRenderer.send(IpcChannels.INITIATE_WINNER, requirementList)
-}
+  return result
+})
 
-window.ipcRenderer.on(IpcChannels.INITIATE_WINNER, (event, winners: WinnerView[]) => {
-  isLoading.value = false
-  listOfWinner.value = winners
+/* PRIZE DETAIL MODAL STATE */
+const prizeDetailModalState = reactive({
+  isOpen: false
 })
 
 /* START & STOP ROLLER */
 const listOfWinner: Ref<WinnerView[]> = ref([])
 const isRollerStart: Ref<Boolean> = ref(false)
-  
-  /* AUTOMATIC ROLLER */
+
+/* AUTOMATIC ROLLER */
 const rollAnimationTime = ref(1)
 const showWinnerTime = ref(1)
 const shouldContinueRolling = ref(true);
@@ -53,13 +91,13 @@ const isAutomaticRollerStart = ref(false)
 async function startRollerWithoutStopper() {
   isAutomaticRollerStart.value = true
 
-  while(listOfWinner.value.length && shouldContinueRolling.value) {
+  while (listOfWinner.value.length && shouldContinueRolling.value) {
     moveRoller()
-    await new Promise(resolve => setTimeout(resolve, rollAnimationTime.value*1000))
+    await new Promise(resolve => setTimeout(resolve, rollAnimationTime.value * 1000))
 
     if (shouldContinueRolling.value) {
       stopRoller()
-      await new Promise(resolve => setTimeout(resolve, showWinnerTime.value*1000))
+      await new Promise(resolve => setTimeout(resolve, showWinnerTime.value * 1000))
     }
   }
   isAutomaticRollerStart.value = false
@@ -76,87 +114,12 @@ function stopRoller() {
   const winner = listOfWinner.value.shift()
   window.ipcRenderer.send(IpcChannels.STOP_ROLLING, JSON.parse(JSON.stringify(winner)))
 }
-
-/*  PRIZE  */
-function getPrizeList() {
-  window.ipcRenderer.send(IpcChannels.GET_PRIZE)
-}
-
-interface Prize {
-  id: number,
-  name: string,
-  detail: {
-    numOfItem: number,
-    text: string
-  }[]
-}
-
-const prizeList = ref<Prize[]>([])
-window.ipcRenderer.on(IpcChannels.GET_PRIZE, (event, rows) => {
-  if (rows) {
-    prizeList.value = rows.map((row: any) => {
-      return {
-        id: row.id,
-        name: row.name,
-        detail: JSON.parse(row.detail)
-      }
-    })
-  }
-})
-
-const selectedPrizeId = ref<number[]>([])
-const selectedPrizeName = computed(() => {
-  return prizeList.value.filter((prize: Prize) => selectedPrizeId.value.includes(prize.id))
-})
-
-onMounted(() => {
-  getPrizeList()
-})
 </script>
 
 <template>
   <div>
-    <div class="my-5 flex mx-5 gap-5">
-      <div class="border rounded-md p-5 shadow-sm border-gray-800 bg-blue-300 flex-1">
-        <h3 class="font-bold text-2xl">Winner Requirement</h3>
-        <!-- Min Balance -->
-        <label>
-          Min. Balance: Rp
-        </label>
-        <input
-          v-model="minBalance"
-          class="mt-4 p-2 border border-gray-800 rounded"
-          placeholder="input balance"
-          type="number"
-        />
-
-        <!-- Table to display prizes -->
-        <div
-          v-if="selectedPrizeName.length"
-          class="overflow-auto max-h-96 mt-5"
-        >
-          <table class="table-auto w-full">
-            <thead>
-            <tr>
-              <th class="px-4 py-2 border border-gray-800">Nama Barang</th>
-              <th class="px-4 py-2 border border-gray-800">Quota</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="prize in selectedPrizeName" :key="prize.id" class="text-center">
-              <td class="border px-4 py-2 border-gray-800">{{ prize.name }}</td>
-              <td class="border px-4 py-2 border-gray-800">
-                <ul>
-                  <li v-for="(quota, index) in prize.detail" :key="index">
-                    {{ quota.text }}: {{ quota.numOfItem }}
-                  </li>
-                </ul>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <div class="my-5 flex flex-col mx-5 gap-5">
+      <!-- Roller Settings -->
       <div class="border rounded-md p-5 shadow-sm border-gray-800 bg-amber-300 flex-1">
         <!-- Num of Winner -->
         <h3 class="font-bold text-2xl">Lottery Settings</h3>
@@ -164,19 +127,9 @@ onMounted(() => {
           <span>Category: </span>
           <SelectComponent
             v-model="selectedCategory"
-            :options="prizeCategory"
+            :options="listOfCategory"
           />
         </div>
-
-        <div class="flex gap-3 mt-3 items-center">
-          <span>Selected Prize: </span>
-          <multi-select-component
-            :options="prizeList"
-            placeholder="Select Prize"
-            @update:modelValue="selectedPrizeId = $event"
-          />
-        </div>
-
         <div class="flex gap-3 my-3">
           <switch-component
             v-model:value="canControlRoller"
@@ -184,16 +137,13 @@ onMounted(() => {
           />
           <p>Can Control Roller ?</p>
         </div>
+
+        <!-- Loading when roller is start -->
         <loading-component v-if="isLoading" class="my-3"/>
-        <div v-else>
-          <button
-            v-if="!listOfWinner.length && selectedPrizeName.length"
-            class="bg-green-500 hover:bg-green-300 py-2 px-5 rounded-md text-white"
-            @click="findWinner()"
-          >
-            Initiate Roller
-          </button>
-          <div v-else-if="listOfWinner.length">
+
+        <div v-else class="grid grid-cols-2 gap-3">
+          <!-- Roller Control -->
+          <div>
             <div v-if="canControlRoller" class="flex gap-3 mt-4">
               <button
                 v-if="!isRollerStart"
@@ -210,9 +160,9 @@ onMounted(() => {
                 Stop and Set Winner
               </button>
             </div>
-            <div 
+            <div
               v-else-if="!isAutomaticRollerStart"
-              class="mt-4 flex flex-col justify-end"
+              class="mt-4 flex flex-col justify-end flex-1"
             >
               <div class="flex gap-3 items-center mb-3">
                 <label for="showWinnerTime">Roll Animation Time: </label>
@@ -220,8 +170,8 @@ onMounted(() => {
                   id="showWinnerTime"
                   v-model="rollAnimationTime"
                   class="p-2 border border-gray-800 rounded"
-                  placeholder="input animation time in second"
                   min="1"
+                  placeholder="input animation time in second"
                   type="number"
                 />
               </div>
@@ -231,22 +181,58 @@ onMounted(() => {
                   id="showWinnerTime"
                   v-model="showWinnerTime"
                   class="p-2 border border-gray-800 rounded"
-                  placeholder="input show winner time in second"
                   min="1"
+                  placeholder="input show winner time in second"
                   type="number"
                 />
               </div>
-              
+
               <button
                 v-if="showWinnerTime > 0 && rollAnimationTime > 0"
-                @click="startRollerWithoutStopper()"
                 class="bg-green-500 hover:bg-green-300 p-2 rounded-md text-white"
+                @click="startRollerWithoutStopper()"
               >
                 Start Roller Without Stopper
               </button>
             </div>
             <loading-component v-else-if="isAutomaticRollerStart" class="my-3"/>
           </div>
+
+          <!-- PRIZE DATA DETAIL -->
+          <div class="border rounded-md p-5 shadow-sm border-gray-800 bg-gray-200">
+            <h3 class="font-bold text-2xl mb-1">Category {{ selectedCategoryData.categoryName }}</h3>
+            <p class="text-lg">Total Winner : {{ selectedCategoryData.totalWinner }}</p>
+            <p class="mb-1 text-lg mb-3">Min Balance : {{ formatNumber(selectedCategoryData.minBalance) }}</p>
+            <div v-if="selectedCategoryData">
+              <button
+                class="bg-blue-500 hover:bg-blue-300 p-2 rounded-md text-white"
+                @click="prizeDetailModalState.isOpen = true"
+              >
+                Open Prize Detail
+              </button>
+            </div>
+          </div>
+          <modal-component
+            :is-open="prizeDetailModalState.isOpen"
+            @update:isOpen="prizeDetailModalState.isOpen = $event"
+          >
+            <table class="table-auto w-full border-white text-center">
+              <thead>
+                <tr>
+                  <th class="px-4 py-2 border border-gray-800">Prize Name</th>
+                  <th class="px-4 py-2 border border-gray-800">Regions</th>
+                  <th class="px-4 py-2 border border-gray-800">Num of Item</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(category, index) in selectedCategoryData.prize" :key="index">
+                  <td class="border px-4 py-2 border-gray-800">{{ category.prizeName }}</td>
+                  <td class="border px-4 py-2 border-gray-800">{{ category.regions.join(', ') }}</td>
+                  <td class="border px-4 py-2 border-gray-800">{{ category.numOfItem }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </modal-component>
         </div>
       </div>
     </div>

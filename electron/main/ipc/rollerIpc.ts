@@ -1,5 +1,4 @@
 import {dbRun} from "../database/init";
-import {IpcChannels} from "../../../src/constants/enum/IpcChannels";
 import {ipcMain} from "electron";
 import {
   deleteAllRollData,
@@ -10,9 +9,7 @@ import {
   getCustomerDataByBalanceAndRegion,
   updateCustomerRollId
 } from "../database/customerDB";
-import {dialog} from "electron";
 import {addWinner} from "../database/winnerDB";
-import {WinnerRequirement} from "../../../src/constants/types/WinnerRequirement"
 import {WinnerView} from "../../../src/constants/types/WinnerView";
 
 async function migrateCustomerToRollByBalanceAndRegionThenReturnCumulativePoints(minBalance: number, region: string): Promise<number> {
@@ -84,18 +81,3 @@ async function createWinner(requirement: WinnerRequirement): Promise<WinnerView[
     await deleteAllRollData();
   }
 }
-
-ipcMain.on(IpcChannels.INITIATE_WINNER, async (event, requirement: WinnerRequirement[]) => {
-  try {
-    let listOfWinner: WinnerView[] = []
-    for (let i = 0; i < requirement.length; i++) {
-      const winner: WinnerView[] = await createWinner(requirement[i])
-      listOfWinner = [...listOfWinner, ...winner]
-    }
-
-    event.sender.send(IpcChannels.INITIATE_WINNER, listOfWinner);
-  } catch (error) {
-    event.sender.send(IpcChannels.INITIATE_WINNER, []);
-    dialog.showErrorBox("Error", `An error occurred: ${error.message}`);
-  }
-});
