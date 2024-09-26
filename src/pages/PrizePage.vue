@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {onMounted, reactive, ref} from "vue";
-import MultiSelectComponent from "../components/MultiSelectComponent.vue";
+import SelectComponent from "../components/SelectComponent.vue";
 import ModalComponent from "../components/ModalComponent.vue";
 import {IpcChannels} from "../constants/enum/IpcChannels";
 import SwitchComponent from "../components/SwitchComponent.vue";
@@ -32,7 +32,7 @@ function openModalEditPrize(prize: Prize) {
   modalPrizeState.name = prize.name
   editedPrizeId.value = prize.id
 
-  if (prize.detail[0]?.id[0] === 'All Region') {
+  if (prize.detail[0]?.id === 'All Region') {
     allRegionState.isActive = true
     allRegionState.quota = prize.detail[0].numOfItem
   }
@@ -55,8 +55,8 @@ function switchAllRegion(isActive: boolean) {
 /* ADD PRIZE FOR CERTAIN REGION */
 function addRow() {
   modalPrizeState.quotas.push({
-    id: ['DKI Jakarta'],
-    name: ['DKI Jakarta'],
+    id: 'DKI Jakarta',
+    name: 'DKI Jakarta',
     numOfItem: 1
   },)
 }
@@ -68,8 +68,8 @@ function saveNewPrize() {
     window.ipcRenderer.send(IpcChannels.ADD_PRIZE, {
       name: modalPrizeState.name,
       detail: JSON.stringify([{
-        id: ['All Region'],
-        name: ['All Region'],
+        id: 'All Region',
+        name: 'All Region',
         numOfItem: allRegionState.quota
       }])
     })
@@ -125,8 +125,8 @@ function saveEditedPrize() {
       id: editedPrizeId.value,
       name: modalPrizeState.name,
       detail: JSON.stringify([{
-        id: ['All Region'],
-        name: ['All Region'],
+        id: 'All Region',
+        name: 'All Region',
         numOfItem: allRegionState.quota
       }])
     })
@@ -261,10 +261,9 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
           :key="index"
           class="flex gap-3 items-center mt-3"
         >
-          <multi-select-component
+          <select-component
+            :model-value="item.id"
             :options="provinces"
-            placeholder="Select Province"
-            :selected-options="item.id"
             @update:modelValue="item.id = $event; item.name = $event"
           />
           <input
