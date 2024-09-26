@@ -1,9 +1,9 @@
-import {IpcChannels} from "../../../src/constants/enum/IpcChannels";
-import {dialog, ipcMain} from "electron";
+import { IpcChannels } from "../../../src/constants/enum/IpcChannels";
+import { dialog, ipcMain } from "electron";
 import fs from "fs";
 import readline from "readline";
-import {dbRun} from "../database/init";
-import {dropCustomerTable, createCustomerTable, isCustomerDataExist, getTotalCumulativePoints, massInsertCustomer} from "../database/customerDB";
+import { dbRun } from "../database/init";
+import { dropCustomerTable, createCustomerTable, isCustomerDataExist, getTotalCumulativePoints, massInsertCustomer } from "../database/customerDB";
 import { windows } from "..";
 import { CustomerTable } from "../../../src/constants/types/CustomerTable";
 import { createTable, dropTable, massInsert } from "../database/dynamicDB";
@@ -24,14 +24,14 @@ let arrayOfCumulativePoints = []
 async function insertBatch(batchs: any[], conditions: CustomerTable[]): Promise<void> {
   const arrayOfBatch = Array.from({ length: conditions.length }, () => []);
   arrayOfCumulativePoints = new Array(conditions.length).fill(0)
-  
+
   for (const batch of batchs) {
     const [customer_id, cif, account, name, branch, region, points, cumulative_points, balance] = batch
 
     // insert to array of batch
     for (let i = 0; i < conditions.length; i++) {
       const condition = conditions[i]
-      if (condition.minBalance <= balance && (condition.regions[0] === "All Region" || condition.regions.includes(region))) {
+      if (condition.minBalance <= balance && (condition.regions === "All Region" || condition.regions === region)) {
         arrayOfCumulativePoints[i] += points
         arrayOfBatch[i].push([customer_id, points, arrayOfCumulativePoints[i]])
       }
@@ -41,7 +41,7 @@ async function insertBatch(batchs: any[], conditions: CustomerTable[]): Promise<
   const promises = []
   // insert all batchs to customer table
   promises.push(await massInsertCustomer(batchs))
-  
+
   // Insert array of batch to dynamic table, name follow condition
   for (let i = 0; i < arrayOfBatch.length; i++) {
     const condition = conditions[i]
@@ -57,7 +57,7 @@ async function insertBatch(batchs: any[], conditions: CustomerTable[]): Promise<
 ipcMain.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, async (event, filePath, listOfCustomerTable: CustomerTable[]) => {
   arrayOfCumulativePoints = new Array(listOfCustomerTable.length).fill(0)
   await initAllCustomerTable(listOfCustomerTable)
-  
+
   const rl = readline.createInterface({
     input: fs.createReadStream(filePath),
     crlfDelay: Infinity,
