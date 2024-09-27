@@ -5,7 +5,7 @@ import { createCustomerTable } from "./customerDB";
 import { createCategoryTable } from "./categoryDB";
 import { createWinnerTable } from "./winnerDB";
 import { createPrizeTable } from "./prizeDB";
-import { createRegionTable, initRegion, isRegionExist, isRegionExist } from "./regionDB";
+import { createRegionTable, initRegion, isRegionExist } from "./regionDB";
 
 export const db = new sqlite3.Database(DBSOURCE, async (err) => {
   if (err) {

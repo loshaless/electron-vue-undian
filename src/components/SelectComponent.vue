@@ -12,7 +12,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'update:selectedName']);
 
 const selectedValue = ref(props.modelValue);
 
@@ -20,6 +20,7 @@ const updateValue = (event: Event) => {
   const target = event.target as HTMLSelectElement;
   selectedValue.value = target.value;
   emit('update:modelValue', target.value);
+  emit('update:selectedName', target.options[target.selectedIndex].text);
 };
 </script>
 

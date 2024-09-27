@@ -3,14 +3,36 @@ import {onMounted, reactive, ref} from "vue";
 import SelectComponent from "../components/SelectComponent.vue";
 import ModalComponent from "../components/ModalComponent.vue";
 import {IpcChannels} from "../constants/enum/IpcChannels";
-import SwitchComponent from "../components/SwitchComponent.vue";
-import { provinces } from "../constants/data/provinces";
 import { Quota } from "../constants/types/Quota";
 import { Prize } from "../constants/types/Prize";
 
 const isLoadingInAction = ref(false)
 
-/* MODAL */
+/* GET REGION DATA */
+interface Region {
+  id: number
+  name: string
+}
+const regions = ref<Region[]>([])
+window.ipcRenderer.on(IpcChannels.GET_REGION_DATA, (event, rows) => {
+  if (rows) {
+    regions.value = rows
+  }
+})
+
+function deleteRegion(id: number) {
+  regions.value = regions.value.filter((region) => region.id !== id)
+}
+
+function getRegion() {
+  window.ipcRenderer.send(IpcChannels.GET_REGION_DATA)
+}
+
+onMounted(() => {
+  getRegion()
+})
+
+/* MODAL PRIZE */
 const modalPrizeState = reactive({
   isOpen: false,
   isLoading: false,
@@ -23,64 +45,39 @@ function openModalCreatePrize(isOpen: boolean) {
   modalPrizeState.name = ""
   editedPrizeId.value = 0
   modalPrizeState.quotas = []
-  allRegionState.isActive = true
-  allRegionState.quota = 1
 }
 
 function openModalEditPrize(prize: Prize) {
   modalPrizeState.isOpen = true
   modalPrizeState.name = prize.name
   editedPrizeId.value = prize.id
-
-  if (prize.detail[0]?.id === 'All Region') {
-    allRegionState.isActive = true
-    allRegionState.quota = prize.detail[0].numOfItem
-  }
-  else {
-    allRegionState.isActive = false
-    modalPrizeState.quotas = JSON.parse(JSON.stringify(prize.detail))
-  }
+  modalPrizeState.quotas = JSON.parse(JSON.stringify(prize.detail))
+  
 }
 
-/* SWITCH ALL REGION */
-const allRegionState = reactive({
-  isActive: true,
-  quota: 1
+/* MODAL REGION */
+const modalRegionState = reactive({
+  isOpen: false,
+  isLoading: false,
+  isEdit: false
 })
 
-function switchAllRegion(isActive: boolean) {
-  allRegionState.isActive = isActive
-}
 
 /* ADD PRIZE FOR CERTAIN REGION */
 function addRow() {
   modalPrizeState.quotas.push({
-    id: 'DKI Jakarta',
-    name: 'DKI Jakarta',
+    id: regions.value[0].id,
+    name: regions.value[0].name,
     numOfItem: 1
   },)
 }
 
 function saveNewPrize() {
   modalPrizeState.isLoading = true
-
-  if (allRegionState.isActive) {
-    window.ipcRenderer.send(IpcChannels.ADD_PRIZE, {
-      name: modalPrizeState.name,
-      detail: JSON.stringify([{
-        id: 'All Region',
-        name: 'All Region',
-        numOfItem: allRegionState.quota
-      }])
-    })
-  }
-
-  else {
-    window.ipcRenderer.send(IpcChannels.ADD_PRIZE, {
-      name: modalPrizeState.name,
-      detail: JSON.stringify(modalPrizeState.quotas)
-    })
-  }
+  window.ipcRenderer.send(IpcChannels.ADD_PRIZE, {
+    name: modalPrizeState.name,
+    detail: JSON.stringify(modalPrizeState.quotas)
+  })
 }
 
 window.ipcRenderer.on(IpcChannels.ADD_PRIZE, (event) => {
@@ -120,24 +117,11 @@ function saveEditedPrize() {
   modalPrizeState.isLoading = true
   isLoadingInAction.value = true
 
-  if (allRegionState.isActive) {
-    window.ipcRenderer.send(IpcChannels.EDIT_PRIZE, {
-      id: editedPrizeId.value,
-      name: modalPrizeState.name,
-      detail: JSON.stringify([{
-        id: 'All Region',
-        name: 'All Region',
-        numOfItem: allRegionState.quota
-      }])
-    })
-  }
-  else {
-    window.ipcRenderer.send(IpcChannels.EDIT_PRIZE, {
-      id: editedPrizeId.value,
-      name: modalPrizeState.name,
-      detail: JSON.stringify(modalPrizeState.quotas)
-    })
-  }
+  window.ipcRenderer.send(IpcChannels.EDIT_PRIZE, {
+    id: editedPrizeId.value,
+    name: modalPrizeState.name,
+    detail: JSON.stringify(modalPrizeState.quotas)
+  })
 }
 
 window.ipcRenderer.on(IpcChannels.EDIT_PRIZE, () => {
@@ -166,6 +150,12 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
           @click="openModalCreatePrize(true)"
         >
           Create New Prize
+        </button>
+        <button
+          class="rounded-md bg-green-700 text-white hover:bg-amber-500 cursor-pointer py-3 px-8"
+          @click="modalRegionState.isOpen = true"
+        >
+          Edit Region
         </button>
       </div>
 
@@ -230,22 +220,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
           type="text"
         >
       </div>
-
-      <div class="flex gap-3 mt-3 items-center">
-        <switch-component
-          v-model:value="allRegionState.isActive"
-          @input="switchAllRegion($event)"
-        />
-        <p>For All Region?</p>
-        <input
-          v-if="allRegionState.isActive"
-          v-model="allRegionState.quota"
-          class="border-gray-300 rounded p-2 border"
-          placeholder="prize quota"
-          type="number"
-        >
-      </div>
-      <div v-if="!allRegionState.isActive">
+      <div>
         <div class="mt-3 flex items-center gap-3">
           <p>Quota Detail : </p>
           <button
@@ -262,9 +237,10 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
           class="flex gap-3 items-center mt-3"
         >
           <select-component
+            :options="regions"
             :model-value="item.id"
-            :options="provinces"
-            @update:modelValue="item.id = $event; item.name = $event"
+            @update:modelValue="item.id = $event;"
+            @update:selectedName="item.name = $event;"
           />
           <input
             v-model="item.numOfItem"
@@ -288,6 +264,54 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
           @click="editedPrizeId ? saveEditedPrize() : saveNewPrize()"
         >
           {{ editedPrizeId ? `Edit Prize Id: ${editedPrizeId}` : 'Create New Prize' }}
+        </button>
+      </div>
+    </modal-component>
+
+    <modal-component
+      :is-loading="modalRegionState.isLoading"
+      :is-open="modalRegionState.isOpen"
+      @update:isOpen="modalRegionState.isOpen = $event"
+    >
+      <div>
+        <table class="table-auto w-full border-white text-center">
+          <thead>
+            <tr>
+              <th class="px-4 py-2 border border-gray-800">ID</th>
+              <th class="px-4 py-2 border border-gray-800">Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="region in regions" :key="region.id">
+              <td class="border px-4 py-2 border-gray-800">{{ region.id }}</td>
+              <td class="border px-4 py-2 border-gray-800">
+                <div v-if="modalRegionState.isEdit" class="flex gap-3 items-center">
+                  <input
+                    v-model="region.name"
+                    class="border-gray-300 rounded p-2 border"
+                    placeholder="prize name"
+                    type="text"
+                  >
+                  <div
+                    class="rounded-full bg-red-700 hover:bg-orange-700 cursor-pointer h-full px-2 text-white hover:scale-110"
+                    @click="deleteRegion(region.id)"
+                  >
+                    X
+                  </div>
+                </div>
+
+                <p v-else>
+                  {{ region.name }}
+                </p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <button
+          class="mt-3 w-full rounded-md bg-green-700 text-white hover:bg-amber-500 cursor-pointer py-3 px-8 w-3/4"
+          @click="modalRegionState.isEdit = !modalRegionState.isEdit"
+        >
+          {{ modalRegionState.isEdit ? 'Save' : 'Edit' }}
         </button>
       </div>
     </modal-component>

@@ -8,6 +8,7 @@ export async function createRegionTable() {
 }
 
 const regions = [
+  "All Region",
   "Jakarta A",
   "Jakarta B",
   "Jabar Jateng",

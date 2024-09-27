@@ -1,5 +1,5 @@
 export interface Quota {
-	id: string;
+	id: number;
 	name: string;
 	numOfItem: number;
 }
