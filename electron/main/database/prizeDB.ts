@@ -1,5 +1,13 @@
 import { dbRun, dbAll, dbGet } from "../database/init";
 
+export async function createPrizeTable() {
+  await dbRun(`CREATE TABLE IF NOT EXISTS prize (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(255),
+    detail TEXT
+  )`);
+}
+
 export async function addPrize(name: string, detail: string) {
   const sql = `INSERT INTO prize (name, detail) VALUES (?, ?)`;
   await dbRun(sql, [name, detail]);

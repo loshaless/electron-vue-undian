@@ -3,42 +3,29 @@ import { promisify } from 'util';
 const DBSOURCE = "db.sqlite";
 import { createCustomerTable } from "./customerDB";
 import { createCategoryTable } from "./categoryDB";
+import { createWinnerTable } from "./winnerDB";
+import { createPrizeTable } from "./prizeDB";
+import { createRegionTable, initRegion, isRegionExist, isRegionExist } from "./regionDB";
 
-export const db = new sqlite3.Database(DBSOURCE, (err) => {
+export const db = new sqlite3.Database(DBSOURCE, async (err) => {
   if (err) {
     console.error(err.message);
     return;
   }
-  console.log("init database");
 
-  db.serialize(() => {
-    createCustomerTable()
+  const promises = [
+    createCustomerTable(),
+    createPrizeTable(),
+    createCategoryTable(),
+    createWinnerTable(),
+    createRegionTable()
+  ]
+  await Promise.all(promises)
 
-    db.run(`CREATE TABLE IF NOT EXISTS prize (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name VARCHAR(255),
-      detail TEXT
-    )`);
-
-    db.run(`CREATE TABLE IF NOT EXISTS roll (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      customer_id INTEGER,
-      points INTEGER,
-      cumulative_points INTEGER
-    )`);
-
-    createCategoryTable()
-
-    db.run(`CREATE TABLE IF NOT EXISTS winner (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      prize_name VARCHAR(255),
-      roll_id INTEGER,
-      customer_name VARCHAR(100),
-      region VARCHAR(100),
-      category VARCHAR(100),
-      created_at TIMESTAMP DEFAULT (DATETIME('now', 'localtime'))
-    )`);
-  });
+  const isRegionDataExist = await isRegionExist()
+  if (!isRegionDataExist) {
+    await initRegion()
+  }
 });
 
 export const dbAll = promisify(db.all).bind(db);
