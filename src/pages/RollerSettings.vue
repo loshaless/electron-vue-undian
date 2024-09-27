@@ -48,7 +48,7 @@ const selectedCategoryData = computed(() => {
     prize: [] as {
       tableName: string,
       prizeName: string,
-      regions: string[],
+      regions: string,
       numOfItem: number
     }[]
   }
@@ -62,7 +62,7 @@ const selectedCategoryData = computed(() => {
     const prizeDetail = prizeList.value.find((p: Prize) => p.id === prizeId)
     prizeDetail?.detail.forEach((quota: Quota) => {
       result.totalWinner += +quota.numOfItem
-      const tableName = `customer_${replaceSpaceWithUnderscore(category.name)}_${replaceSpaceWithUnderscore(quota.name.join('_'))}`
+      const tableName = `customer_${replaceSpaceWithUnderscore(category.name)}_${replaceSpaceWithUnderscore(quota.name)}`
 
       return result.prize.push({
         tableName: tableName,
@@ -228,7 +228,7 @@ function stopRoller() {
               <tbody>
                 <tr v-for="(category, index) in selectedCategoryData.prize" :key="index">
                   <td class="border px-4 py-2 border-gray-800">{{ category.prizeName }}</td>
-                  <td class="border px-4 py-2 border-gray-800">{{ category.regions.join(', ') }}</td>
+                  <td class="border px-4 py-2 border-gray-800">{{ category.regions }}</td>
                   <td class="border px-4 py-2 border-gray-800">{{ category.numOfItem }}</td>
                 </tr>
               </tbody>

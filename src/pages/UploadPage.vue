@@ -112,7 +112,7 @@ function generateListOfCustomerTable(): CustomerTable[] {
       const prizeDetail = prizes.value.find((p: Prize) => p.id === prizeId)
 
       prizeDetail?.detail.forEach((quota: Quota) => {
-        const tableName = `customer_${replaceSpaceWithUnderscore(category.name)}_${replaceSpaceWithUnderscore(quota.name.join('_'))}`
+        const tableName = `customer_${replaceSpaceWithUnderscore(category.name)}_${replaceSpaceWithUnderscore(quota.name)}`
       
         result.push({
           tableName: tableName,
