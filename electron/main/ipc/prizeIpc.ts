@@ -1,13 +1,15 @@
-import {ipcMain} from "electron";
-import {IpcChannels} from "../../../src/constants/enum/IpcChannels";
-import {addPrize, getPrizes, deletePrize, editPrize} from "../database/prizeDB";
-import {dialog} from "electron";
+import { ipcMain } from "electron";
+import { IpcChannels } from "../../../src/constants/enum/IpcChannels";
+import { addPrize, getPrizes, deletePrize, editPrize, isPrizeDataExist } from "../database/prizeDB";
+import { dialog } from "electron";
+import { dbRun } from "../database/init";
 
-ipcMain.on(IpcChannels.ADD_PRIZE, async (event, {name, detail}) => {
+ipcMain.on(IpcChannels.ADD_PRIZE, async (event, { name, detail }) => {
   try {
     await addPrize(name, detail);
     console.log("Prize added successfully");
     event.sender.send(IpcChannels.ADD_PRIZE);
+    event.sender.send(IpcChannels.IS_PRIZE_DATA_EXIST, true)
   } catch (err) {
     dialog.showErrorBox("Error", `Error adding prize: ${err.message}`);
   }
@@ -25,6 +27,12 @@ ipcMain.on(IpcChannels.GET_PRIZE, async (event) => {
 ipcMain.on(IpcChannels.DELETE_PRIZE, async (event, id) => {
   try {
     await deletePrize(id);
+    const isExist = await isPrizeDataExist();
+    if (!isExist) {
+      console.log("all prize data deleted");
+      event.sender.send(IpcChannels.IS_PRIZE_DATA_EXIST, false)
+    }
+
     console.log("Prize deleted successfully");
     event.sender.send(IpcChannels.DELETE_PRIZE);
   } catch (err) {
@@ -32,7 +40,7 @@ ipcMain.on(IpcChannels.DELETE_PRIZE, async (event, id) => {
   }
 });
 
-ipcMain.on(IpcChannels.EDIT_PRIZE, async (event, {id, name, detail}) => {
+ipcMain.on(IpcChannels.EDIT_PRIZE, async (event, { id, name, detail }) => {
   try {
     await editPrize(id, name, detail);
     console.log("Prize edited successfully");
@@ -40,4 +48,9 @@ ipcMain.on(IpcChannels.EDIT_PRIZE, async (event, {id, name, detail}) => {
   } catch (err) {
     dialog.showErrorBox("Error", `Error editing prize: ${err.message}`);
   }
+});
+
+ipcMain.on(IpcChannels.IS_PRIZE_DATA_EXIST, async (event) => {
+  const isExist = await isPrizeDataExist();
+  event.sender.send(IpcChannels.IS_PRIZE_DATA_EXIST, isExist);
 });

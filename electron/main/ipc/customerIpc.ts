@@ -117,12 +117,8 @@ ipcMain.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, async (event, filePath,
 ipcMain.on(IpcChannels.DELETE_CUSTOMER_IN_DATABASE, async (event) => {
   try {
     await dbRun('BEGIN TRANSACTION');
-
     await dropCustomerTable();
-    console.log("All customerdata drop successfully");
-
     await createCustomerTable();
-    console.log("customer table created successfully");
 
     await dbRun('COMMIT');
     event.sender.send(IpcChannels.IS_CUSTOMER_DATA_EXIST, false);

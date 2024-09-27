@@ -1,4 +1,4 @@
-import { dbRun, dbAll } from "./init";
+import { dbRun, dbAll, dbGet } from "./init";
 
 export async function addWinner(prizeName: string, rollId: number, customerName: string, region: string, category: number) {
   const sql = `INSERT INTO winner (prize_name, roll_id, customer_name, region, category) VALUES (?, ?, ?, ?, ?)`;

@@ -24,6 +24,11 @@ export async function getMaxCumulativePoints(tableName: string) {
   return result.cumulative_points;
 }
 
+export async function getTotalCustomer(tableName: string) {
+  const result = await dbGet(`SELECT id FROM ${tableName} ORDER BY id DESC LIMIT 1`);
+  return result.id;
+}
+
 export async function findCustomerByCumulativePoints(tableName: string, cumulativePoints: number) {
   const result = await dbGet(`SELECT customer_id, points, cumulative_points FROM ${tableName} WHERE cumulative_points >= ?`, [cumulativePoints]);
   return result;

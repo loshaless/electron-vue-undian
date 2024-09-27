@@ -19,8 +19,14 @@ window.ipcRenderer.on(IpcChannels.IS_CUSTOMER_DATA_EXIST, (event, isDataExist) =
   isCustomerDataExist.value = isDataExist;
 })
 
+const isPrizeDataExist: Ref<Boolean> = ref(false)
+window.ipcRenderer.on(IpcChannels.IS_PRIZE_DATA_EXIST, (event, isDataExist) => {
+  isPrizeDataExist.value = isDataExist;
+})
+
 onMounted(() => {
   window.ipcRenderer.send(IpcChannels.IS_CUSTOMER_DATA_EXIST)
+  window.ipcRenderer.send(IpcChannels.IS_PRIZE_DATA_EXIST)
 })
 </script>
 
@@ -28,29 +34,31 @@ onMounted(() => {
   <div>
     <div class="container mx-auto flex justify-around items-center mt-3 gap-3.5">
       <p
-        :class="{'!bg-green-500': selectedPage === PAGE.PRIZE_PAGE}"
+        v-if="!isCustomerDataExist"
+        :class="{'!bg-green-500 !text-white': selectedPage === PAGE.PRIZE_PAGE}"
         class="navbar"
         @click="selectedPage = PAGE.PRIZE_PAGE"
       >
-        Prize Settings
+        Prize & Region Settings
       </p>
       <p
-        :class="{'!bg-green-500': selectedPage === PAGE.UPLOAD_PAGE}"
+        v-if="isPrizeDataExist"
+        :class="{'!bg-green-500 !text-white': selectedPage === PAGE.UPLOAD_PAGE}"
         class="navbar"
         @click="selectedPage = PAGE.UPLOAD_PAGE"
       >
         Upload
       </p>
       <p
-        v-if="isCustomerDataExist"
-        :class="{'!bg-green-500': selectedPage === PAGE.SETTINGS_PAGE}"
+        v-if="isPrizeDataExist && isCustomerDataExist"
+        :class="{'!bg-green-500 !text-white': selectedPage === PAGE.SETTINGS_PAGE}"
         class="navbar"
         @click="selectedPage = PAGE.SETTINGS_PAGE"
       >
         Roller Settings
       </p>
       <p
-        :class="{'!bg-green-500': selectedPage === PAGE.REPORT_PAGE}"
+        :class="{'!bg-green-500 !text-white': selectedPage === PAGE.REPORT_PAGE}"
         class="navbar"
         @click="selectedPage = PAGE.REPORT_PAGE"
       >

@@ -25,7 +25,7 @@ export async function isCustomerDataExist() {
 }
 
 export async function getCustomerDataByBalanceAndRegion(
-  minBalance: number, 
+  minBalance: number,
   region: string,
   limit: number,
   offset: number
@@ -34,12 +34,12 @@ export async function getCustomerDataByBalanceAndRegion(
     SELECT customer_id, points
     FROM customer
     WHERE balance >= ? 
-    ${region === 'All Region' ? "": "AND region = ?"}
+    ${region === 'All Region' ? "" : "AND region = ?"}
     AND roll_id IS NULL
     ORDER BY customer_id
     LIMIT ? OFFSET ?
   `;
-  
+
   const params = region === 'All Region' ? [minBalance, limit, offset] : [minBalance, region, limit, offset];
   return await dbAll(sql, params);
 }
@@ -63,6 +63,12 @@ export async function getTotalCumulativePoints(): Promise<number> {
   `
   const result = await dbGet(sql)
   return result.cumulative_points
+}
+
+export async function getTotalCustomer() {
+  const sql = `SELECT customer_id FROM customer order by customer_id desc limit 1`;
+  const result = await dbGet(sql);
+  return result.customer_id;
 }
 
 export async function massInsertCustomer(data: any[]) {

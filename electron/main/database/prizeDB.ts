@@ -1,4 +1,4 @@
-import { dbRun, dbAll } from "../database/init";
+import { dbRun, dbAll, dbGet } from "../database/init";
 
 export async function addPrize(name: string, detail: string) {
   const sql = `INSERT INTO prize (name, detail) VALUES (?, ?)`;
@@ -8,6 +8,12 @@ export async function addPrize(name: string, detail: string) {
 export async function getPrizes() {
   const sql = `SELECT * FROM prize`;
   return await dbAll(sql);
+}
+
+export async function isPrizeDataExist() {
+  const sql = `SELECT id FROM prize limit 1`;
+  const rows = await dbGet(sql);
+  return rows != undefined;
 }
 
 export async function deletePrize(id: number) {

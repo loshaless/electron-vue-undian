@@ -16,5 +16,6 @@ export enum IpcChannels {
   GET_WINNER_BY_CATEGORY = "get-winner-by-category",
   SAVE_CATEGORY = "save_category",
   GET_CATEGORY = "get_category",
-  GET_A_WINNER = "get-a-winner"
+  GET_A_WINNER = "get-a-winner",
+  IS_PRIZE_DATA_EXIST = "IS_PRIZE_DATA_EXIST"
 }

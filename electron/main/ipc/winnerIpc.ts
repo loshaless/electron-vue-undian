@@ -1,6 +1,6 @@
 import { ipcMain } from "electron";
 import { IpcChannels } from "../../../src/constants/enum/IpcChannels";
-import { getWinnerByCategory } from "../database/winnerDB";
+import { getWinnerByCategory, isWinnerDataExist } from "../database/winnerDB";
 import { dialog } from "electron";
 
 ipcMain.on(IpcChannels.GET_WINNER_BY_CATEGORY, async (event, categoryId: number[]) => {
