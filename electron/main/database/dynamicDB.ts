@@ -20,13 +20,17 @@ export async function massInsert(tableName: string, data: any[]) {
 }
 
 export async function getMaxCumulativePoints(tableName: string) {
-  const result = await dbGet(`SELECT cumulative_points FROM ${tableName} ORDER BY id DESC LIMIT 1`);
+  const idName = tableName === "customer" ? "customer_id" : "id"
+
+  const result = await dbGet(`SELECT cumulative_points FROM ${tableName} ORDER BY ${idName} DESC LIMIT 1`);
   return result.cumulative_points;
 }
 
 export async function getTotalCustomer(tableName: string) {
-  const result = await dbGet(`SELECT id FROM ${tableName} ORDER BY id DESC LIMIT 1`);
-  return result.id;
+  const idName = tableName === "customer" ? "customer_id" : "id"
+
+  const result = await dbGet(`SELECT ${idName} FROM ${tableName} ORDER BY ${idName} DESC LIMIT 1`);
+  return result[idName];
 }
 
 export async function findCustomerByCumulativePoints(tableName: string, cumulativePoints: number) {

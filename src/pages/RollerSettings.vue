@@ -4,9 +4,8 @@ import {IpcChannels} from "../constants/enum/IpcChannels";
 import SelectComponent from "../components/SelectComponent.vue";
 import LoadingComponent from "../components/LoadingComponent.vue";
 import {useCategory} from "../composables/useCategory";
-import {PrizeDetail} from "../constants/types/PrizeDetail";
+import {PrizeDetail, PrizeRegionDetail} from "../constants/types/PrizeDetail";
 import {Category} from "../constants/types/Category";
-import {Quota} from "../constants/types/Quota";
 import ModalComponent from "../components/ModalComponent.vue";
 import {formatNumber, replaceSpaceWithUnderscore} from "../utils/generalUtils";
 import { WinnerView } from "../constants/types/WinnerView";
@@ -20,19 +19,28 @@ function getPrizeList() {
 
 const prizeList = ref<PrizeDetail[]>([])
 window.ipcRenderer.on(IpcChannels.GET_PRIZE, (event, rows) => {
-  if (rows) {
-    prizeList.value = rows.map((row: any) => {
-      return {
-        id: row.id,
-        name: row.name,
-        detail: JSON.parse(row.detail)
-      }
-    })
-  }
+  prizeList.value = rows
+  getCumulativePointsAndTotalCustomer()
 })
 
 onMounted(() => {
   getPrizeList()
+})
+
+/* GET CUMULATIVE POITNS AND TOTAL CUSTOMER */
+function getCumulativePointsAndTotalCustomer() {
+  window.ipcRenderer.send(IpcChannels.GET_CUMULATIVE_POINTS_AND_TOTAL_CUSTOMER)
+}
+
+interface ListCumulativePointsAndTotalCustomer {
+  [key: string]: {
+    cumulativePoints: number, totalCustomer: number
+  }
+}
+const listCumulativePointsAndTotalCustomer = ref<ListCumulativePointsAndTotalCustomer>({})
+window.ipcRenderer.on(IpcChannels.GET_CUMULATIVE_POINTS_AND_TOTAL_CUSTOMER, (event, cumulativePointsAndTotalCustomer) => {
+  console.log("cumulativePointsAndTotalCustomer", cumulativePointsAndTotalCustomer)
+  listCumulativePointsAndTotalCustomer.value = cumulativePointsAndTotalCustomer
 })
 
 /* SELECTED CATEGORY */
@@ -46,6 +54,8 @@ const selectedCategoryData = computed(() => {
     minBalance: 0,
     totalWinner: 0,
     prize: [] as {
+      cumulativePoints: number,
+      totalCustomer: number,
       tableName: string,
       prizeName: string,
       regions: string,
@@ -58,17 +68,19 @@ const selectedCategoryData = computed(() => {
   result.categoryId = category?.id ?? 0
   result.minBalance = category?.minBalance ?? 0
 
-  category?.prize?.forEach((prizeId: number) => {
-    const prizeDetail = prizeList.value.find((p: Prize) => p.id === prizeId)
-    prizeDetail?.detail.forEach((quota: Quota) => {
-      result.totalWinner += +quota.numOfItem
-      const tableName = `customer_${replaceSpaceWithUnderscore(category.name)}_${replaceSpaceWithUnderscore(quota.name)}`
+  category?.prizes?.forEach((prizeId: number) => {
+    const prizeDetail = prizeList.value.find((p: PrizeDetail) => p.prizeId === prizeId)
+    prizeDetail?.regions.forEach((region: PrizeRegionDetail) => {
+      result.totalWinner += +region.numOfItem
+      const tableName = `customer_${replaceSpaceWithUnderscore(category.name)}_${replaceSpaceWithUnderscore(region.regionName)}`
 
       return result.prize.push({
         tableName: tableName,
-        prizeName: prizeDetail?.name,
-        regions: quota.name,
-        numOfItem: quota.numOfItem
+        cumulativePoints: listCumulativePointsAndTotalCustomer.value[tableName]?.cumulativePoints,
+        totalCustomer: listCumulativePointsAndTotalCustomer.value[tableName]?.totalCustomer,
+        prizeName: prizeDetail?.prizeName,
+        regions: region.regionName,
+        numOfItem: region.numOfItem
       });
     })
   })
@@ -143,6 +155,11 @@ function stopRoller() {
 
 <template>
   <div>
+    <div class="border rounded-md p-5 shadow-sm border-gray-800 bg-gray-200 mx-5 my-5">
+      <h1 class="text-2xl font-bold mb-2">Customer Data</h1>
+      <h3 class="text-lg">Total Customer: {{ formatNumber(listCumulativePointsAndTotalCustomer?.customer?.totalCustomer)}}</h3>
+      <h3 class="text-lg">Total Roll Id: {{formatNumber(listCumulativePointsAndTotalCustomer?.customer?.cumulativePoints)}}</h3>
+    </div>
     <div class="my-5 flex flex-col mx-5 gap-5">
       <!-- Roller Settings -->
       <div class="border rounded-md p-5 shadow-sm border-gray-800 bg-amber-300 flex-1">
@@ -223,6 +240,8 @@ function stopRoller() {
                   <th class="px-4 py-2 border border-gray-800">Prize Name</th>
                   <th class="px-4 py-2 border border-gray-800">Regions</th>
                   <th class="px-4 py-2 border border-gray-800">Num of Item</th>
+                  <th class="px-4 py-2 border border-gray-800">Total Roll Id</th>
+                  <th class="px-4 py-2 border border-gray-800">Total Customer</th>
                 </tr>
               </thead>
               <tbody>
@@ -230,6 +249,8 @@ function stopRoller() {
                   <td class="border px-4 py-2 border-gray-800">{{ category.prizeName }}</td>
                   <td class="border px-4 py-2 border-gray-800">{{ category.regions }}</td>
                   <td class="border px-4 py-2 border-gray-800">{{ category.numOfItem }}</td>
+                  <td class="border px-4 py-2 border-gray-800">{{ formatNumber(category.cumulativePoints) }}</td>
+                  <td class="border px-4 py-2 border-gray-800">{{ formatNumber(category.totalCustomer) }}</td>
                 </tr>
               </tbody>
             </table>

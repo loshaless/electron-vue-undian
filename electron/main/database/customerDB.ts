@@ -73,6 +73,6 @@ export async function getTotalCustomer() {
 
 export async function massInsertCustomer(data: any[]) {
   const placeholders = data.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
-  const values = data.flatMap(item => [item[0], item[1], item[2], item[3], item[4], item[5], item[6], item[7], item[8]]);
+  const values = data.flatMap(item => [item[0], item[1], item[2], item[3], item[4], item[5], item[6], item[7].toString(), item[8]]);
   await dbRun(`INSERT INTO customer (customer_id, cif, account, name, branch, region, points, cumulative_points, balance) VALUES ${placeholders}`, values);
 }

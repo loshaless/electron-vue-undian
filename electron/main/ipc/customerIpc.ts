@@ -6,7 +6,7 @@ import { dbRun } from "../database/init";
 import { dropCustomerTable, createCustomerTable, isCustomerDataExist, getTotalCumulativePoints, massInsertCustomer } from "../database/customerDB";
 import { windows } from "..";
 import { CustomerTable } from "../../../src/constants/types/CustomerTable";
-import { createTable, dropTable, massInsert } from "../database/dynamicDB";
+import { createTable, dropTable, getMaxCumulativePoints, getTotalCustomer, massInsert } from "../database/dynamicDB";
 import { addTempTableName, createTempTableNameTable, dropTempTableName, getTempTableName } from "../database/tempTableNameDB";
 
 async function initAllCustomerTable(conditions: CustomerTable[]) {
@@ -22,7 +22,6 @@ async function initAllCustomerTable(conditions: CustomerTable[]) {
 let arrayOfCumulativePoints = []
 async function insertBatch(batchs: any[], conditions: CustomerTable[]): Promise<void> {
   const arrayOfBatch = Array.from({ length: conditions.length }, () => []);
-  arrayOfCumulativePoints = new Array(conditions.length).fill(0)
 
   for (const batch of batchs) {
     const [customer_id, cif, account, name, branch, region, points, cumulative_points, balance] = batch
@@ -66,7 +65,7 @@ ipcMain.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, async (event, filePath,
   const batchSize = 3000
   let batch = []
   const insertPromises = []
-  let cumulativePoints = 0
+  let cumulativePoints = BigInt(0)
 
   let index = 0
 
@@ -76,7 +75,7 @@ ipcMain.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, async (event, filePath,
     for await (const line of rl) {
       index++
       const [cif, account, name, branch, region, points, balance] = line.split("|");
-      cumulativePoints += parseInt(points)
+      cumulativePoints += BigInt(points)
       batch.push([index, cif, account, name, branch, region, parseInt(points), cumulativePoints, parseInt(balance)]);
 
       if (batch.length >= batchSize) {
@@ -160,4 +159,23 @@ ipcMain.on(IpcChannels.GET_TOTAL_CUMULATIVE_POINTS, async (event) => {
   catch (error) {
     dialog.showErrorBox("Error", `Get total cumulative points: ${error.message}`);
   }
+})
+
+ipcMain.on(IpcChannels.GET_CUMULATIVE_POINTS_AND_TOTAL_CUSTOMER, async (event) => {
+  const result = {}
+
+  const listOfCustomerTableObject = await getTempTableName()
+  const listOfCustomerTable: string[] = listOfCustomerTableObject.map((table: any) => table.table_name)
+  listOfCustomerTable.push("customer")
+
+  for (const tableName of listOfCustomerTable) {
+    const cumulativePoints = await getMaxCumulativePoints(tableName)
+    const totalCustomer = await getTotalCustomer(tableName)
+    result[tableName] = {
+      cumulativePoints,
+      totalCustomer
+    }
+  }
+
+  event.sender.send(IpcChannels.GET_CUMULATIVE_POINTS_AND_TOTAL_CUSTOMER, result)
 })
