@@ -2,26 +2,103 @@ import {ipcMain} from "electron";
 import {IpcChannels} from "../../../src/constants/enum/IpcChannels";
 
 import {dialog} from "electron";
-import {massInsertCategory, dropCategoryTable, getCategory, createCategoryTable} from "../database/categoryDB";
+import {getCategoryJoinPrize, editCategory} from "../database/categoryDB";
+import { dbRun } from "../database/init";
+import { editCategoryPrize } from "../database/prizeDB";
     
-ipcMain.on(IpcChannels.SAVE_CATEGORY, async (event, categories: any[]) => {
-  try {
-    await dropCategoryTable();
-    await createCategoryTable();
+interface EditCategory {
+  id: number;
+  minBalance: number;
+}
 
-    await massInsertCategory(categories);
+interface EditCategoryPrize {
+  prizeId: number;
+  categoryId: number;
+}
+
+ipcMain.on(IpcChannels.SAVE_CATEGORY, async (
+  event,
+  edittedCategories: EditCategory[],
+  edittedCategoryPrizes: EditCategoryPrize[]
+) => {
+  try {
+    await dbRun(`BEGIN TRANSACTION`);
+    console.log(edittedCategories);
+    console.log(edittedCategoryPrizes);
+    const categoryPromises = edittedCategories.map((category) => {
+      editCategory(category.id, category.minBalance);
+    });
+
+    const prizePromises = edittedCategoryPrizes.map((categoryPrize) => {
+      editCategoryPrize(categoryPrize.prizeId, categoryPrize.categoryId);
+    });
+
+    await Promise.all(categoryPromises);
+    await Promise.all(prizePromises);
+
     console.log("Category added successfully");
     event.sender.send(IpcChannels.SAVE_CATEGORY);
+    await dbRun(`COMMIT`);
   } catch (err) {
+    await dbRun(`ROLLBACK`);
     dialog.showErrorBox("Error", `Error adding category: ${err.message}`);
   }
 });
 
 ipcMain.on(IpcChannels.GET_CATEGORY, async (event) => {
-    try {
-        const rows = await getCategory();
-        event.sender.send(IpcChannels.GET_CATEGORY, rows);
-    } catch (err) {
-        dialog.showErrorBox("Error", `Error fetching category: ${err.message}`);
-    }
+  try {
+      const rows = await getCategoryJoinPrize();      
+      event.sender.send(IpcChannels.GET_CATEGORY, transformData(rows));
+  } catch (err) {
+      dialog.showErrorBox("Error", `Error fetching category: ${err.message}`);
+  }
 })
+
+function transformData(data: any[]) {
+  return data.reduce((acc, item) => {
+    let category = acc.find(c => c.id === item.id);
+    if (!category) {
+      category = {
+        id: item.id,
+        name: item.name,
+        minBalance: item.min_balance,
+        prizes: []
+      };
+      acc.push(category);
+    }
+    category.prizes.push(item.prize_id);
+    return acc;
+  }, []);
+}
+
+// function transformData(data: any[]) {
+//   return data.reduce((acc, item) => {
+//     let category = acc.find(c => c.categoryId === item.id);
+//     if (!category) {
+//       category = {
+//         categoryId: item.id,
+//         categoryName: item.name,
+//         minBalance: item.min_balance,
+//         prizes: []
+//       };
+//       acc.push(category);
+//     }
+  
+//     let prize = category.prizes.find(p => p.prizeId === item.prize_id);
+//     if (!prize) {
+//       prize = {
+//         prizeId: item.prize_id,
+//         name: item.prize_name,
+//         regions: []
+//       };
+//       category.prizes.push(prize);
+//     }
+  
+//     prize.regions.push({
+//       regionName: item.region_name,
+//       numOfItem: item.num_of_item
+//     });
+  
+//     return acc;
+//   }, []);
+// }

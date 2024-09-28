@@ -4,7 +4,9 @@ export async function createPrizeTable() {
   await dbRun(`CREATE TABLE IF NOT EXISTS prize (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(255) NOT NULL,
-    UNIQUE (name)
+    category_id INTEGER,
+    UNIQUE (name),
+    FOREIGN KEY (category_id) REFERENCES category(id)
   )`);
 }
 
@@ -62,4 +64,9 @@ export async function deletePrize(id: number) {
 export async function editPrize(id: number, name: string) {
   const sql = `UPDATE prize SET name = ? WHERE id = ?`;
   await dbRun(sql, [name, id]);
+}
+
+export async function editCategoryPrize(id: number, categoryId: number) {
+  const sql = `UPDATE prize SET category_id = ? WHERE id = ?`;
+  await dbRun(sql, [categoryId, id]);
 }

@@ -3,31 +3,21 @@ import {IpcChannels} from "../constants/enum/IpcChannels";
 import {ref, onBeforeMount, onMounted, reactive, computed} from "vue";
 import TooltipComponent from "../components/TooltipComponent.vue";
 import LoadingComponent from "../components/LoadingComponent.vue";
-import { Prize } from "../constants/types/PrizeDetail";
+import { PrizeDetail, PrizeRegionDetail } from "../constants/types/PrizeDetail";
 import MultiSelectComponent from "../components/MultiSelectComponent.vue";
-import { Quota } from "../constants/types/Quota";
 import { CustomerTable } from "../constants/types/CustomerTable";
 import { useCategory } from "../composables/useCategory";
 import { Category } from "../constants/types/Category";
-import { replaceSpaceWithUnderscore } from "../utils/generalUtils";
-import { formatNumber } from "../utils/generalUtils";
+import { formatNumber, replaceSpaceWithUnderscore } from "../utils/generalUtils";
 
 /* GET LIST OF PRIZE */
 onMounted(() => {
   window.ipcRenderer.send(IpcChannels.GET_PRIZE)
 })
 
-const prizes = ref<Prize[]>([])
+const prizes = ref<PrizeDetail[]>([])
 window.ipcRenderer.on(IpcChannels.GET_PRIZE, (event, rows) => {
-  if (rows) {
-    prizes.value = rows.map((row: any) => {
-      return {
-        id: row.id,
-        name: row.name,
-        detail: JSON.parse(row.detail)
-      }
-    })
-  }
+  prizes.value = rows
 })
 
 /* INIT CATEGORY */
@@ -36,7 +26,7 @@ const { listOfCategory, getCategory } = useCategory(prizes);
 
 /* SETTING CATEGORY PRIZE */
 function handleUpdatePrize(index: number, prize: number[]) {
-  listOfCategory[index].prize = prize
+  listOfCategory[index].prizes = prize
 }
 
 /* SAVE CATEGORY */
@@ -46,12 +36,26 @@ const saveCategoryState = reactive({
 })
 
 const canSaveCategory = computed(() => {
-  return listOfCategory.every((category: Category) => category.prize?.length)
+  return listOfCategory.every((category: Category) => category.prizes?.length)
 })
 function saveCategory() {
+  const edditedCategories = listOfCategory.map((category: Category) => ({
+    id: category.id,
+    minBalance: category.minBalance
+  }))
+  const edditedCategoryPrizes: {prizeId: number, categoryId: number}[] = []
+  listOfCategory.forEach((category: Category) => {
+    category.prizes?.forEach((prizeId: number) => {
+      edditedCategoryPrizes.push({
+        prizeId: prizeId,
+        categoryId: category.id
+      })
+    })
+  })
   window.ipcRenderer.send(
     IpcChannels.SAVE_CATEGORY, 
-    JSON.parse(JSON.stringify(listOfCategory))
+    JSON.parse(JSON.stringify(edditedCategories)),
+    JSON.parse(JSON.stringify(edditedCategoryPrizes))
   )
   
   saveCategoryState.isEdit = false
@@ -62,6 +66,7 @@ window.ipcRenderer.on(IpcChannels.SAVE_CATEGORY, (event, isDone) => {
   if (isDone) {
     saveCategoryState.isLoading = false
   }
+  getCategory()
 })
 
 /* CHECK PATH OF URL */
@@ -108,16 +113,16 @@ const isLoading = ref(false);
 function generateListOfCustomerTable(): CustomerTable[] {
   const result: CustomerTable[] = []
   listOfCategory.forEach((category: Category) => {
-    category.prize?.forEach((prizeId: number) => {
-      const prizeDetail = prizes.value.find((p: Prize) => p.id === prizeId)
-
-      prizeDetail?.detail.forEach((quota: Quota) => {
-        const tableName = `customer_${replaceSpaceWithUnderscore(category.name)}_${replaceSpaceWithUnderscore(quota.name)}`
+    category.prizes?.forEach((prizeId: number) => {
+      const prizeDetail: PrizeDetail | undefined = prizes.value.find((p: PrizeDetail) => p.prizeId === prizeId)
+      
+      prizeDetail?.regions.forEach((region: PrizeRegionDetail) => {
+        const tableName = `customer_${replaceSpaceWithUnderscore(category.name)}_${replaceSpaceWithUnderscore(region.regionName)}`
       
         result.push({
           tableName: tableName,
           minBalance: category.minBalance,
-          regions: quota.name
+          regions: region.regionName
         })
       })
     })
@@ -170,9 +175,9 @@ window.ipcRenderer.on(IpcChannels.UPLOAD_COMPLETE, (event, isDone) => {
             <td class="border px-4 py-2">
               <multi-select-component
                 :isViewMode="!saveCategoryState.isEdit"
-                :options="prizes"
+                :options="prizes.map((p: PrizeDetail) => ({id: p.prizeId, name: p.prizeName}))"
                 placeholder="Select Prizes"
-                :selectedOptions="category.prize ?? []"  
+                :selectedOptions="category.prizes ?? []"  
                 @update:modelValue="handleUpdatePrize(index, $event)"
               />
             </td>
