@@ -7,16 +7,15 @@ import { dropCustomerTable, createCustomerTable, isCustomerDataExist, getTotalCu
 import { windows } from "..";
 import { CustomerTable } from "../../../src/constants/types/CustomerTable";
 import { createTable, dropTable, massInsert } from "../database/dynamicDB";
+import { addTempTableName, createTempTableNameTable, dropTempTableName, getTempTableName } from "../database/tempTableNameDB";
 
 async function initAllCustomerTable(conditions: CustomerTable[]) {
-  const dropPromises = []
   const createPromises = []
 
   for (const condition of conditions) {
-    dropPromises.push(dropTable(condition.tableName))
     createPromises.push(createTable(condition.tableName))
+    createPromises.push(addTempTableName(condition.tableName))
   }
-  await Promise.all(dropPromises);
   await Promise.all(createPromises);
 }
 
@@ -117,8 +116,21 @@ ipcMain.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, async (event, filePath,
 ipcMain.on(IpcChannels.DELETE_CUSTOMER_IN_DATABASE, async (event) => {
   try {
     await dbRun('BEGIN TRANSACTION');
+    
+    /* re-create table customer */
     await dropCustomerTable();
-    await createCustomerTable();
+    const promises = [createCustomerTable()]
+    const tempTableNameList = await getTempTableName()
+
+    /* drop table all temporary table */
+    for (const tableName of tempTableNameList) {
+      promises.push(dropTable(tableName.table_name))
+    }
+
+    /* drop table temp_table_name */
+    promises.push(dropTempTableName())
+    promises.push(createTempTableNameTable())
+    await Promise.all(promises)
 
     await dbRun('COMMIT');
     event.sender.send(IpcChannels.IS_CUSTOMER_DATA_EXIST, false);
