@@ -1,18 +1,28 @@
 import { ipcMain } from "electron";
 import { IpcChannels } from "../../../src/constants/enum/IpcChannels";
-import { addPrize, deletePrize, editPrize, isPrizeDataExist, getAllPrizeJoinRegion, AllPrizeJoinRegion } from "../database/prizeDB";
+import { addPrize, deletePrize, editPrize, isPrizeDataExist, getAllPrizeJoinRegion, AllPrizeJoinRegion, getPrizeId } from "../database/prizeDB";
 import { addPrizeRegion, editPrizeRegion, deletePrizeRegion } from "../database/prize_regionDB";
 import { dialog } from "electron";
 import { PrizeDetail, PrizeRegionDetail } from "../../../src/constants/types/PrizeDetail";
 import { dbRun } from "../database/init";
 
-ipcMain.on(IpcChannels.ADD_PRIZE, async (event, { name }) => {
+ipcMain.on(IpcChannels.ADD_PRIZE, async (event, prizeDetail: PrizeDetail, addedPrizeRegion: PrizeRegionDetail[]) => {
   try {
-    await addPrize(name);
-    console.log("Prize added successfully");
+    await dbRun('BEGIN TRANSACTION');
+    await addPrize(prizeDetail.prizeName);
+    const prizeId = await getPrizeId(prizeDetail.prizeName);
+    const promises = [];
+    
+    addedPrizeRegion.forEach((region) => {
+      promises.push(addPrizeRegion(prizeId, region.regionId, region.numOfItem));
+    });
+    await Promise.all(promises);
+    await dbRun('COMMIT');
+
     event.sender.send(IpcChannels.ADD_PRIZE);
     event.sender.send(IpcChannels.IS_PRIZE_DATA_EXIST, true)
   } catch (err) {
+    await dbRun('ROLLBACK');
     dialog.showErrorBox("Error", `Error adding prize: ${err.message}`);
   }
 });

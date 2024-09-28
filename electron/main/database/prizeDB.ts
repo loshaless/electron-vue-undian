@@ -3,7 +3,8 @@ import { dbRun, dbAll, dbGet } from "../database/init";
 export async function createPrizeTable() {
   await dbRun(`CREATE TABLE IF NOT EXISTS prize (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(255)
+    name VARCHAR(255) NOT NULL,
+    UNIQUE (name)
   )`);
 }
 
@@ -12,7 +13,13 @@ export async function addPrize(name: string) {
   await dbRun(sql, [name]);
 }
 
-export async function getPrizes() {
+export async function getPrizeId(name: string) {
+  const sql = `SELECT id FROM prize WHERE name = ?`;
+  const rows = await dbGet(sql, [name]);
+  return rows?.id;
+}
+
+export async function getAllPrizes() {
   const sql = `SELECT * FROM prize`;
   return await dbAll(sql);
 }

@@ -77,9 +77,13 @@ const modalPrizeState = reactive({
 
 function openModalCreatePrize(isOpen: boolean) {
   modalPrizeState.isOpen = isOpen
-  modalPrizeState.prizeDetail.prizeName = ""
+  modalPrizeState.prizeDetail = {
+    prizeId: 0,
+    prizeName: "",
+    regions: []
+  }
   editedPrizeId.value = 0
-  modalPrizeState.prizeDetail.regions = []
+  modalPrizeState.addedPrizeRegion = []
 }
 
 function openModalEditPrize(prize: PrizeDetail) {
@@ -103,10 +107,10 @@ function addRegionForPrize() {
 
 function saveNewPrize() {
   modalPrizeState.isLoading = true
-  window.ipcRenderer.send(IpcChannels.ADD_PRIZE, {
-    name: modalPrizeState.prizeDetail.prizeName,
-    detail: JSON.stringify(modalPrizeState.prizeDetail.regions)
-  })
+  window.ipcRenderer.send(IpcChannels.ADD_PRIZE,
+    JSON.parse(JSON.stringify(modalPrizeState.prizeDetail)),
+    JSON.parse(JSON.stringify(modalPrizeState.addedPrizeRegion)),
+  )
 }
 
 window.ipcRenderer.on(IpcChannels.ADD_PRIZE, (event) => {
