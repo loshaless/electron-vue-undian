@@ -3,18 +3,41 @@ import { dbRun, dbAll, dbGet } from "../database/init";
 export async function createPrizeTable() {
   await dbRun(`CREATE TABLE IF NOT EXISTS prize (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(255),
-    detail TEXT
+    name VARCHAR(255)
   )`);
 }
 
-export async function addPrize(name: string, detail: string) {
-  const sql = `INSERT INTO prize (name, detail) VALUES (?, ?)`;
-  await dbRun(sql, [name, detail]);
+export async function addPrize(name: string) {
+  const sql = `INSERT INTO prize (name) VALUES (?)`;
+  await dbRun(sql, [name]);
 }
 
 export async function getPrizes() {
   const sql = `SELECT * FROM prize`;
+  return await dbAll(sql);
+}
+
+export interface AllPrizeJoinRegion{
+  id: number,
+  prize_name: string,
+  region_id: number,
+  region_name: string,
+  num_of_item: number,
+  prize_region_id: number
+}
+
+export async function getAllPrizeJoinRegion(): Promise<AllPrizeJoinRegion[]>  {
+  const sql = `
+    SELECT prize.id, 
+    prize.name as prize_name, 
+    region.id as region_id,
+    region.name as region_name,
+    prize_region.id as prize_region_id,
+    prize_region.num_of_item as num_of_item
+    FROM prize 
+    JOIN prize_region ON prize.id = prize_region.prize_id 
+    JOIN region ON region.id = prize_region.region_id`
+  ;
   return await dbAll(sql);
 }
 
@@ -29,7 +52,7 @@ export async function deletePrize(id: number) {
   await dbRun(sql, [id]);
 }
 
-export async function editPrize(id: number, name: string, detail: string) {
-  const sql = `UPDATE prize SET name = ?, detail = ? WHERE id = ?`;
-  await dbRun(sql, [name, detail, id]);
+export async function editPrize(id: number, name: string) {
+  const sql = `UPDATE prize SET name = ? WHERE id = ?`;
+  await dbRun(sql, [name, id]);
 }

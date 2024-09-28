@@ -13,8 +13,8 @@ async function initAllCustomerTable(conditions: CustomerTable[]) {
   const createPromises = []
 
   for (const condition of conditions) {
-    dropPromises.push(await dropTable(condition.tableName))
-    createPromises.push(await createTable(condition.tableName))
+    dropPromises.push(dropTable(condition.tableName))
+    createPromises.push(createTable(condition.tableName))
   }
   await Promise.all(dropPromises);
   await Promise.all(createPromises);
@@ -40,14 +40,14 @@ async function insertBatch(batchs: any[], conditions: CustomerTable[]): Promise<
 
   const promises = []
   // insert all batchs to customer table
-  promises.push(await massInsertCustomer(batchs))
+  promises.push(massInsertCustomer(batchs))
 
   // Insert array of batch to dynamic table, name follow condition
   for (let i = 0; i < arrayOfBatch.length; i++) {
     const condition = conditions[i]
     const batch = arrayOfBatch[i]
     if (batch.length > 0) {
-      promises.push(await massInsert(condition.tableName, batch))
+      promises.push(massInsert(condition.tableName, batch))
     }
   }
 
@@ -81,7 +81,7 @@ ipcMain.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, async (event, filePath,
       batch.push([index, cif, account, name, branch, region, parseInt(points), cumulativePoints, parseInt(balance)]);
 
       if (batch.length >= batchSize) {
-        insertPromises.push(await insertBatch(batch, listOfCustomerTable));
+        insertPromises.push(insertBatch(batch, listOfCustomerTable));
         inserted += batch.length;
         event.sender.send(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, inserted);
         batch = [];
@@ -90,7 +90,7 @@ ipcMain.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, async (event, filePath,
 
     // Insert any remaining records in the last batch
     if (batch.length > 0) {
-      insertPromises.push(await insertBatch(batch, listOfCustomerTable));
+      insertPromises.push(insertBatch(batch, listOfCustomerTable));
       inserted += batch.length;
       event.sender.send(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, inserted);
     }

@@ -4,7 +4,7 @@ import {IpcChannels} from "../constants/enum/IpcChannels";
 import SelectComponent from "../components/SelectComponent.vue";
 import LoadingComponent from "../components/LoadingComponent.vue";
 import {useCategory} from "../composables/useCategory";
-import {Prize} from "../constants/types/Prize";
+import {PrizeDetail} from "../constants/types/PrizeDetail";
 import {Category} from "../constants/types/Category";
 import {Quota} from "../constants/types/Quota";
 import ModalComponent from "../components/ModalComponent.vue";
@@ -18,7 +18,7 @@ function getPrizeList() {
   window.ipcRenderer.send(IpcChannels.GET_PRIZE)
 }
 
-const prizeList = ref<Prize[]>([])
+const prizeList = ref<PrizeDetail[]>([])
 window.ipcRenderer.on(IpcChannels.GET_PRIZE, (event, rows) => {
   if (rows) {
     prizeList.value = rows.map((row: any) => {

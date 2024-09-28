@@ -3,7 +3,7 @@ import {IpcChannels} from "../constants/enum/IpcChannels";
 import {ref, onBeforeMount, onMounted, reactive, computed} from "vue";
 import TooltipComponent from "../components/TooltipComponent.vue";
 import LoadingComponent from "../components/LoadingComponent.vue";
-import { Prize } from "../constants/types/Prize";
+import { Prize } from "../constants/types/PrizeDetail";
 import MultiSelectComponent from "../components/MultiSelectComponent.vue";
 import { Quota } from "../constants/types/Quota";
 import { CustomerTable } from "../constants/types/CustomerTable";

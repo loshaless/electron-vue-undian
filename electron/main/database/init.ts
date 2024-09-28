@@ -6,6 +6,7 @@ import { createCategoryTable } from "./categoryDB";
 import { createWinnerTable } from "./winnerDB";
 import { createPrizeTable } from "./prizeDB";
 import { createRegionTable, initRegion, isRegionExist } from "./regionDB";
+import { createPrizeRegionTable } from "./prize_regionDB";
 
 export const db = new sqlite3.Database(DBSOURCE, async (err) => {
   if (err) {
@@ -18,7 +19,8 @@ export const db = new sqlite3.Database(DBSOURCE, async (err) => {
     createPrizeTable(),
     createCategoryTable(),
     createWinnerTable(),
-    createRegionTable()
+    createRegionTable(),
+    createPrizeRegionTable(),
   ]
   await Promise.all(promises)
 

@@ -1,10 +1,10 @@
 import { Ref, reactive, onMounted } from "vue";
 import { IpcChannels } from "../constants/enum/IpcChannels";
-import { Prize } from "../constants/types/Prize";
+import { PrizeDetail } from "../constants/types/PrizeDetail";
 import { prizeCategory } from "../constants/data/prizeCategory";
 import { Category } from "../constants/types/Category";
 
-export function useCategory(prizes: Ref<Prize[]>) {
+export function useCategory(prizes: Ref<PrizeDetail[]>) {
   const listOfCategory = reactive<Category[]>([]);
 
   function getCategory() {
@@ -25,7 +25,7 @@ export function useCategory(prizes: Ref<Prize[]>) {
           name: row.name,
           minBalance: row.min_balance,
           prize: JSON.parse(row.prize).filter((prize: number) =>
-            prizes.value.some((p: Prize) => p.id === prize)
+            prizes.value.some((p: PrizeDetail) => p.id === prize)
           ),
         });
       });

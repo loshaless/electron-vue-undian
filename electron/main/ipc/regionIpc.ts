@@ -1,6 +1,8 @@
-import { ipcMain } from "electron";
-import { addRegion, deleteRegion, getRegions } from "../database/regionDB";
+import { dialog, ipcMain } from "electron";
+import { getRegions, editRegion, addRegion, deleteRegion } from "../database/regionDB";
 import { IpcChannels } from "../../../src/constants/enum/IpcChannels";
+import { dbRun } from "../database/init";
+import { Region } from "../../../src/constants/types/Region";
 
 ipcMain.on(IpcChannels.GET_REGION_DATA, async (event) => {
   console.log('GET_REGION_DATA')
@@ -8,24 +10,28 @@ ipcMain.on(IpcChannels.GET_REGION_DATA, async (event) => {
     const regionData = await getRegions()
     event.sender.send(IpcChannels.GET_REGION_DATA, regionData)
   } catch (err) {
-    window.alert(err)
+    dialog.showErrorBox("Error", `Error get region data: ${err.message}`);
   }
 })
 
-ipcMain.on(IpcChannels.ADD_REGION_DATA, async (event, regionData) => {
+ipcMain.on(IpcChannels.MASS_EDIT_REGION, async (event, editedRegion: Region[], addedRegion: string[], deletedRegion: number[]) => {
   try {
-    await addRegion(regionData)
-    event.sender.send(IpcChannels.ADD_REGION_DATA, true)
+    await dbRun('BEGIN TRANSACTION');
+    const promises = []
+    editedRegion.forEach(async region => {
+      promises.push(editRegion(region.id, region.name))
+    })
+    addedRegion.forEach(async region => {
+      promises.push(addRegion(region))
+    })
+    deletedRegion.forEach(async id => {
+      promises.push(deleteRegion(id))
+    })
+    await Promise.all(promises)
+    await dbRun('COMMIT')
+    event.sender.send(IpcChannels.MASS_EDIT_REGION, true)
   } catch (err) {
-    window.alert(err)
-  }
-})
-
-ipcMain.on(IpcChannels.DELETE_REGION_DATA, async (event, id: number) => {
-  try {
-    await deleteRegion(id)
-    event.sender.send(IpcChannels.DELETE_REGION_DATA, true)
-  } catch (err) {
-    window.alert(err)
+    await dbRun('ROLLBACK');
+    dialog.showErrorBox("Error", `Error mass edit region: ${err.message}`);
   }
 })
