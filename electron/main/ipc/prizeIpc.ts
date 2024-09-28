@@ -12,7 +12,7 @@ ipcMain.on(IpcChannels.ADD_PRIZE, async (event, prizeDetail: PrizeDetail, addedP
     await addPrize(prizeDetail.prizeName);
     const prizeId = await getPrizeId(prizeDetail.prizeName);
     const promises = [];
-    
+
     addedPrizeRegion.forEach((region) => {
       promises.push(addPrizeRegion(prizeId, region.regionId, region.numOfItem));
     });
@@ -48,12 +48,15 @@ function transformData(data: AllPrizeJoinRegion[]){
       };
       acc.push(prize);
     }
-    prize.regions.push({
-      prizeRegionId: item.prize_region_id,
-      regionId: item.region_id,
-      regionName: item.region_name,
-      numOfItem: item.num_of_item,
-    });
+    if (item.prize_region_id !== null) {
+      prize.regions.push({
+        prizeRegionId: item.prize_region_id,
+        regionId: item.region_id,
+        regionName: item.region_name,
+        numOfItem: item.num_of_item,
+      });
+    }
+    
     return acc;
   }, []);
 }

@@ -13,6 +13,7 @@ export const db = new sqlite3.Database(DBSOURCE, async (err) => {
     console.error(err.message);
     return;
   }
+  await dbRun(`PRAGMA foreign_keys = ON;`)
 
   const promises = [
     createCustomerTable(),

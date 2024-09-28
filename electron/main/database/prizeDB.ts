@@ -27,10 +27,10 @@ export async function getAllPrizes() {
 export interface AllPrizeJoinRegion{
   id: number,
   prize_name: string,
-  region_id: number,
-  region_name: string,
-  num_of_item: number,
-  prize_region_id: number
+  region_id: number | null,
+  region_name: string | null,
+  num_of_item: number | null,
+  prize_region_id: number | null
 }
 
 export async function getAllPrizeJoinRegion(): Promise<AllPrizeJoinRegion[]>  {
@@ -42,8 +42,8 @@ export async function getAllPrizeJoinRegion(): Promise<AllPrizeJoinRegion[]>  {
     prize_region.id as prize_region_id,
     prize_region.num_of_item as num_of_item
     FROM prize 
-    JOIN prize_region ON prize.id = prize_region.prize_id 
-    JOIN region ON region.id = prize_region.region_id`
+    LEFT JOIN prize_region ON prize.id = prize_region.prize_id 
+    LEFT JOIN region ON region.id = prize_region.region_id`
   ;
   return await dbAll(sql);
 }

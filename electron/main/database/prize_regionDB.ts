@@ -6,8 +6,8 @@ export async function createPrizeRegionTable() {
     prize_id INTEGER,
     region_id INTEGER,
     num_of_item INTEGER,
-    FOREIGN KEY (prize_id) REFERENCES prize(id),
-    FOREIGN KEY (region_id) REFERENCES region(region_id)
+    FOREIGN KEY (prize_id) REFERENCES prize(id) on delete cascade,
+    FOREIGN KEY (region_id) REFERENCES region(id) on delete cascade
   )`);
 }
 

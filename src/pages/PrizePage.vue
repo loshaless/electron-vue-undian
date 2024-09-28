@@ -160,6 +160,7 @@ function deletePrize(id: number) {
 }
 
 window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
+  isLoadingInAction.value = false
   getPrize()
 })
 </script>
@@ -270,7 +271,8 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
             v-model="item.numOfItem"
             class="border-gray-300 rounded p-2 border"
             placeholder="total pemenang"
-            type="text"
+            min="1"
+            type="number"
           >
           <span
             v-if="modalPrizeState.editedPrizeRegion.length + modalPrizeState.addedPrizeRegion.length > 1"
@@ -297,7 +299,8 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
             v-model="item.numOfItem"
             class="border-gray-300 rounded p-2 border"
             placeholder="total pemenang"
-            type="text"
+            type="number"
+            min="1"
           >
           <span
             v-if="modalPrizeState.editedPrizeRegion.length + modalPrizeState.addedPrizeRegion.length > 1"
@@ -311,10 +314,11 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
 
       <div class="flex justify-center mt-8">
         <button
+          v-if="modalPrizeState.addedPrizeRegion.length > 0 || modalPrizeState.editedPrizeRegion.length > 0"
           class="rounded-md bg-green-700 text-white hover:bg-amber-500 cursor-pointer py-3 px-8 w-3/4"
           @click="editedPrizeId ? saveEditedPrize() : saveNewPrize()"
         >
-          {{ editedPrizeId ? `Edit Prize Id: ${editedPrizeId}` : 'Create New Prize' }}
+          {{ editedPrizeId ? `Edit Prize Id: ${editedPrizeId}` : 'Save New Prize' }}
         </button>
       </div>
     </modal-component>
