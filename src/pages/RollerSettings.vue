@@ -9,6 +9,7 @@ import {Category} from "../constants/types/Category";
 import ModalComponent from "../components/ModalComponent.vue";
 import {formatNumber, replaceSpaceWithUnderscore} from "../utils/generalUtils";
 import { WinnerView } from "../constants/types/WinnerView";
+import { PageName } from "../constants/enum/PageName";
 
 const isLoading = ref(false)
 
@@ -39,7 +40,6 @@ interface ListCumulativePointsAndTotalCustomer {
 }
 const listCumulativePointsAndTotalCustomer = ref<ListCumulativePointsAndTotalCustomer>({})
 window.ipcRenderer.on(IpcChannels.GET_CUMULATIVE_POINTS_AND_TOTAL_CUSTOMER, (event, cumulativePointsAndTotalCustomer) => {
-  console.log("cumulativePointsAndTotalCustomer", cumulativePointsAndTotalCustomer)
   listCumulativePointsAndTotalCustomer.value = cumulativePointsAndTotalCustomer
 })
 
@@ -151,17 +151,40 @@ function stopRoller() {
   window.ipcRenderer.send(IpcChannels.STOP_ROLLING, JSON.parse(JSON.stringify(winner.value)))
   winner.value = undefined
 }
+
+/* CHANGE PAGE */
+function changePage(pageName: PageName) {
+  window.ipcRenderer.send(IpcChannels.CHANGE_PAGE, pageName)
+}
+
+/* UPLOAD BACKGROUND */
+const backgroundName = ref('home')
+function handleFileUpload(event: Event) {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      // document.body.style.backgroundImage = `url(${result})`;
+      reader.readAsDataURL(file);
+      window.ipcRenderer.send(IpcChannels.UPLOAD_IMAGE_TO_DB, reader.result, backgroundName.value)
+    };
+  }
+}
 </script>
 
 <template>
   <div>
+    <!-- Customer Data -->
     <div class="border rounded-md p-5 shadow-sm border-gray-800 bg-gray-200 mx-5 my-5">
       <h1 class="text-2xl font-bold mb-2">Customer Data</h1>
       <h3 class="text-lg">Total Customer: {{ formatNumber(listCumulativePointsAndTotalCustomer?.customer?.totalCustomer)}}</h3>
       <h3 class="text-lg">Total Roll Id: {{formatNumber(listCumulativePointsAndTotalCustomer?.customer?.cumulativePoints)}}</h3>
     </div>
+
+    <!-- Roller Settings -->
     <div class="my-5 flex flex-col mx-5 gap-5">
-      <!-- Roller Settings -->
       <div class="border rounded-md p-5 shadow-sm border-gray-800 bg-amber-300 flex-1">
         <!-- Num of Winner -->
         <h3 class="font-bold text-2xl">Lottery Settings</h3>
@@ -176,8 +199,8 @@ function stopRoller() {
         <!-- Loading when roller is start -->
         <loading-component v-if="isLoading" class="my-3"/>
 
+        <!-- Roller Control -->
         <div v-else class="grid grid-cols-2 gap-3 mt-5">
-          <!-- Roller Control -->
           <div>
             <div
               class="mt-4 flex flex-col justify-end flex-1"
@@ -258,5 +281,39 @@ function stopRoller() {
         </div>
       </div>
     </div>
+
+    <!-- PAGE SETTING -->
+    <div class="rounded-md mx-5 p-5 shadow-sm border-gray-800 bg-purple-300">
+      <h3 class="font-bold text-2xl mb-1">Page Setting</h3>
+      <div class="flex gap-3 mt-3 items-center">
+        <button
+          class="bg-blue-500 hover:bg-blue-300 p-2 rounded-md text-white"
+          @click="changePage(PageName.HOME)"
+        >
+          Home Page
+        </button>
+        <button
+          class="bg-blue-500 hover:bg-blue-300 p-2 rounded-md text-white"
+          @click="changePage(PageName.ROLLER)"
+        >
+          Roller Page
+        </button>
+        <button
+          class="bg-blue-500 hover:bg-blue-300 p-2 rounded-md text-white"
+          @click="changePage(PageName.WINNER)"
+        >
+          Winner Page
+        </button>
+      </div>
+
+      <!-- Background Upload -->
+      <div class="mt-3">
+        <input type="file" @change="handleFileUpload" accept="image/*" />
+      </div>
+    </div>
+    
+
+    <!-- Loading when roller is start -->
+    <loading-component v-if="isLoading" class="my-3"/>
   </div>
 </template>

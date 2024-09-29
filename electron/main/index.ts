@@ -8,6 +8,7 @@ import "./ipc/rollerIpc";
 import "./ipc/winnerIpc";
 import "./ipc/categoryIpc";
 import "./ipc/regionIpc";
+import "./ipc/pageIpc";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

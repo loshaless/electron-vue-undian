@@ -214,7 +214,7 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
 
     <!-- DEM0 -->
     <div class="rounded-md border-2 border-gray-300 p-8 mb-5 mx-5">
-      <div id="pdf-content" style="font-size: 12px; margin-left: 5rem; margin-right: 5rem; margin-top: 3rem;">
+      <div id="pdf-content" style="font-size: 12px; margin-left: 2rem; margin-right: 2rem; margin-top: 3rem;">
         <!-- BODY -->
         <p style="font-weight: bold; font-size: 0.9rem;">{{ title }}</p>
         <p style="margin-bottom: 0.75rem; font-weight: bold; font-size: 0.875rem;">{{ subtitle }}</p>
