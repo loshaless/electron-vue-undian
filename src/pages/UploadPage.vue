@@ -104,7 +104,13 @@ onBeforeMount(() => {
 function deleteData() {
   window.ipcRenderer.send(IpcChannels.DELETE_CUSTOMER_IN_DATABASE);
   canShowCategory.value = true
+  isLoading.value = true
 }
+
+window.ipcRenderer.on(IpcChannels.DELETE_CUSTOMER_IN_DATABASE, (event) => {
+  isDataExist.value = false
+  isLoading.value = false
+})
 
 /* UPLOADING DATA */
 const insertedData = ref(0);
@@ -140,9 +146,11 @@ function uploadDataToDatabase() {
 window.ipcRenderer.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, (event, inserted) => {
   insertedData.value = inserted;
 });
+
 window.ipcRenderer.on(IpcChannels.UPLOAD_COMPLETE, (event, isDone) => {
   isLoading.value = !isDone;
   pathUrl.value = ''
+  insertedData.value = 0
 })
 </script>
 

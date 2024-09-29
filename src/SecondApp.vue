@@ -9,7 +9,7 @@ import { IpcChannels } from "./constants/enum/IpcChannels";
 const pageName = ref(PageName.HOME)
 window.ipcRenderer.on(IpcChannels.CHANGE_PAGE, (event, newPageName) => {
   pageName.value = newPageName
-})                                                                                                                                                                      
+})
 
 </script>
 

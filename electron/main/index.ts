@@ -51,11 +51,11 @@ async function createWindow(html = "index.html", referenceName = "main", x = 0, 
     title: "Main window",
     icon: path.join(process.env.VITE_PUBLIC, "favicon.ico"),
     webPreferences: {
-      preload
+      preload,
     },
     autoHideMenuBar: true,
     x,
-    y
+    y,
   });
 
   if (VITE_DEV_SERVER_URL) {

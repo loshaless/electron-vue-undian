@@ -128,11 +128,12 @@ ipcMain.on(IpcChannels.DELETE_CUSTOMER_IN_DATABASE, async (event) => {
 
     /* drop table temp_table_name */
     promises.push(dropTempTableName())
-    promises.push(createTempTableNameTable())
     await Promise.all(promises)
+    await createTempTableNameTable()
 
     await dbRun('COMMIT');
     event.sender.send(IpcChannels.IS_CUSTOMER_DATA_EXIST, false);
+    event.sender.send(IpcChannels.DELETE_CUSTOMER_IN_DATABASE)
   } catch (err) {
     await dbRun('ROLLBACK');
     dialog.showErrorBox("Error", `Delete Customer Data: ${err.message}`);

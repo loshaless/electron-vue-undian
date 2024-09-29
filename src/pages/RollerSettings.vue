@@ -154,22 +154,22 @@ function stopRoller() {
 
 /* CHANGE PAGE */
 function changePage(pageName: PageName) {
+  backgroundName.value = pageName
   window.ipcRenderer.send(IpcChannels.CHANGE_PAGE, pageName)
 }
 
 /* UPLOAD BACKGROUND */
-const backgroundName = ref('home')
+const backgroundName = ref(PageName.HOME)
 function handleFileUpload(event: Event) {
   const input = event.target as HTMLInputElement;
-  if (input.files && input.files[0]) {
-    const file = input.files[0];
+  
+  if (input.files?.[0]) {
+    const file = input.files[0]
     const reader = new FileReader();
     reader.onload = (e) => {
-      const result = e.target?.result as string;
-      // document.body.style.backgroundImage = `url(${result})`;
-      reader.readAsDataURL(file);
       window.ipcRenderer.send(IpcChannels.UPLOAD_IMAGE_TO_DB, reader.result, backgroundName.value)
     };
+    reader.readAsDataURL(file);
   }
 }
 </script>

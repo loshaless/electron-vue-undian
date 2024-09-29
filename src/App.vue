@@ -12,7 +12,7 @@ const PAGE = {
   SETTINGS_PAGE: "SETTINGS_PAGE",
   REPORT_PAGE: "REPORT_PAGE",
 }
-const selectedPage = ref(PAGE.PRIZE_PAGE)
+const selectedPage = ref(PAGE.SETTINGS_PAGE)
 
 const isCustomerDataExist: Ref<Boolean> = ref(false)
 window.ipcRenderer.on(IpcChannels.IS_CUSTOMER_DATA_EXIST, (event, isDataExist) => {
