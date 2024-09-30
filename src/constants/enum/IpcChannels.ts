@@ -1,4 +1,4 @@
-export enum   IpcChannels {
+export enum IpcChannels {
   OPEN_FILE_DIALOG = "open-file-dialog",
   SELECTED_FILE = "selected-file",
   UPLOAD_CUSTOMER_DATA_TO_DATABASE = "upload-customer-data-to-database",
@@ -15,6 +15,7 @@ export enum   IpcChannels {
   GET_TOTAL_CUMULATIVE_POINTS = "get-total-cumulative-points",
   GET_WINNER_BY_CATEGORY = "get-winner-by-category",
   SAVE_CATEGORY = "save_category",
+  GET_CATEGORY_JOIN_PRIZE = "get_category_join_prize",
   GET_CATEGORY = "get_category",
   GET_A_WINNER = "get-a-winner",
   IS_PRIZE_DATA_EXIST = "IS_PRIZE_DATA_EXIST",
@@ -26,4 +27,7 @@ export enum   IpcChannels {
   CHANGE_PAGE = "CHANGE_PAGE",
   UPLOAD_IMAGE_TO_DB = "UPLOAD_IMAGE_TO_DB",
   GET_BACKGROUND_IMAGE = "GET_BACKGROUND_IMAGE",
+  CREATE_TXT_REPORT = "CREATE_TXT_REPORT",
+  IS_WINNER_DATA_EXIST = "IS_WINNER_DATA_EXIST",
+  DELETE_WINNER_DATA = "DELETE_WINNER_DATA",
 }

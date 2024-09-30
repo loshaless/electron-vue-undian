@@ -2,7 +2,6 @@ import { dbRun } from "../database/init";
 import { ipcMain } from "electron";
 import {
   findCustomerById,
-  getCustomerDataByBalanceAndRegion,
   updateCustomerRollId
 } from "../database/customerDB";
 import { getMaxCumulativePoints, findCustomerByCumulativePoints } from "../database/dynamicDB";
@@ -29,7 +28,7 @@ ipcMain.on(IpcChannels.GET_A_WINNER, async (event, winnerView: WinnerView, datab
 
         winnerView.rollId = rollId
         winnerView.winnerName = winnerCustomer.name
-        await addWinner(winnerView.prizeName, winnerView.rollId, winnerView.winnerName, winnerCustomer.region, winnerView.category)
+        await addWinner(winnerView.prizeName, winnerView.rollId, winnerRoll.customer_id, winnerView.winnerName, winnerCustomer.region, winnerView.category)
         await dbRun("COMMIT");
 
         event.reply(IpcChannels.GET_A_WINNER, winnerView)

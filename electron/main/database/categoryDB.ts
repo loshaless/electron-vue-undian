@@ -55,3 +55,9 @@ export async function editCategory(id: number, minBalance: number) {
   const sql = `UPDATE category SET min_balance = ? WHERE id = ?`;
   await dbRun(sql, [minBalance, id]);
 }
+
+export async function getCategory() {
+  const sql = `SELECT * FROM category`;
+  const rows = await dbAll(sql);
+  return rows;
+}

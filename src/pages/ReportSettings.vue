@@ -1,23 +1,17 @@
 <script lang="ts" setup>
-import {ref} from 'vue'
+import {onMounted, ref} from 'vue'
 import MultiSelectComponent from '../components/MultiSelectComponent.vue';
 import {IpcChannels} from '../constants/enum/IpcChannels';
 
-const selectedPrizeId = ref<number[]>([])
-const categoryOptions = ref([
-  {
-    id: 1,
-    name: 'Grand Prize'
-  },
-  {
-    id: 2,
-    name: 'Premium Prize'
-  },
-  {
-    id: 3,
-    name: 'Lucky Prize'
-  }
-])
+const selectedCategoryId = ref<number[]>([])
+const categoryOptions = ref([])
+onMounted(() => {
+  window.ipcRenderer.send(IpcChannels.GET_CATEGORY_JOIN_PRIZE)
+})
+
+window.ipcRenderer.on(IpcChannels.GET_CATEGORY_JOIN_PRIZE, (event, category) => {
+  categoryOptions.value = category
+})
 
 /* TITLE */
 const title = ref('Pemenang Lucky Draw Festival Fantasi Junior Indie')
@@ -92,11 +86,16 @@ function generatePDF() {
   }
 }
 
+/* GENERATE TXT */
+function generateTxt() {
+  window.ipcRenderer.send(IpcChannels.CREATE_TXT_REPORT, [...selectedCategoryId.value])
+}
+
 /* GET WINNER BY CATEGORY */
 const winners = ref<any>([])
 
 function fillBody() {
-  window.ipcRenderer.send(IpcChannels.GET_WINNER_BY_CATEGORY, [...selectedPrizeId.value])
+  window.ipcRenderer.send(IpcChannels.GET_WINNER_BY_CATEGORY, [...selectedCategoryId.value])
 }
 
 window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) => {
@@ -115,7 +114,7 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
         <multi-select-component
           :options="categoryOptions"
           placeholder="Select Prize"
-          @update:modelValue="selectedPrizeId = $event"
+          @update:modelValue="selectedCategoryId = $event"
         />
         <button
           class="ml-3 bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 hover:scale-110"
@@ -203,12 +202,29 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
       </div>
     </div>
 
-    <div class="flex justify-center my-3">
+    <div class="flex justify-center my-3 gap-3">
       <button
-        class="bg-blue-500 text-white py-2 px-32 rounded-md hover:bg-blue-600 hover:scale-110"
+        :disabled="!selectedCategoryId.length"
+        :class="[
+          {'cursor-not-allowed bg-gray-300 text-gray-500': !selectedCategoryId.length},
+          {'cursor-pointer bg-blue-500 hover:bg-blue-600 text-white hover:scale-105': selectedCategoryId.length}
+        ]"
+        class="py-2 px-32 rounded-md"
         @click="generatePDF"
       >
-        Generate File
+        Generate Report PDF
+      </button>
+
+      <button
+        :disabled="!selectedCategoryId.length"
+        :class="[
+          {'cursor-not-allowed bg-gray-300 text-gray-500': !selectedCategoryId.length},
+          {'cursor-pointer bg-blue-500 hover:bg-blue-600 text-white hover:scale-105': selectedCategoryId.length}
+        ]"
+        class="py-2 px-32 rounded-md"
+        @click="generateTxt"
+      >
+        Generate File Txt
       </button>
     </div>
 

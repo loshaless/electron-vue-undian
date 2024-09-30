@@ -2,7 +2,7 @@ import { ipcMain } from "electron";
 import { IpcChannels } from "../../../src/constants/enum/IpcChannels";
 
 import { dialog } from "electron";
-import { getCategoryJoinPrize, editCategory } from "../database/categoryDB";
+import { getCategoryJoinPrize, editCategory, getCategory } from "../database/categoryDB";
 import { dbRun } from "../database/init";
 import { editCategoryPrize } from "../database/prizeDB";
 
@@ -45,10 +45,10 @@ ipcMain.on(IpcChannels.SAVE_CATEGORY, async (
   }
 });
 
-ipcMain.on(IpcChannels.GET_CATEGORY, async (event) => {
+ipcMain.on(IpcChannels.GET_CATEGORY_JOIN_PRIZE, async (event) => {
   try {
     const rows = await getCategoryJoinPrize();
-    event.sender.send(IpcChannels.GET_CATEGORY, transformData(rows));
+    event.sender.send(IpcChannels.GET_CATEGORY_JOIN_PRIZE, transformData(rows));
   } catch (err) {
     dialog.showErrorBox("Error", `Error fetching category: ${err.message}`);
   }
@@ -72,3 +72,12 @@ function transformData(data: any[]) {
     return acc;
   }, []);
 }
+
+ipcMain.on(IpcChannels.GET_CATEGORY, async (event) => {
+  try {
+    const rows = await getCategory();
+    event.sender.send(IpcChannels.GET_CATEGORY, rows);
+  } catch (err) {
+    dialog.showErrorBox("Error", `Error fetching category: ${err.message}`);
+  }
+})

@@ -7,14 +7,14 @@ export function useCategory(prizes: Ref<PrizeDetail[]>) {
   const listOfCategory = reactive<Category[]>([]);
 
   function getCategory() {
-    window.ipcRenderer.send(IpcChannels.GET_CATEGORY);
+    window.ipcRenderer.send(IpcChannels.GET_CATEGORY_JOIN_PRIZE);
   }
 
   onMounted(() => {
     getCategory();
   });
 
-  window.ipcRenderer.on(IpcChannels.GET_CATEGORY, (event, rows) => {
+  window.ipcRenderer.on(IpcChannels.GET_CATEGORY_JOIN_PRIZE, (event, rows) => {
     listOfCategory.splice(0, listOfCategory.length);
     listOfCategory.push(...rows);
   });

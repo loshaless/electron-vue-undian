@@ -92,23 +92,23 @@ window.ipcRenderer.on(IpcChannels.SELECTED_FILE, (event, path) => {
 });
 
 /* CHECK IS DATA EXIST */
-const isDataExist = ref(false);
+const isCustomerDataExist = ref(false);
 window.ipcRenderer.on(IpcChannels.IS_CUSTOMER_DATA_EXIST, (event, isExist) => {
-  isDataExist.value = isExist;
+  isCustomerDataExist.value = isExist;
 });
 onBeforeMount(() => {
   window.ipcRenderer.send(IpcChannels.IS_CUSTOMER_DATA_EXIST);
 });
 
 /* DELETE DATA */
-function deleteData() {
+function deleteCustomerData() {
   window.ipcRenderer.send(IpcChannels.DELETE_CUSTOMER_IN_DATABASE);
   canShowCategory.value = true
   isLoading.value = true
 }
 
 window.ipcRenderer.on(IpcChannels.DELETE_CUSTOMER_IN_DATABASE, (event) => {
-  isDataExist.value = false
+  isCustomerDataExist.value = false
   isLoading.value = false
 })
 
@@ -156,12 +156,31 @@ window.ipcRenderer.on(IpcChannels.UPLOAD_COMPLETE, (event, isDone) => {
   pathUrl.value = ''
   insertedData.value = 0
 })
+
+/* CHECK WINNER DATA EXIST */
+const isWinnerDataExist = ref(false);
+window.ipcRenderer.on(IpcChannels.IS_WINNER_DATA_EXIST, (event, isExist) => {
+  isWinnerDataExist.value = isExist;
+});
+onBeforeMount(() => {
+  window.ipcRenderer.send(IpcChannels.IS_WINNER_DATA_EXIST);
+});
+
+function deleteWinnerData() {
+  window.ipcRenderer.send(IpcChannels.DELETE_WINNER_DATA);
+  isLoading.value = true
+}
+
+window.ipcRenderer.on(IpcChannels.DELETE_WINNER_DATA, (event) => {
+  isWinnerDataExist.value = false
+  isLoading.value = false
+})
 </script>
 
 <template>
   <div>
     <div 
-      v-if="canShowCategory && !isDataExist"
+      v-if="canShowCategory && !isCustomerDataExist"
       class="rounded border border-gray-400 p-4 m-3"
     >
       <table class="table-auto w-full border-white text-center">
@@ -231,7 +250,7 @@ window.ipcRenderer.on(IpcChannels.UPLOAD_COMPLETE, (event, isDone) => {
         class="bg-blue-500 text-white py-2 rounded-md px-4 hover:bg-blue-600 hover:scale-105"
         @click="openFileDialog"
       >
-        {{ (pathUrl && isDataExist) ? "Change File" : "Select New File" }}
+        {{ (pathUrl && isCustomerDataExist) ? "Change File" : "Select New File" }}
       </button>
 
       <tooltip-component
@@ -253,16 +272,24 @@ window.ipcRenderer.on(IpcChannels.UPLOAD_COMPLETE, (event, isDone) => {
           </button>
         </template>
         <template v-slot:tooltipText>
-          {{ isDataExist ? 'Data already exist in database!' : 'Please Upload the file first!'}}
+          {{ isCustomerDataExist ? 'Data already exist in database!' : 'Please Upload the file first!'}}
         </template>
       </tooltip-component>
 
       <button
-        v-if="isDataExist"
-        class="text-white bg-red-700 p-2 rounded-md"
-        @click="deleteData"
+        v-if="isCustomerDataExist"
+        class="text-white bg-red-700 p-2 rounded-md hover:bg-red-600 hover:scale-105"
+        @click="deleteCustomerData"
       >
-        Delete Data
+        Delete Customer Data
+      </button>
+
+      <button
+        v-if="isWinnerDataExist"
+        class="text-white bg-red-700 p-2 rounded-md hover:bg-red-600 hover:scale-105"
+        @click="deleteWinnerData"
+      >
+        Delete Winner Data
       </button>
     </div>
 
