@@ -3,6 +3,8 @@ import { IpcChannels } from "../../../src/constants/enum/IpcChannels";
 import { deleteWinnerData, getWinnerByCategory, getWinnerDetailByCategory, isWinnerDataExist, WinnerDetail } from "../database/winnerDB";
 import { dialog } from "electron";
 import fs from 'fs';
+import { dbRun } from "../database/init";
+import { deleteAllRollId } from "../database/customerDB";
 
 ipcMain.on(IpcChannels.GET_WINNER_BY_CATEGORY, async (event, categoryId: number[]) => {
   try {
@@ -51,9 +53,16 @@ ipcMain.on(IpcChannels.IS_WINNER_DATA_EXIST, async (event) => {
 
 ipcMain.on(IpcChannels.DELETE_WINNER_DATA, async (event) => {
   try {
-    await deleteWinnerData()
+    await dbRun(`BEGIN TRANSACTION`)
+    const promises = []
+    promises.push(deleteAllRollId())
+    promises.push(deleteWinnerData())
+    await Promise.all(promises)
+    await dbRun(`COMMIT TRANSACTION`)
+
     event.reply(IpcChannels.DELETE_WINNER_DATA)
   } catch (error) {
+    await dbRun(`ROLLBACK TRANSACTION`)
     dialog.showErrorBox('Error', `Failed to delete winner data: ${error}`)
   }
 })

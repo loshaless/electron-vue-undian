@@ -96,7 +96,6 @@ const prizeDetailModalState = reactive({
 /* AUTOMATIC ROLLER */
 const rollAnimationTime = ref(1)
 const showWinnerTime = ref(1)
-const isAutomaticRollerStart = ref(false)
 
 /* ROLLER QUEUE */
 function generateRollerQueue() {
@@ -118,26 +117,55 @@ function generateRollerQueue() {
   return result
 }
 
+let rollerQueue = reactive<any[]>([])
+const isRolling = ref(false);
 async function startRollerWithoutStopper() {
-  isAutomaticRollerStart.value = true
+  isRolling.value = true;
 
-  const rollerQueue = generateRollerQueue()
-  let index = 0
-  while (index < rollerQueue.length) {
-    moveRoller(rollerQueue[index][1], rollerQueue[index][0])
+  /* generate roller queue if not exist */
+  if (rollerQueue.length === 0) {
+    rollerQueue = generateRollerQueue()
+  }
+
+  while (rollerQueue.length > 0 && isRolling.value) {
+    /* get winner */
+    const [database, winnerView] = rollerQueue.shift()
+    startRollingAndGetWinner(winnerView, database)
     await new Promise(resolve => setTimeout(resolve, rollAnimationTime.value * 1000))
 
-    while(!winner.value) {
+    /* keep rolling when winner value not received */
+    while(!winner.value && isRolling.value) {
       await new Promise(resolve => setTimeout(resolve, showWinnerTime.value * 1000))
     }
-    stopRoller()
+
+    /* Stop roller when user stop rolling manually and winner value reveived, 
+    then show the winner */
+    if (!isRolling.value) break;
+
+    /* auto stop roller and show winner */
+    stopRollerAndSendWinner()
     await new Promise(resolve => setTimeout(resolve, showWinnerTime.value * 1000))
-    index++
   }
-  isAutomaticRollerStart.value = false
+  isRolling.value = false
 }
 
-function moveRoller(winnerView: WinnerView, database: string) {
+function startRollerManually() {
+  if (rollerQueue.length === 0) {
+    rollerQueue = generateRollerQueue()
+  }
+  const [database, winnerView] = rollerQueue.shift()
+  
+  startRollingAndGetWinner(winnerView, database)
+  isRolling.value = true;
+}
+
+function stopRolling() {
+  isRolling.value = false;
+  stopRollerAndSendWinner()
+}
+
+function startRollingAndGetWinner(winnerView: WinnerView, database: string) {
+  
   window.ipcRenderer.send(IpcChannels.START_ROLLING)
   window.ipcRenderer.send(IpcChannels.GET_A_WINNER, winnerView, database)
 }
@@ -147,7 +175,7 @@ window.ipcRenderer.on(IpcChannels.GET_A_WINNER, (event, winnerView) => {
   winner.value = winnerView
 })
 
-function stopRoller() {
+function stopRollerAndSendWinner() {
   window.ipcRenderer.send(IpcChannels.STOP_ROLLING, JSON.parse(JSON.stringify(winner.value)))
   winner.value = undefined
 }
@@ -229,14 +257,30 @@ function handleFileUpload(event: Event) {
               </div>
 
               <button
-                v-if="showWinnerTime > 0 && rollAnimationTime > 0"
+                v-if="showWinnerTime > 0 && rollAnimationTime > 0 && !isRolling"
                 class="bg-green-500 hover:bg-green-300 p-2 rounded-md text-white mt-3"
                 @click="startRollerWithoutStopper()"
               >
                 Start Roller Without Stopper
               </button>
+
+              <button
+                v-if="!isRolling"
+                class="bg-blue-500 hover:bg-blue-300 p-2 rounded-md text-white mt-3"
+                @click="startRollerManually()"
+              >
+                Start Roller Manually
+              </button>
+
+              <button
+                v-if="winner && isRolling"
+                class="bg-red-500 hover:bg-red-300 p-2 rounded-md text-white mt-3"
+                @click="stopRolling()"
+              >
+                Stop Roller
+              </button>
             </div>
-            <loading-component v-if="isAutomaticRollerStart" class="my-3"/>
+            <loading-component v-if="isRolling" class="my-3"/>
           </div>
 
           <!-- PRIZE DATA DETAIL -->
