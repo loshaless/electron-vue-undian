@@ -1,4 +1,5 @@
 export function replaceSpaceWithUnderscore(str: string): string {
+  str = str.replace(/&/g, 'and');
   return str.replace(/\s+/g, '_').toLowerCase();
 }
 

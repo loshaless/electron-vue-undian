@@ -1,11 +1,11 @@
-import {ipcMain} from "electron";
-import {IpcChannels} from "../../../src/constants/enum/IpcChannels";
+import { ipcMain } from "electron";
+import { IpcChannels } from "../../../src/constants/enum/IpcChannels";
 
-import {dialog} from "electron";
-import {getCategoryJoinPrize, editCategory} from "../database/categoryDB";
+import { dialog } from "electron";
+import { getCategoryJoinPrize, editCategory } from "../database/categoryDB";
 import { dbRun } from "../database/init";
 import { editCategoryPrize } from "../database/prizeDB";
-    
+
 interface EditCategory {
   id: number;
   minBalance: number;
@@ -47,10 +47,10 @@ ipcMain.on(IpcChannels.SAVE_CATEGORY, async (
 
 ipcMain.on(IpcChannels.GET_CATEGORY, async (event) => {
   try {
-      const rows = await getCategoryJoinPrize();      
-      event.sender.send(IpcChannels.GET_CATEGORY, transformData(rows));
+    const rows = await getCategoryJoinPrize();
+    event.sender.send(IpcChannels.GET_CATEGORY, transformData(rows));
   } catch (err) {
-      dialog.showErrorBox("Error", `Error fetching category: ${err.message}`);
+    dialog.showErrorBox("Error", `Error fetching category: ${err.message}`);
   }
 })
 
@@ -66,39 +66,9 @@ function transformData(data: any[]) {
       };
       acc.push(category);
     }
-    category.prizes.push(item.prize_id);
+    if (item.prize_id) {
+      category.prizes.push(item.prize_id);
+    }
     return acc;
   }, []);
 }
-
-// function transformData(data: any[]) {
-//   return data.reduce((acc, item) => {
-//     let category = acc.find(c => c.categoryId === item.id);
-//     if (!category) {
-//       category = {
-//         categoryId: item.id,
-//         categoryName: item.name,
-//         minBalance: item.min_balance,
-//         prizes: []
-//       };
-//       acc.push(category);
-//     }
-  
-//     let prize = category.prizes.find(p => p.prizeId === item.prize_id);
-//     if (!prize) {
-//       prize = {
-//         prizeId: item.prize_id,
-//         name: item.prize_name,
-//         regions: []
-//       };
-//       category.prizes.push(prize);
-//     }
-  
-//     prize.regions.push({
-//       regionName: item.region_name,
-//       numOfItem: item.num_of_item
-//     });
-  
-//     return acc;
-//   }, []);
-// }

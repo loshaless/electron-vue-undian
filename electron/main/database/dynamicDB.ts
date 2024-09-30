@@ -23,14 +23,14 @@ export async function getMaxCumulativePoints(tableName: string) {
   const idName = tableName === "customer" ? "customer_id" : "id"
 
   const result = await dbGet(`SELECT cumulative_points FROM ${tableName} ORDER BY ${idName} DESC LIMIT 1`);
-  return result.cumulative_points;
+  return result?.cumulative_points ? result.cumulative_points : 0;
 }
 
 export async function getTotalCustomer(tableName: string) {
   const idName = tableName === "customer" ? "customer_id" : "id"
 
   const result = await dbGet(`SELECT ${idName} FROM ${tableName} ORDER BY ${idName} DESC LIMIT 1`);
-  return result[idName];
+  return result?.[idName] ? result[idName] : 0;
 }
 
 export async function findCustomerByCumulativePoints(tableName: string, cumulativePoints: number) {

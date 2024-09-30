@@ -82,6 +82,7 @@ function openModalCreatePrize(isOpen: boolean) {
     prizeName: "",
     regions: []
   }
+  modalPrizeState.editedPrizeRegion = []
   editedPrizeId.value = 0
   modalPrizeState.addedPrizeRegion = []
 }

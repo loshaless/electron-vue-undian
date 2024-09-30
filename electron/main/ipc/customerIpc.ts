@@ -115,7 +115,6 @@ ipcMain.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, async (event, filePath,
 ipcMain.on(IpcChannels.DELETE_CUSTOMER_IN_DATABASE, async (event) => {
   try {
     await dbRun('BEGIN TRANSACTION');
-    
     /* re-create table customer */
     await dropCustomerTable();
     const promises = [createCustomerTable()]

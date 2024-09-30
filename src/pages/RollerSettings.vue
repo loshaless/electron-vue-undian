@@ -311,7 +311,6 @@ function handleFileUpload(event: Event) {
         <input type="file" @change="handleFileUpload" accept="image/*" />
       </div>
     </div>
-    
 
     <!-- Loading when roller is start -->
     <loading-component v-if="isLoading" class="my-3"/>

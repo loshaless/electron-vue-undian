@@ -118,6 +118,7 @@ const isLoading = ref(false);
 
 function generateListOfCustomerTable(): CustomerTable[] {
   const result: CustomerTable[] = []
+  const setOfCustomerTable = new Set<string>()
   listOfCategory.forEach((category: Category) => {
     category.prizes?.forEach((prizeId: number) => {
       const prizeDetail: PrizeDetail | undefined = prizes.value.find((p: PrizeDetail) => p.prizeId === prizeId)
@@ -125,11 +126,14 @@ function generateListOfCustomerTable(): CustomerTable[] {
       prizeDetail?.regions.forEach((region: PrizeRegionDetail) => {
         const tableName = `customer_${replaceSpaceWithUnderscore(category.name)}_${replaceSpaceWithUnderscore(region.regionName)}`
       
-        result.push({
-          tableName: tableName,
-          minBalance: category.minBalance,
-          regions: region.regionName
-        })
+        if (!setOfCustomerTable.has(tableName)) {
+            result.push({
+            tableName: tableName,
+            minBalance: category.minBalance,
+            regions: region.regionName
+          })
+          setOfCustomerTable.add(tableName)
+        }
       })
     })
   })
