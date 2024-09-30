@@ -28,6 +28,7 @@ ipcMain.on(IpcChannels.GET_A_WINNER, async (event, winnerView: WinnerView, datab
 
         winnerView.rollId = rollId
         winnerView.winnerName = winnerCustomer.name
+        winnerView.region = winnerCustomer.region
         await addWinner(winnerView.prizeName, winnerView.rollId, winnerRoll.customer_id, winnerView.winnerName, winnerCustomer.region, winnerView.category)
         await dbRun("COMMIT");
 

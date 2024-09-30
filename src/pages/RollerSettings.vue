@@ -287,22 +287,31 @@ function handleFileUpload(event: Event) {
       <h3 class="font-bold text-2xl mb-1">Page Setting</h3>
       <div class="flex gap-3 mt-3 items-center">
         <button
-          :class="{'cursor-not-allowed !bg-gray-500 hover:!bg-gray-500': backgroundName === PageName.HOME}"
-          class="bg-amber-500 hover:bg-amber-300 p-2 rounded-md text-black"
+          :class="[
+            {'cursor-not-allowed bg-gray-500 hover:bg-gray-500': backgroundName === PageName.HOME},
+            {'bg-amber-500 hover:bg-amber-300': backgroundName !== PageName.HOME}
+          ]"
+          class="p-2 rounded-md text-black"
           @click="changePage(PageName.HOME)"  
         >
           Home Page
         </button>
         <button
-          :class="{'cursor-not-allowed bg-gray-500 hover:bg-gray-500': backgroundName === PageName.ROLLER}"
-          class="bg-amber-500 hover:bg-amber-300 p-2 rounded-md text-black"
+          :class="[
+            {'cursor-not-allowed bg-gray-500 hover:bg-gray-500': backgroundName === PageName.ROLLER},
+            {'bg-amber-500 hover:bg-amber-300': backgroundName !== PageName.ROLLER}
+          ]"
+          class="p-2 rounded-md text-black"
           @click="changePage(PageName.ROLLER)"
         >
           Roller Page
         </button>
         <button
-          :class="{'cursor-not-allowed bg-gray-500 hover:bg-gray-500': backgroundName === PageName.WINNER}"
-          class="bg-amber-500 hover:bg-amber-300 p-2 rounded-md text-black"
+          :class="[
+            {'cursor-not-allowed bg-gray-500 hover:bg-gray-500': backgroundName === PageName.WINNER},
+            {'bg-amber-500 hover:bg-amber-300': backgroundName !== PageName.WINNER}
+          ]"
+          class="p-2 rounded-md text-black"
           @click="changePage(PageName.WINNER)"
         >
           Winner Page

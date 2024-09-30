@@ -1,9 +1,12 @@
 <script lang="ts" setup>
-import {ref, onUnmounted, onMounted} from "vue";
+import {ref, onUnmounted, onMounted, reactive} from "vue";
 import {IpcChannels} from "../constants/enum/IpcChannels";
 import {WinnerView} from "../constants/types/WinnerView";
 
-const winnerName = ref("");
+const winnerState = reactive({
+  name: '',
+  region: ''
+})
 const numDigits = ref(3);
 const digits = ref(Array(numDigits.value).fill(0));
 let intervalId: any;
@@ -16,28 +19,29 @@ function startRolling() {
 }
 
 window.ipcRenderer.on(IpcChannels.START_ROLLING, (event) => {
-  winnerName.value = ''
+  winnerState.name = ''
   startRolling()
 })
 
 /* SHOW WINNER */
 window.ipcRenderer.on(IpcChannels.STOP_ROLLING, (event, winnerData: WinnerView) => {
   stopRoller()
+  winnerState.region = winnerData.region
   const rollIdString = winnerData.rollId.toString()
   const numOfZero = numDigits.value - rollIdString.length
 
-  // IF ROLLID = 123 => it will genberate new digit = 0000123
+  // IF ROLLID = 123 => it will generate new digit = 0000123
   const newDigits = Array(numOfZero).fill(0)
   for (let i = 0; i < rollIdString.length; i++) {
     newDigits.push(rollIdString[i])
   }
 
-  winnerName.value = winnerData.winnerName
+  winnerState.name = winnerData.winnerName
   digits.value = newDigits
 })
 
 function stopRoller() {
-  winnerName.value = ''
+  winnerState.name = ''
   clearInterval(intervalId);
 }
 
@@ -67,8 +71,8 @@ onMounted(() => {
         {{ digit }}
       </span>
     </div>
-    <p v-if="winnerName" class="text-3xl text-green-700">
-      Selamat kepada {{ winnerName }}
+    <p v-if="winnerState.name" class="text-3xl text-green-700">
+      Selamat kepada {{ winnerState.name }} dari {{ winnerState.region }}
     </p>
   </div>
 </template>
