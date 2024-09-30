@@ -56,6 +56,11 @@ export async function editCategory(id: number, minBalance: number) {
   await dbRun(sql, [minBalance, id]);
 }
 
+export async function makeAllCategoryPrizeNull() {
+  const sql = `UPDATE prize SET category_id = NULL`;
+  await dbRun(sql);
+}
+
 export async function getCategory() {
   const sql = `SELECT * FROM category`;
   const rows = await dbAll(sql);

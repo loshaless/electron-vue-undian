@@ -29,6 +29,7 @@ function handleUpdatePrize(index: number, prize: number[]) {
   listOfCategory[index].prizes = prize
 }
 
+
 /* SAVE CATEGORY */
 const saveCategoryState = reactive({
   isLoading: false,
@@ -38,11 +39,15 @@ const saveCategoryState = reactive({
 const canSaveCategory = computed(() => {
   return listOfCategory.every((category: Category) => category.prizes?.length)
 })
+
 function saveCategory() {
+  /* all edited category */
   const edditedCategories = listOfCategory.map((category: Category) => ({
     id: category.id,
     minBalance: category.minBalance
   }))
+
+  /* all edited prize that is related to category */
   const edditedCategoryPrizes: {prizeId: number, categoryId: number}[] = []
   listOfCategory.forEach((category: Category) => {
     category.prizes?.forEach((prizeId: number) => {

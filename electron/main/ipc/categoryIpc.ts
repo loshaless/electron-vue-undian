@@ -2,7 +2,7 @@ import { ipcMain } from "electron";
 import { IpcChannels } from "../../../src/constants/enum/IpcChannels";
 
 import { dialog } from "electron";
-import { getCategoryJoinPrize, editCategory, getCategory } from "../database/categoryDB";
+import { getCategoryJoinPrize, editCategory, getCategory, makeAllCategoryPrizeNull } from "../database/categoryDB";
 import { dbRun } from "../database/init";
 import { editCategoryPrize } from "../database/prizeDB";
 
@@ -23,12 +23,11 @@ ipcMain.on(IpcChannels.SAVE_CATEGORY, async (
 ) => {
   try {
     await dbRun(`BEGIN TRANSACTION`);
-    console.log(edittedCategories);
-    console.log(edittedCategoryPrizes);
+    await makeAllCategoryPrizeNull();
+
     const categoryPromises = edittedCategories.map((category) => {
       editCategory(category.id, category.minBalance);
     });
-
     const prizePromises = edittedCategoryPrizes.map((categoryPrize) => {
       editCategoryPrize(categoryPrize.prizeId, categoryPrize.categoryId);
     });
@@ -36,7 +35,6 @@ ipcMain.on(IpcChannels.SAVE_CATEGORY, async (
     await Promise.all(categoryPromises);
     await Promise.all(prizePromises);
 
-    console.log("Category added successfully");
     event.sender.send(IpcChannels.SAVE_CATEGORY);
     await dbRun(`COMMIT`);
   } catch (err) {

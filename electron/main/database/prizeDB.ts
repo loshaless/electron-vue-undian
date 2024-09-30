@@ -26,7 +26,7 @@ export async function getAllPrizes() {
   return await dbAll(sql);
 }
 
-export interface AllPrizeJoinRegion{
+export interface AllPrizeJoinRegion {
   id: number,
   prize_name: string,
   region_id: number | null,
@@ -35,7 +35,7 @@ export interface AllPrizeJoinRegion{
   prize_region_id: number | null
 }
 
-export async function getAllPrizeJoinRegion(): Promise<AllPrizeJoinRegion[]>  {
+export async function getAllPrizeJoinRegion(): Promise<AllPrizeJoinRegion[]> {
   const sql = `
     SELECT prize.id, 
     prize.name as prize_name, 
@@ -46,7 +46,7 @@ export async function getAllPrizeJoinRegion(): Promise<AllPrizeJoinRegion[]>  {
     FROM prize 
     LEFT JOIN prize_region ON prize.id = prize_region.prize_id 
     LEFT JOIN region ON region.id = prize_region.region_id`
-  ;
+    ;
   return await dbAll(sql);
 }
 
