@@ -64,27 +64,42 @@ window.ipcRenderer.on(IpcChannels.WINNER_PAGE_START_SCROLL, async (event, scroll
 })
 
 /* SCROLL PROGRESS */
-const scrollProgress = ref(0)
+const scrollProgress = ref<string>('0%')
 function updateScrollProgress(element: HTMLElement) {
-  scrollProgress.value = (element.scrollTop / (element.scrollHeight - element.clientHeight)) * 100;
+  const progress = (element.scrollTop / (element.scrollHeight - element.clientHeight)) * 100;
+  scrollProgress.value = progress.toFixed(2) + '%';
+  sendScrollProgress(scrollProgress.value)
+}
+function sendScrollProgress(scrollProgress: string) {
+  window.ipcRenderer.send(IpcChannels.WINNER_PAGE_GET_PROGRESS, scrollProgress)
 }
 
 /* SCROLL SPEED */
-const scrollSpeed = ref(10)
+const scrollSpeed = ref(100)
 window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_SCROLL_TIME, async (event, scrollTime) => {
   scrollSpeed.value = scrollTime
 })
 
-const scrollProgressPercentage = computed(() => scrollProgress.value.toFixed(2) + '%');
+/* HEIGHT AND WIDTH */
+const height = ref(400)
+const width = ref(400)
+
+window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_HEIGHT_WIDTH, async (event, h, w) => {
+  height.value = h
+  width.value = w
+})
 </script>
 
 <template>
-  <div>
-    <div id="winner-list" style="max-height: 400px; overflow-y: auto;">
+  <div class="flex items-center justify-center h-screen">
+    <div 
+      id="winner-list" 
+      :style="{ height: height + 'px', width: width + 'px' }"
+      class="text-center bg-gray-200 overflow-y-hidden"
+    >
       <div v-for="winner in winners" :key="winner.id">
         <h3>{{ winner.customer_name }}</h3>
       </div>
     </div>
-    <p>Scroll Progress: {{ scrollProgressPercentage }}</p>
   </div>
 </template>

@@ -22,3 +22,11 @@ ipcMain.on(IpcChannels.WINNER_PAGE_STOP_SCROLL, async (event, settings) => {
 ipcMain.on(IpcChannels.WINNER_PAGE_GET_PROGRESS, async (event, settings) => {
   windows.view.webContents.send(IpcChannels.WINNER_PAGE_GET_PROGRESS, settings)
 })
+
+ipcMain.on(IpcChannels.WINNER_PAGE_GET_PROGRESS, async (event, settings) => {
+  windows.main.webContents.send(IpcChannels.WINNER_PAGE_GET_PROGRESS, settings)
+})
+
+ipcMain.on(IpcChannels.WINNER_PAGE_SET_HEIGHT_WIDTH, async (event, height, width) => {
+  windows.view.webContents.send(IpcChannels.WINNER_PAGE_SET_HEIGHT_WIDTH, height, width)
+})

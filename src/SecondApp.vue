@@ -6,7 +6,7 @@ import { PageName } from "./constants/enum/PageName";
 import { ref } from "vue";
 import { IpcChannels } from "./constants/enum/IpcChannels";
 
-const pageName = ref(PageName.HOME)
+const pageName = ref(PageName.WINNER)
 window.ipcRenderer.on(IpcChannels.CHANGE_PAGE, (event, newPageName) => {
   pageName.value = newPageName
 })

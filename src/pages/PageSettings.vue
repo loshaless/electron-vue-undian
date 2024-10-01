@@ -56,6 +56,21 @@ function stopScroll() {
 function setCategory() {
   window.ipcRenderer.send(IpcChannels.WINNER_PAGE_SET_CATEGORY, selectedCategoryId.value)
 }
+
+/* PROGRESS SCROLL */
+const scrollProgressPercentage = ref<number>(0)
+window.ipcRenderer.on(IpcChannels.WINNER_PAGE_GET_PROGRESS, (event, progress) => {
+  scrollProgressPercentage.value = progress
+})
+
+/* HEIGHT AND WIDTH */
+const height = ref(400)
+const width = ref(400)
+
+/* SEND HEIGHT AND WIDTH */
+function sendHeightWidthSettings() {
+  window.ipcRenderer.send(IpcChannels.WINNER_PAGE_SET_HEIGHT_WIDTH, height.value, width.value)
+}
 </script>
 
 <template>
@@ -131,6 +146,8 @@ function setCategory() {
           Set Category
         </button>
       </div>
+
+      <!-- SCROLL TIME -->
       <div class="flex gap-3 items-center">
         <p>Scroll Time: </p>
         <input 
@@ -145,6 +162,8 @@ function setCategory() {
           Set Scroll Time
         </button>
       </div>
+
+      <!-- SCROLL CONTROL -->
       <div class="flex gap-3 items-center">
         <button
           class="w-48 bg-blue-500 hover:bg-blue-600 p-2 rounded-md text-white"
@@ -159,6 +178,32 @@ function setCategory() {
           Stop Scroll
         </button>
       </div>
+
+      <!-- HEIGHT AND WIDTH -->
+      <h2 class="font-bold">Height and Width Screen</h2>
+      <div class="flex gap-3 items-center">
+        <p>Height: </p>
+        <input 
+          type="number" 
+          v-model="height"
+          class="border-gray-300 rounded p-1 border"
+        >
+        <p>Width: </p>
+        <input 
+          type="number" 
+          v-model="width"
+          class="border-gray-300 rounded p-1 border"
+        >
+        <button
+          class="bg-yellow-500 hover:bg-yellow-600 p-2 rounded-md text-white"
+          @click="sendHeightWidthSettings"
+        >
+          Set Height and Width
+        </button>
+      </div>
+
+      <!-- SCROLL PROGRESS -->
+      <p>Scroll Progress: {{ scrollProgressPercentage }}</p>
     </div>
   </div>
 </template>
