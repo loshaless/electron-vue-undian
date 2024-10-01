@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { PageName } from '../constants/enum/PageName';
 import { IpcChannels } from '../constants/enum/IpcChannels';
+import SelectComponent from '../components/SelectComponent.vue';
 
 /* CHANGE PAGE */
 function changePage(pageName: PageName) {
@@ -22,6 +23,38 @@ function handleFileUpload(event: Event) {
     };
     reader.readAsDataURL(file);
   }
+}
+
+/* GET CATEGORY */
+const categoryOptions = ref([])
+onMounted(() => {
+  window.ipcRenderer.send(IpcChannels.GET_CATEGORY_JOIN_PRIZE)
+})
+
+const selectedCategoryId = ref<number>(1)
+window.ipcRenderer.on(IpcChannels.GET_CATEGORY_JOIN_PRIZE, (event, category) => {
+  categoryOptions.value = category
+})
+
+/* SCROLL SPEED */
+const scrollTime = ref<number>(100)
+function sendScrollTimeSettings() {
+  window.ipcRenderer.send(IpcChannels.WINNER_PAGE_SET_SCROLL_TIME, scrollTime.value)
+}
+
+/* START SCROLL */
+function startScroll() {
+  window.ipcRenderer.send(IpcChannels.WINNER_PAGE_START_SCROLL, scrollTime.value)
+}
+
+/* STOP SCROLL */
+function stopScroll() {
+  window.ipcRenderer.send(IpcChannels.WINNER_PAGE_STOP_SCROLL)
+}
+
+/* SET CATEGORY  */
+function setCategory() {
+  window.ipcRenderer.send(IpcChannels.WINNER_PAGE_SET_CATEGORY, selectedCategoryId.value)
 }
 </script>
 
@@ -78,5 +111,54 @@ function handleFileUpload(event: Event) {
         class="hidden"
       />
     </div>  
+
+    <!-- Winner Page Settings -->
+    <div 
+      v-if="backgroundName === PageName.WINNER"
+      class="mt-5 flex flex-col gap-3"
+    >
+      <p class="font-bold">Winner Page Settings</p>
+      <div class="flex gap-3 items-center">
+        <p>Category: </p>
+        <select-component
+          :options="categoryOptions"
+          v-model="selectedCategoryId"
+        />
+        <button
+          class="w-48 bg-yellow-500 hover:bg-yellow-600 p-2 rounded-md text-white"
+          @click="setCategory"
+        >
+          Set Category
+        </button>
+      </div>
+      <div class="flex gap-3 items-center">
+        <p>Scroll Time: </p>
+        <input 
+          type="number" 
+          v-model="scrollTime"
+          class="border-gray-300 rounded p-1 border"
+        >
+        <button
+          class="bg-yellow-500 hover:bg-yellow-600 p-2 rounded-md text-white"
+          @click="sendScrollTimeSettings"
+        >
+          Set Scroll Time
+        </button>
+      </div>
+      <div class="flex gap-3 items-center">
+        <button
+          class="w-48 bg-blue-500 hover:bg-blue-600 p-2 rounded-md text-white"
+          @click="startScroll"
+        >
+          Continue Scroll
+        </button>
+        <button
+          class="w-48 bg-red-500 hover:bg-red-600 p-2 rounded-md text-white"
+          @click="stopScroll"
+        > 
+          Stop Scroll
+        </button>
+      </div>
+    </div>
   </div>
 </template>
