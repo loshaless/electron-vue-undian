@@ -41,7 +41,9 @@ export async function getWinnerDetailByCategory(categoryId: number[]): Promise<W
     SELECT c.cif, c.account, c.name, c.branch, c.region, c.points, c.balance, c.roll_id, w.prize_name
     FROM winner w
     JOIN customer c ON w.customer_id = c.customer_id
-    WHERE w.category IN (${placeholders})`;
+    WHERE w.category IN (${placeholders})
+    ORDER BY w.prize_name ASC
+  `;
   console.log(sql)
   return await dbAll(sql, categoryId);
 }

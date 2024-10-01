@@ -5,22 +5,22 @@ import { PageName } from '../constants/enum/PageName';
 
 /* GET WINNER BY CATEGORY */
 window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_CATEGORY, async (event, categoryId) => {
-  getWinnerByCategory(categoryId)
+  getWinnerDetailByCategory(categoryId)
 })
 
-function getWinnerByCategory(categoryId: number) {
-  window.ipcRenderer.send(IpcChannels.GET_WINNER_BY_CATEGORY, [categoryId])
+function getWinnerDetailByCategory(categoryId: number) {
+  window.ipcRenderer.send(IpcChannels.WINNER_PAGE_GET_WINNER_DETAIL_BY_CATEGORY, [categoryId])
 }
 
 const winners = ref<any>([])
-window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, async (event, listOfWinner) => {
+window.ipcRenderer.on(IpcChannels.WINNER_PAGE_GET_WINNER_DETAIL_BY_CATEGORY, async (event, listOfWinner) => {
   winners.value = listOfWinner
 })
 
 /* AUTOMATIC SCROLL */
 let intervalId: NodeJS.Timeout | null = null;
 function startAutoScroll(element: HTMLElement, scrollTop = undefined) {
-  const scrollAmount = (element.firstElementChild?.clientHeight || 0) / 20; // Adjust scroll amount for smoothness
+  const scrollAmount = 1;
   if (scrollTop) {
     element.scrollTop = scrollTop
   }
@@ -83,7 +83,7 @@ window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_SCROLL_TIME, async (event, scr
 
 /* HEIGHT AND WIDTH */
 const height = ref(250)
-const width = ref(250)
+const width = ref(1200)
 
 window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_HEIGHT_WIDTH, async (event, h, w) => {
   height.value = h
@@ -118,11 +118,26 @@ window.ipcRenderer.on(IpcChannels.GET_BACKGROUND_IMAGE, (event, image) => {
         <div 
           id="winner-list" 
           :style="{ height: height + 'px', width: width + 'px' }"
-          class="text-center overflow-y-hidden"
+          class="overflow-y-hidden"
         >
-          <div v-for="winner in winners" :key="winner.id">
-            <h3>{{ winner.customer_name }}</h3>
-          </div>
+          <table class="table-auto w-full text-center">
+            <thead>
+              <tr>
+                <th>Prize Name</th>
+                <th>Account</th>
+                <th>Name</th>
+                <th>Region</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="winner in winners" :key="winner.id">
+                <td>{{ winner.prize_name }}</td>
+                <td>{{ winner.account }}</td>
+                <td>{{ winner.name }}</td>
+                <td>{{ winner.region }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
