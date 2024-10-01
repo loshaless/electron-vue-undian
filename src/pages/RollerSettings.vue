@@ -54,12 +54,14 @@ const selectedCategoryData = computed(() => {
     minBalance: 0,
     totalWinner: 0,
     prize: [] as {
-      cumulativePoints: number,
-      totalCustomer: number,
       tableName: string,
-      prizeName: string,
+      totalCustomer: number,
+      cumulativePoints: number,
       regions: string,
-      numOfItem: number
+      regionId: number,
+      prizeId: number,
+      prizeName: string,
+      numOfItem: number,
     }[]
   }
 
@@ -74,12 +76,14 @@ const selectedCategoryData = computed(() => {
       result.totalWinner += +region.numOfItem
       const tableName = `customer_${replaceSpaceWithUnderscore(category.name)}_${replaceSpaceWithUnderscore(region.regionName)}`
 
-      return result.prize.push({
+      result.prize.push({
         tableName: tableName,
-        cumulativePoints: listCumulativePointsAndTotalCustomer.value[tableName]?.cumulativePoints,
         totalCustomer: listCumulativePointsAndTotalCustomer.value[tableName]?.totalCustomer,
-        prizeName: prizeDetail?.prizeName,
+        cumulativePoints: listCumulativePointsAndTotalCustomer.value[tableName]?.cumulativePoints,
         regions: region.regionName,
+        regionId: region.regionId,
+        prizeId: prizeId,
+        prizeName: prizeDetail?.prizeName,
         numOfItem: region.numOfItem
       });
     })
@@ -106,10 +110,13 @@ function generateRollerQueue() {
       result.push(
         [prize.tableName, 
           {
+            prizeId: prize.prizeId,
             prizeName: prize.prizeName,
-            category: selectedCategoryData.value.categoryId,
             rollId: 0,
-            winnerName: ''
+            winnerName: '',
+            categoryId: selectedCategoryData.value.categoryId,
+            regionId: prize.regionId,
+            region: prize.regions
           } as WinnerView
         ])
     }
@@ -173,6 +180,9 @@ function startRollingAndGetWinner(winnerView: WinnerView, database: string) {
 const winner = ref<WinnerView>()
 window.ipcRenderer.on(IpcChannels.GET_A_WINNER, (event, winnerView) => {
   winner.value = winnerView
+
+  /* UPDATE NUM OF ITEM */
+  getPrizeList()
 })
 
 function stopRollerAndSendWinner() {

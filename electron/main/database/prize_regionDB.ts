@@ -26,3 +26,8 @@ export async function deletePrizeRegion(id: number) {
   const sql = `DELETE FROM prize_region WHERE id = ?`;
   await dbRun(sql, [id]);
 }
+
+export async function editPrizeRegionNumOfItemByPrizeIdAndRegionId(prize_id: number, region_id: number) {
+  const sql = `UPDATE prize_region SET num_of_item = num_of_item - 1 WHERE prize_id = ? AND region_id = ?`;
+  await dbRun(sql, [prize_id, region_id]);
+}

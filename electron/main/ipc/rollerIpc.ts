@@ -8,6 +8,7 @@ import { getMaxCumulativePoints, findCustomerByCumulativePoints } from "../datab
 import { addWinner } from "../database/winnerDB";
 import { WinnerView } from "../../../src/constants/types/WinnerView";
 import { IpcChannels } from "../../../src/constants/enum/IpcChannels";
+import { editPrizeRegionNumOfItemByPrizeIdAndRegionId } from "../database/prize_regionDB";
 
 ipcMain.on(IpcChannels.GET_A_WINNER, async (event, winnerView: WinnerView, database: string) => {
   try {
@@ -16,20 +17,19 @@ ipcMain.on(IpcChannels.GET_A_WINNER, async (event, winnerView: WinnerView, datab
 
     while (true) {
       const randomRollNumber = Math.floor(Math.random() * maxCumulativePoints) + 1;
-      console.log("Random roll number:", randomRollNumber);
       const winnerRoll = await findCustomerByCumulativePoints(database, randomRollNumber);
-      console.log("winnerRoll - ", winnerRoll);
       const winnerCustomer = await findCustomerById(winnerRoll.customer_id);
-      console.log("winnerCustomer - ", winnerCustomer);
 
       if (winnerCustomer.roll_id === null) {
         const rollId = winnerCustomer.cumulative_points - (winnerRoll.cumulative_points - randomRollNumber)
         await updateCustomerRollId(winnerRoll.customer_id, rollId);
 
+        /* this data used for winner view in the second window */
         winnerView.rollId = rollId
         winnerView.winnerName = winnerCustomer.name
-        winnerView.region = winnerCustomer.region
-        await addWinner(winnerView.prizeName, winnerView.rollId, winnerRoll.customer_id, winnerView.winnerName, winnerCustomer.region, winnerView.category)
+
+        await addWinner(winnerView.prizeName, winnerView.rollId, winnerRoll.customer_id, winnerView.winnerName, winnerCustomer.region, winnerView.categoryId)
+        await editPrizeRegionNumOfItemByPrizeIdAndRegionId(winnerView.prizeId, winnerView.regionId)
         await dbRun("COMMIT");
 
         event.reply(IpcChannels.GET_A_WINNER, winnerView)
