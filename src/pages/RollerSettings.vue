@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {computed, onMounted, reactive, Ref, ref} from "vue";
+import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
 import {IpcChannels} from "../constants/enum/IpcChannels";
 import SelectComponent from "../components/SelectComponent.vue";
 import LoadingComponent from "../components/LoadingComponent.vue";
@@ -127,6 +127,8 @@ function generateRollerQueue() {
 let rollerQueue = reactive<any[]>([])
 const isRolling = ref(false);
 async function startRollerWithoutStopper() {
+  // CHANGE PAGE TO ROLLER PAGE
+  window.ipcRenderer.send(IpcChannels.CHANGE_PAGE, PageName.ROLLER)
   isRolling.value = true;
 
   /* generate roller queue if not exist */
@@ -157,6 +159,8 @@ async function startRollerWithoutStopper() {
 }
 
 function startRollerManually() {
+  // CHANGE PAGE TO ROLLER PAGE
+  window.ipcRenderer.send(IpcChannels.CHANGE_PAGE, PageName.ROLLER)
   if (rollerQueue.length === 0) {
     rollerQueue = generateRollerQueue()
   }
@@ -171,8 +175,16 @@ function stopRolling() {
   stopRollerAndSendWinner()
 }
 
-function startRollingAndGetWinner(winnerView: WinnerView, database: string) {
-  
+onUnmounted( async () => {
+  if (isRolling.value) {
+    if (winner.value) {
+      await new Promise(resolve => setTimeout(resolve, rollAnimationTime.value * 1000))
+    }
+    stopRolling()
+  }
+})
+
+function startRollingAndGetWinner(winnerView: WinnerView, database: string) {  
   window.ipcRenderer.send(IpcChannels.START_ROLLING)
   window.ipcRenderer.send(IpcChannels.GET_A_WINNER, winnerView, database)
 }
