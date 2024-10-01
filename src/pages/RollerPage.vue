@@ -2,6 +2,7 @@
 import {ref, onUnmounted, onMounted, reactive} from "vue";
 import {IpcChannels} from "../constants/enum/IpcChannels";
 import {WinnerView} from "../constants/types/WinnerView";
+import { PageName } from "../constants/enum/PageName";
 
 const winnerState = reactive({
   name: '',
@@ -62,10 +63,24 @@ window.ipcRenderer.on(IpcChannels.GET_TOTAL_CUMULATIVE_POINTS, (event, points: n
 onMounted(() => {
   getTotalPoints()
 })
+
+/* BACKGROUND IMAGE */
+const backgroundImage = ref(``)
+onMounted(() => {
+  window.ipcRenderer.send(IpcChannels.GET_BACKGROUND_IMAGE, PageName.ROLLER)
+})
+
+window.ipcRenderer.on(IpcChannels.GET_BACKGROUND_IMAGE, (event, image) => {
+  backgroundImage.value = image
+})
 </script>
 
 <template>
-  <div class="h-screen flex flex-col gap-5 items-center justify-center">
+  <div 
+    v-if="backgroundImage" 
+    :style="{ backgroundImage: `url(${backgroundImage})`, backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }"
+    class="h-screen w-screen flex flex-col gap-5 items-center justify-center"
+  >
     <div class="text-8xl text-red-700 font-bold flex gap-3">
       <span v-for="(digit, index) in digits" :key="index">
         {{ digit }}

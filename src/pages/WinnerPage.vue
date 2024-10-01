@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, nextTick, watch, computed } from 'vue';
 import { IpcChannels } from '../constants/enum/IpcChannels';
+import { PageName } from '../constants/enum/PageName';
 
 /* GET WINNER BY CATEGORY */
 window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_CATEGORY, async (event, categoryId) => {
@@ -88,17 +89,33 @@ window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_HEIGHT_WIDTH, async (event, h,
   height.value = h
   width.value = w
 })
+
+/* BACKGROUND IMAGE */
+const backgroundImage = ref(``)
+onMounted(() => {
+  window.ipcRenderer.send(IpcChannels.GET_BACKGROUND_IMAGE, PageName.WINNER)
+})
+
+window.ipcRenderer.on(IpcChannels.GET_BACKGROUND_IMAGE, (event, image) => {
+  backgroundImage.value = image
+})
 </script>
 
 <template>
-  <div class="flex items-center justify-center h-screen">
-    <div 
-      id="winner-list" 
+  <div 
+    v-if="backgroundImage" 
+    class="h-screen w-screen" 
+    :style="{ backgroundImage: `url(${backgroundImage})`, backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }"
+  >
+    <div class="flex items-center justify-center h-screen">
+      <div 
+        id="winner-list" 
       :style="{ height: height + 'px', width: width + 'px' }"
-      class="text-center bg-gray-200 overflow-y-hidden"
-    >
-      <div v-for="winner in winners" :key="winner.id">
-        <h3>{{ winner.customer_name }}</h3>
+        class="text-center overflow-y-hidden"
+      >
+        <div v-for="winner in winners" :key="winner.id">
+          <h3>{{ winner.customer_name }}</h3>
+        </div>
       </div>
     </div>
   </div>
