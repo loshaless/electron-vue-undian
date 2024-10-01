@@ -82,8 +82,8 @@ window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_SCROLL_TIME, async (event, scr
 })
 
 /* HEIGHT AND WIDTH */
-const height = ref(400)
-const width = ref(400)
+const height = ref(250)
+const width = ref(250)
 
 window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_HEIGHT_WIDTH, async (event, h, w) => {
   height.value = h
@@ -107,16 +107,29 @@ window.ipcRenderer.on(IpcChannels.GET_BACKGROUND_IMAGE, (event, image) => {
     class="h-screen w-screen" 
     :style="{ backgroundImage: `url(${backgroundImage})`, backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }"
   >
-    <div class="flex items-center justify-center h-screen">
-      <div 
-        id="winner-list" 
-      :style="{ height: height + 'px', width: width + 'px' }"
-        class="text-center overflow-y-hidden"
-      >
-        <div v-for="winner in winners" :key="winner.id">
-          <h3>{{ winner.customer_name }}</h3>
+    <div class="flex flex-col items-center justify-center h-screen gap-3">
+      <!-- TITLE -->
+      <p class="text-xl text-red-700 font-bold italic">
+        Selamat kepada para Pemenang!
+      </p>
+
+      <!-- WINNER LIST -->
+      <div class="flex items-center justify-center">
+        <div 
+          id="winner-list" 
+          :style="{ height: height + 'px', width: width + 'px' }"
+          class="text-center overflow-y-hidden"
+        >
+          <div v-for="winner in winners" :key="winner.id">
+            <h3>{{ winner.customer_name }}</h3>
+          </div>
         </div>
       </div>
+
+      <!-- YEAR -->
+      <p class="text-xl text-red-700 font-bold">
+        2006 - {{ new Date().getFullYear() }} CIMB NIAGA
+      </p>
     </div>
   </div>
 </template>

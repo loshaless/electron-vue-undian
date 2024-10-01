@@ -203,7 +203,7 @@ function sendHeightWidthSettings() {
       </div>
 
       <!-- SCROLL PROGRESS -->
-      <p>Scroll Progress: {{ scrollProgressPercentage }}</p>
+      <p>Progress: {{ scrollProgressPercentage }}</p>
     </div>
   </div>
 </template>

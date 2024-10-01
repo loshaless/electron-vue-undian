@@ -6,7 +6,8 @@ import { PageName } from "../constants/enum/PageName";
 
 const winnerState = reactive({
   name: '',
-  region: ''
+  region: '',
+  prizeName: '',
 })
 const numDigits = ref(3);
 const digits = ref(Array(numDigits.value).fill(0));
@@ -28,6 +29,9 @@ window.ipcRenderer.on(IpcChannels.START_ROLLING, (event) => {
 window.ipcRenderer.on(IpcChannels.STOP_ROLLING, (event, winnerData: WinnerView) => {
   stopRoller()
   winnerState.region = winnerData.region
+  winnerState.prizeName = winnerData.prizeName
+  winnerState.name = winnerData.winnerName
+
   const rollIdString = winnerData.rollId.toString()
   const numOfZero = numDigits.value - rollIdString.length
 
@@ -37,12 +41,13 @@ window.ipcRenderer.on(IpcChannels.STOP_ROLLING, (event, winnerData: WinnerView) 
     newDigits.push(rollIdString[i])
   }
 
-  winnerState.name = winnerData.winnerName
   digits.value = newDigits
 })
 
 function stopRoller() {
   winnerState.name = ''
+  winnerState.prizeName = ''
+  winnerState.region = ''
   clearInterval(intervalId);
 }
 
@@ -81,11 +86,14 @@ window.ipcRenderer.on(IpcChannels.GET_BACKGROUND_IMAGE, (event, image) => {
     :style="{ backgroundImage: `url(${backgroundImage})`, backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }"
     class="h-screen w-screen flex flex-col gap-5 items-center justify-center"
   >
-    <div class="text-8xl text-red-700 font-bold flex gap-3">
+    <div class="text-8xl text-red-700 font-bold flex gap-2">
       <span v-for="(digit, index) in digits" :key="index">
         {{ digit }}
       </span>
     </div>
+    <p class="text-3xl text-green-700">
+      {{ winnerState.name }}
+    </p>
     <p v-if="winnerState.name" class="text-3xl text-green-700">
       Selamat kepada {{ winnerState.name }} dari {{ winnerState.region }}
     </p>
