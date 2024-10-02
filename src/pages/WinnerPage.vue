@@ -37,19 +37,25 @@ function startAutoScroll(element: HTMLElement, scrollTop = undefined) {
   const setScrollInterval = () => {
     if (intervalId) clearInterval(intervalId);
     intervalId = setInterval(updateScroll, scrollSpeed.value);
+
+    /* to send scroll progress */
+    createIntervalScrollProgress()
   };
 
   watch(scrollSpeed, setScrollInterval, { immediate: true });
 }
 
 /* STOP SCROLL */
+let intervalIdScrollProgress: NodeJS.Timeout | null = null;
 function stopAutoScroll() {
   if (intervalId) {
     clearInterval(intervalId);
     intervalId = null;
+    clearInterval(intervalIdScrollProgress as NodeJS.Timeout);
+    intervalIdScrollProgress = null;
   }
 }
-window.ipcRenderer.on(IpcChannels.WINNER_PAGE_STOP_SCROLL, async (event, scrollTime) => {
+window.ipcRenderer.on(IpcChannels.WINNER_PAGE_STOP_SCROLL, async (event) => {
   stopAutoScroll()
 })
 
@@ -60,8 +66,18 @@ function continueAutoScroll() {
     startAutoScroll(winnerListDiv);
   }
 }
-window.ipcRenderer.on(IpcChannels.WINNER_PAGE_START_SCROLL, async (event, scrollTime) => {
+window.ipcRenderer.on(IpcChannels.WINNER_PAGE_START_SCROLL, async (event) => {
   continueAutoScroll()
+})
+
+/* RESTART SCROLL */
+window.ipcRenderer.on(IpcChannels.WINNER_PAGE_RESTART_SCROLL, async (event, scrollTime) => {
+  stopAutoScroll()
+  const winnerListDiv = document.getElementById('winner-list');
+  if (winnerListDiv) {
+    winnerListDiv.scrollTop = 0
+  }
+  sendScrollProgress('0%')
 })
 
 /* SCROLL PROGRESS */
@@ -69,8 +85,14 @@ const scrollProgress = ref<string>('0%')
 function updateScrollProgress(element: HTMLElement) {
   const progress = (element.scrollTop / (element.scrollHeight - element.clientHeight)) * 100;
   scrollProgress.value = progress.toFixed(2) + '%';
-  sendScrollProgress(scrollProgress.value)
 }
+
+function createIntervalScrollProgress() {
+  intervalIdScrollProgress = setInterval(() => {
+    sendScrollProgress(scrollProgress.value)
+  }, 500)
+}
+
 function sendScrollProgress(scrollProgress: string) {
   window.ipcRenderer.send(IpcChannels.WINNER_PAGE_GET_PROGRESS, scrollProgress)
 }

@@ -44,7 +44,7 @@ function sendScrollTimeSettings() {
 
 /* START SCROLL */
 function startScroll() {
-  window.ipcRenderer.send(IpcChannels.WINNER_PAGE_START_SCROLL, scrollTime.value)
+  window.ipcRenderer.send(IpcChannels.WINNER_PAGE_START_SCROLL)
 }
 
 /* STOP SCROLL */
@@ -52,13 +52,19 @@ function stopScroll() {
   window.ipcRenderer.send(IpcChannels.WINNER_PAGE_STOP_SCROLL)
 }
 
+/* RESTART SCROLL */
+function restartScroll() {
+  window.ipcRenderer.send(IpcChannels.WINNER_PAGE_RESTART_SCROLL)
+}
+
 /* SET CATEGORY  */
 function setCategory() {
+  scrollProgressPercentage.value = '0%'
   window.ipcRenderer.send(IpcChannels.WINNER_PAGE_SET_CATEGORY, selectedCategoryId.value)
 }
 
 /* PROGRESS SCROLL */
-const scrollProgressPercentage = ref<number>(0)
+const scrollProgressPercentage = ref<string>('0%')
 window.ipcRenderer.on(IpcChannels.WINNER_PAGE_GET_PROGRESS, (event, progress) => {
   scrollProgressPercentage.value = progress
 })
@@ -177,6 +183,12 @@ function sendHeightWidthSettings() {
         > 
           Stop Scroll
         </button>
+        <button
+          class="w-48 bg-red-500 hover:bg-red-600 p-2 rounded-md text-white"
+          @click="restartScroll"
+        > 
+          Restart Scroll
+        </button>
       </div>
 
       <!-- HEIGHT AND WIDTH -->
@@ -203,7 +215,13 @@ function sendHeightWidthSettings() {
       </div>
 
       <!-- SCROLL PROGRESS -->
-      <p>Progress: {{ scrollProgressPercentage }}</p>
+      <div class="w-full bg-gray-200 rounded-full h-4 mt-3">
+        <div 
+          class="h-4 rounded-full" 
+          :style="{ width: `${scrollProgressPercentage}`, background: 'blue' }"
+        ></div>
+      </div>
+      <p>{{ scrollProgressPercentage }}</p>
     </div>
   </div>
 </template>

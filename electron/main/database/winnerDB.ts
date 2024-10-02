@@ -44,7 +44,6 @@ export async function getWinnerDetailByCategory(categoryId: number[]): Promise<W
     WHERE w.category IN (${placeholders})
     ORDER BY w.prize_name ASC
   `;
-  console.log(sql)
   return await dbAll(sql, categoryId);
 }
 

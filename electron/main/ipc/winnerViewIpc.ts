@@ -12,16 +12,12 @@ ipcMain.on(IpcChannels.WINNER_PAGE_SET_SCROLL_TIME, async (event, settings) => {
   windows.view.webContents.send(IpcChannels.WINNER_PAGE_SET_SCROLL_TIME, settings)
 })
 
-ipcMain.on(IpcChannels.WINNER_PAGE_START_SCROLL, async (event, settings) => {
-  windows.view.webContents.send(IpcChannels.WINNER_PAGE_START_SCROLL, settings)
+ipcMain.on(IpcChannels.WINNER_PAGE_START_SCROLL, async (event) => {
+  windows.view.webContents.send(IpcChannels.WINNER_PAGE_START_SCROLL)
 })
 
-ipcMain.on(IpcChannels.WINNER_PAGE_STOP_SCROLL, async (event, settings) => {
-  windows.view.webContents.send(IpcChannels.WINNER_PAGE_STOP_SCROLL, settings)
-})
-
-ipcMain.on(IpcChannels.WINNER_PAGE_GET_PROGRESS, async (event, settings) => {
-  windows.view.webContents.send(IpcChannels.WINNER_PAGE_GET_PROGRESS, settings)
+ipcMain.on(IpcChannels.WINNER_PAGE_STOP_SCROLL, async (event) => {
+  windows.view.webContents.send(IpcChannels.WINNER_PAGE_STOP_SCROLL)
 })
 
 ipcMain.on(IpcChannels.WINNER_PAGE_GET_PROGRESS, async (event, settings) => {
@@ -41,3 +37,6 @@ ipcMain.on(IpcChannels.WINNER_PAGE_GET_WINNER_DETAIL_BY_CATEGORY, async (event, 
   }
 })
 
+ipcMain.on(IpcChannels.WINNER_PAGE_RESTART_SCROLL, (event) => {
+  windows.view.webContents.send(IpcChannels.WINNER_PAGE_RESTART_SCROLL)
+})
