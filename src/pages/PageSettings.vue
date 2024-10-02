@@ -77,6 +77,12 @@ const width = ref(400)
 function sendHeightWidthSettings() {
   window.ipcRenderer.send(IpcChannels.WINNER_PAGE_SET_HEIGHT_WIDTH, height.value, width.value)
 }
+
+/* VERTICAL OFFSET */
+const verticalOffset = ref(200)
+function sendVerticalOffset() {
+  window.ipcRenderer.send(IpcChannels.WINNER_PAGE_SET_VERTICAL_OFFSET, verticalOffset.value)
+}
 </script>
 
 <template>
@@ -211,6 +217,22 @@ function sendHeightWidthSettings() {
           @click="sendHeightWidthSettings"
         >
           Set Height and Width
+        </button>
+      </div>
+
+      <!-- VERTICAL OFFSET -->
+      <div class="flex gap-3 items-center">
+        <p>Vertical Offset: </p>
+        <input 
+          type="number" 
+          v-model="verticalOffset"
+          class="border-gray-300 rounded p-1 border"
+        > 
+        <button
+          class="bg-yellow-500 hover:bg-yellow-600 p-2 rounded-md text-white"
+          @click="sendVerticalOffset"
+        >
+          Set Vertical Offset
         </button>
       </div>
 

@@ -104,8 +104,8 @@ window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_SCROLL_TIME, async (event, scr
 })
 
 /* HEIGHT AND WIDTH */
-const height = ref(250)
-const width = ref(1200)
+const height = ref(250) 
+const width = ref(400)
 
 window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_HEIGHT_WIDTH, async (event, h, w) => {
   height.value = h
@@ -121,6 +121,12 @@ onMounted(() => {
 window.ipcRenderer.on(IpcChannels.GET_BACKGROUND_IMAGE, (event, image) => {
   backgroundImage.value = image
 })
+
+/* VERTICAL OFFSET */
+const verticalOffset = ref(200); 
+window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_VERTICAL_OFFSET, async (event, offset) => {
+  verticalOffset.value = offset
+})
 </script>
 
 <template>
@@ -129,7 +135,13 @@ window.ipcRenderer.on(IpcChannels.GET_BACKGROUND_IMAGE, (event, image) => {
     class="h-screen w-screen" 
     :style="{ backgroundImage: `url(${backgroundImage})`, backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }"
   >
-    <div class="flex flex-col items-center justify-center h-screen gap-3">
+    <div 
+      class="flex flex-col items-center justify-center gap-3"
+      :style="{
+        position: 'relative',
+        top: verticalOffset + 'px',
+      }"
+    >
       <!-- TITLE -->
       <p class="text-xl text-red-700 font-bold italic">
         Selamat kepada para Pemenang!

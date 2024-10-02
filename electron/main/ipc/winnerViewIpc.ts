@@ -40,3 +40,7 @@ ipcMain.on(IpcChannels.WINNER_PAGE_GET_WINNER_DETAIL_BY_CATEGORY, async (event, 
 ipcMain.on(IpcChannels.WINNER_PAGE_RESTART_SCROLL, (event) => {
   windows.view.webContents.send(IpcChannels.WINNER_PAGE_RESTART_SCROLL)
 })
+
+ipcMain.on(IpcChannels.WINNER_PAGE_SET_VERTICAL_OFFSET, (event, offset) => {
+  windows.view.webContents.send(IpcChannels.WINNER_PAGE_SET_VERTICAL_OFFSET, offset)
+})
