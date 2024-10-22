@@ -154,16 +154,16 @@ window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_VERTICAL_OFFSET, async (event,
           :style="{ height: height + 'px', width: width + 'px' }"
           class="overflow-y-hidden"
         >
-          <table class="table-auto w-full text-center">
-            <thead>
+          <table class="table-1 text-center">
+            <thead class="sticky top-0">
               <tr>
-                <th>Prize Name</th>
-                <th>Customer Number</th>
-                <th>Name</th>
-                <th>Region</th>
+                <th class="bg-[#ED1C24] text-white">Prize Name</th>
+                <th class="bg-[#ED1C24] text-white">Customer Number</th>
+                <th class="bg-[#ED1C24] text-white">Name</th>
+                <th class="bg-[#ED1C24] text-white">Region</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="overflow-y-auto">
               <tr v-for="winner in winners" :key="winner.id">
                 <td>{{ winner.prize_name }}</td>
                 <td>{{ winner.cif }}</td>
