@@ -44,7 +44,7 @@ window.ipcRenderer.on(IpcChannels.CHANGE_PAGE, (event, canChange) => {
   >
     <nav class="container mx-auto flex justify-between items-center">
       <ul class="flex space-x-3 items-center">
-        <img src="../public/Logo-CN-merah.png" alt="logo" class="h-10 mr-3" />
+        <img src="/Logo-CN-merah.png" alt="logo" class="h-10 mr-3" />
         <li>
           <a
             :class="{'button-selected': selectedPage === PAGE.PRIZE_PAGE, 'button-standby': selectedPage !== PAGE.PRIZE_PAGE}"

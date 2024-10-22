@@ -216,18 +216,18 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
               v-if="!isLoadingInAction"
               class="flex gap-2 justify-center items-center"
             >
-              <button
-                class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
+              <img 
+                src="/icon-cog.svg" 
+                alt="delete" 
+                class="w-6 h-6 cursor-pointer hover:scale-110" 
                 @click="openModalEditPrize(prize)"
               >
-                Edit
-              </button>
-              <button
-                class="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded ml-2"
+              <img 
+                src="/icon-trash-can.svg" 
+                alt="delete" 
+                class="w-6 h-6 cursor-pointer hover:scale-110" 
                 @click="deletePrize(prize.prizeId)"
               >
-                Delete
-              </button>
             </div>
           </td>
         </tr>
