@@ -207,7 +207,7 @@ function stopRollerAndSendWinner() {
 <template>
   <div>
     <!-- Customer Data -->
-    <div class="border rounded-md p-5 shadow-sm border-gray-800 bg-gray-200 mx-5 my-5">
+    <div class="rounded-md p-5 m-5 card">
       <h1 class="text-2xl font-bold mb-2">Customer Data</h1>
       <h3 class="text-lg">Total Customer: {{ formatNumber(listCumulativePointsAndTotalCustomer?.customer?.totalCustomer)}}</h3>
       <h3 class="text-lg">Total Roll Id: {{formatNumber(listCumulativePointsAndTotalCustomer?.customer?.cumulativePoints)}}</h3>
@@ -215,7 +215,7 @@ function stopRollerAndSendWinner() {
 
     <!-- Roller Settings -->
     <div class="my-5 flex flex-col mx-5 gap-5">
-      <div class="border rounded-md p-5 shadow-sm border-gray-800 bg-amber-300 flex-1">
+      <div class="rounded-md p-5 card">
         <!-- Num of Winner -->
         <h3 class="font-bold text-2xl">Lottery Settings</h3>
         <div class="flex gap-3 mt-3 items-center">
@@ -260,7 +260,7 @@ function stopRollerAndSendWinner() {
 
               <button
                 v-if="showWinnerTime > 0 && rollAnimationTime > 0 && !isRolling"
-                class="bg-green-500 hover:bg-green-300 p-2 rounded-md text-white mt-3"
+                class="button-selected-gradient p-2 rounded-md mt-3"
                 @click="startRollerWithoutStopper()"
               >
                 Start Roller Without Stopper
@@ -268,7 +268,7 @@ function stopRollerAndSendWinner() {
 
               <button
                 v-if="!isRolling"
-                class="bg-blue-500 hover:bg-blue-300 p-2 rounded-md text-white mt-3"
+                class="button-selected-gradient-3 p-2 rounded-md mt-3"
                 @click="startRollerManually()"
               >
                 Start Roller Manually
@@ -276,7 +276,7 @@ function stopRollerAndSendWinner() {
 
               <button
                 v-if="winner && isRolling"
-                class="bg-red-500 hover:bg-red-300 p-2 rounded-md text-white mt-3"
+                class="button-selected-gradient-3 p-2 rounded-md mt-3"
                 @click="stopRolling()"
               >
                 Stop Roller
@@ -286,13 +286,13 @@ function stopRollerAndSendWinner() {
           </div>
 
           <!-- PRIZE DATA DETAIL -->
-          <div class="border rounded-md p-5 shadow-sm border-gray-800 bg-gray-200">
+          <div class="rounded-md p-5 card">
             <h3 class="font-bold text-2xl mb-1">Category {{ selectedCategoryData.categoryName }}</h3>
             <p class="text-lg">Total Winner : {{ selectedCategoryData.totalWinner }}</p>
             <p class="mb-1 text-lg mb-3">Min Balance : {{ formatNumber(selectedCategoryData.minBalance) }}</p>
             <div v-if="selectedCategoryData">
               <button
-                class="bg-blue-500 hover:bg-blue-300 p-2 rounded-md text-white"
+                class="button-selected-gradient p-2 rounded-md"
                 @click="prizeDetailModalState.isOpen = true"
               >
                 Open Prize Detail
@@ -303,23 +303,23 @@ function stopRollerAndSendWinner() {
             :is-open="prizeDetailModalState.isOpen"
             @update:isOpen="prizeDetailModalState.isOpen = $event"
           >
-            <table class="table-auto w-full border-white text-center">
+            <table class="table-1">
               <thead>
                 <tr>
-                  <th class="px-4 py-2 border border-gray-800">Prize Name</th>
-                  <th class="px-4 py-2 border border-gray-800">Regions</th>
-                  <th class="px-4 py-2 border border-gray-800">Num of Item</th>
-                  <th class="px-4 py-2 border border-gray-800">Total Roll Id</th>
-                  <th class="px-4 py-2 border border-gray-800">Total Customer</th>
+                  <th>Prize Name</th>
+                  <th>Regions</th>
+                  <th>Num of Item</th>
+                  <th>Total Roll Id</th>
+                  <th>Total Customer</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="(category, index) in selectedCategoryData.prize" :key="index">
-                  <td class="border px-4 py-2 border-gray-800">{{ category.prizeName }}</td>
-                  <td class="border px-4 py-2 border-gray-800">{{ category.regions }}</td>
-                  <td class="border px-4 py-2 border-gray-800">{{ category.numOfItem }}</td>
-                  <td class="border px-4 py-2 border-gray-800">{{ formatNumber(category.cumulativePoints) }}</td>
-                  <td class="border px-4 py-2 border-gray-800">{{ formatNumber(category.totalCustomer) }}</td>
+                  <td>{{ category.prizeName }}</td>
+                  <td>{{ category.regions }}</td>
+                  <td>{{ category.numOfItem }}</td>
+                  <td>{{ formatNumber(category.cumulativePoints) }}</td>
+                  <td>{{ formatNumber(category.totalCustomer) }}</td>
                 </tr>
               </tbody>
             </table>

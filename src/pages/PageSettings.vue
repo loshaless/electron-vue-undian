@@ -87,13 +87,13 @@ function sendVerticalOffset() {
 
 <template>
   <!-- PAGE SETTING -->
-  <div class="rounded-md mx-5 my-5 p-5 shadow-sm border border-gray-800 bg-purple-300">
+  <div class="m-5 p-5 rounded-lg card">
     <h3 class="font-bold text-2xl mb-1">Switch Page</h3>
       <div class="flex gap-3 mt-3 items-center">
         <button
           :class="[
-            {'cursor-not-allowed bg-gray-500 hover:bg-gray-500': backgroundName === PageName.HOME},
-            {'bg-amber-500 hover:bg-amber-300': backgroundName !== PageName.HOME}
+            {'cursor-not-allowed button-selected': backgroundName === PageName.HOME},
+            {'button-standby': backgroundName !== PageName.HOME}
           ]"
           class="p-2 rounded-md text-black"
           @click="changePage(PageName.HOME)"  
@@ -102,8 +102,8 @@ function sendVerticalOffset() {
         </button>
         <button
           :class="[
-            {'cursor-not-allowed bg-gray-500 hover:bg-gray-500': backgroundName === PageName.ROLLER},
-            {'bg-amber-500 hover:bg-amber-300': backgroundName !== PageName.ROLLER}
+            {'cursor-not-allowed button-selected': backgroundName === PageName.ROLLER},
+            {'button-standby': backgroundName !== PageName.ROLLER}
           ]"
           class="p-2 rounded-md text-black"
           @click="changePage(PageName.ROLLER)"
@@ -112,8 +112,8 @@ function sendVerticalOffset() {
         </button>
         <button
           :class="[
-            {'cursor-not-allowed bg-gray-500 hover:bg-gray-500': backgroundName === PageName.WINNER},
-            {'bg-amber-500 hover:bg-amber-300': backgroundName !== PageName.WINNER}
+            {'cursor-not-allowed button-selected': backgroundName === PageName.WINNER},
+            {'button-standby': backgroundName !== PageName.WINNER}
           ]"
           class="p-2 rounded-md text-black"
           @click="changePage(PageName.WINNER)"
@@ -123,10 +123,10 @@ function sendVerticalOffset() {
       </div>
 
       <!-- Background Upload -->
-    <div class="mt-5">
+    <div class="mt-8">
       <label 
         for="file-upload" 
-        class="bg-blue-500 hover:bg-blue-600 p-2 rounded-md text-white cursor-pointer"
+        class="button-selected-gradient p-2 rounded-md cursor-pointer"
       >
         Upload {{ backgroundName }} Background
       </label>
@@ -152,7 +152,7 @@ function sendVerticalOffset() {
           v-model="selectedCategoryId"
         />
         <button
-          class="w-48 bg-yellow-500 hover:bg-yellow-600 p-2 rounded-md text-white"
+          class="w-48 p-2 rounded-md button-selected-gradient"
           @click="setCategory"
         >
           Set Category
@@ -168,7 +168,7 @@ function sendVerticalOffset() {
           class="border-gray-300 rounded p-1 border"
         >
         <button
-          class="bg-yellow-500 hover:bg-yellow-600 p-2 rounded-md text-white"
+          class="p-2 rounded-md button-selected-gradient"
           @click="sendScrollTimeSettings"
         >
           Set Scroll Time
@@ -177,24 +177,24 @@ function sendVerticalOffset() {
 
       <!-- SCROLL CONTROL -->
       <div class="flex gap-3 items-center">
-        <button
-          class="w-48 bg-blue-500 hover:bg-blue-600 p-2 rounded-md text-white"
+        <img
+          src="/icon-play.png"
+          alt="start"
+          class="w-10 cursor-pointer hover:scale-110"
           @click="startScroll"
-        >
-          Continue Scroll
-        </button>
-        <button
-          class="w-48 bg-red-500 hover:bg-red-600 p-2 rounded-md text-white"
+        />
+        <img
+          src="/icon-stop.png"
+          alt="stop"
+          class="w-10 cursor-pointer hover:scale-110"
           @click="stopScroll"
-        > 
-          Stop Scroll
-        </button>
-        <button
-          class="w-48 bg-red-500 hover:bg-red-600 p-2 rounded-md text-white"
+        />
+        <img
+          src="/icon-restart.png"
+          alt="restart"
+          class="w-10 cursor-pointer hover:scale-110"
           @click="restartScroll"
-        > 
-          Restart Scroll
-        </button>
+        />
       </div>
 
       <!-- HEIGHT AND WIDTH -->
@@ -213,7 +213,7 @@ function sendVerticalOffset() {
           class="border-gray-300 rounded p-1 border"
         >
         <button
-          class="bg-yellow-500 hover:bg-yellow-600 p-2 rounded-md text-white"
+          class="p-2 rounded-md button-selected-gradient-2"
           @click="sendHeightWidthSettings"
         >
           Set Height and Width
@@ -229,7 +229,7 @@ function sendVerticalOffset() {
           class="border-gray-300 rounded p-1 border"
         > 
         <button
-          class="bg-yellow-500 hover:bg-yellow-600 p-2 rounded-md text-white"
+          class="p-2 rounded-md button-selected-gradient-3"
           @click="sendVerticalOffset"
         >
           Set Vertical Offset

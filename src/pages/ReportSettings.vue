@@ -108,7 +108,7 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
   <div class="mt-8">
     <!-- SETTINGS -->
     <div class="rounded-md border-2 border-gray-300 p-3 my-3 mx-5">
-      <p class="font-bold text-center bg-purple-500 text-white p-2 rounded-md mb-3">Header Settings</p>
+      <p class="font-bold text-center bg-[#ED1C24] text-white p-2 rounded-md mb-3">Header Settings</p>
       <div class="flex gap-3 items-center">
         <p class="font-bold">Winner Category :</p>
         <multi-select-component
@@ -117,7 +117,7 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
           @update:modelValue="selectedCategoryId = $event"
         />
         <button
-          class="ml-3 bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 hover:scale-110"
+          class="button-selected-gradient p-2 rounded-md ml-3"
           @click="fillBody()"
         >
           apply settings
@@ -133,7 +133,7 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
       </div>
 
       <div class="mt-8">
-        <p class="font-bold text-center bg-purple-500 text-white p-2 rounded-md mb-3">Footer Settings</p>
+        <p class="font-bold text-center bg-[#ED1C24] text-white p-2 rounded-md mb-3">Footer Settings</p>
         <div class="flex gap-3 items-center">
           <p class="font-bold">Place and Date: </p>
           <input v-model="placeAndDate" class="border-2 border-gray-300 rounded-md p-1 w-1/2" type="text"/>
@@ -206,8 +206,8 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
       <button
         :disabled="!selectedCategoryId.length"
         :class="[
-          {'cursor-not-allowed bg-gray-300 text-gray-500': !selectedCategoryId.length},
-          {'cursor-pointer bg-blue-500 hover:bg-blue-600 text-white hover:scale-105': selectedCategoryId.length}
+          {'cursor-not-allowed button-standby': !selectedCategoryId.length},
+          {'cursor-pointer button-selected-gradient': selectedCategoryId.length}
         ]"
         class="py-2 px-32 rounded-md"
         @click="generatePDF"
@@ -218,8 +218,8 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
       <button
         :disabled="!selectedCategoryId.length"
         :class="[
-          {'cursor-not-allowed bg-gray-300 text-gray-500': !selectedCategoryId.length},
-          {'cursor-pointer bg-blue-500 hover:bg-blue-600 text-white hover:scale-105': selectedCategoryId.length}
+          {'cursor-not-allowed button-standby': !selectedCategoryId.length},
+          {'cursor-pointer button-selected-gradient-2': selectedCategoryId.length}
         ]"
         class="py-2 px-32 rounded-md"
         @click="generateTxt"
@@ -240,12 +240,12 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
           <table style="width: 100%; border-collapse: collapse; border-color: #D1D5DB;">
             <thead>
             <tr style="color: white;">
-              <th style="padding: 0.25rem; border: 1px solid; background-color: #6B21A8;">No</th>
-              <th style="padding: 0.25rem; border: 1px solid; background-color: #6B21A8;">Prize</th>
-              <th style="padding: 0.25rem; border: 1px solid; background-color: #6B21A8;">RollId</th>
-              <th style="padding: 0.25rem; border: 1px solid; background-color: #6B21A8;">Customer Name</th>
-              <th style="padding: 0.25rem; border: 1px solid; background-color: #6B21A8;">Area</th>
-              <th style="padding: 0.25rem; border: 1px solid; background-color: #6B21A8;">Time</th>
+              <th style="padding: 0.25rem; border: 1px solid; background-color: #ED1C24;">No</th>
+              <th style="padding: 0.25rem; border: 1px solid; background-color: #ED1C24;">Prize</th>
+              <th style="padding: 0.25rem; border: 1px solid; background-color: #ED1C24;">RollId</th>
+              <th style="padding: 0.25rem; border: 1px solid; background-color: #ED1C24;">Customer Name</th>
+              <th style="padding: 0.25rem; border: 1px solid; background-color: #ED1C24;">Area</th>
+              <th style="padding: 0.25rem; border: 1px solid; background-color: #ED1C24;">Time</th>
             </tr>
             </thead>
             <tbody>
