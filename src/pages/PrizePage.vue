@@ -168,67 +168,71 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
 
 <template>
   <div>
-    <div class="border-gray-800 rounded-md bg-black p-5 my-5 mx-5 flex-col justify-center">
+    <div class="p-5 m-3 flex-col justify-center">
       <div class="flex gap-4 items-center justify-center">
         <button
-          class="rounded-md bg-green-700 text-white hover:bg-amber-500 cursor-pointer py-3 px-8"
+          class="rounded-md button-selected-gradient py-3 px-8"
           @click="openModalCreatePrize(true)"
         >
           Create New Prize
         </button>
         <button
-          class="rounded-md bg-green-700 text-white hover:bg-amber-500 cursor-pointer py-3 px-8"
+          class="rounded-md button-selected-gradient-2 py-3 px-8"
           @click="openModalEditRegion()"
         >
           Edit Region
         </button>
       </div>
+    </div>
 
-      <!-- Table to display prizes -->
-      <div class="mt-5">
-        <table class="table-auto w-full text-white border-white">
-          <thead>
-          <tr>
-            <th class="px-4 py-2 border">ID</th>
-            <th class="px-4 py-2 border">Name</th>
-            <th class="px-4 py-2 border">Quota</th>
-            <th class="px-4 py-2 border">Action</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr v-for="prize in prizes" :key="prize.prizeId" class="text-center">
-            <td class="border px-4 py-2">{{ prize.prizeId }}</td>
-            <td class="border px-4 py-2">{{ prize.prizeName }}</td>
-            <td class="border px-4 py-2">
-              <ul>
-                <li v-for="(quota, index) in prize.regions" :key="index">
-                  {{ quota.regionName }}: {{ quota.numOfItem }}
-                </li>
-              </ul>
-            </td>
-            <td class="border px-4 py-2">
-              <div
-                v-if="!isLoadingInAction"
-                class="flex gap-2 justify-center items-center"
+    <!-- Table to display prizes -->
+    <div class="flex justify-center">
+      <table class="text-black rounded-lg shadow-gray-400 shadow-md">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-4 py-2">ID</th>
+          <th class="px-4 py-2">Name</th>
+          <th class="px-4 py-2">Quota</th>
+          <th class="px-4 py-2">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr 
+          v-for="prize in prizes" 
+          :key="prize.prizeId" 
+          class="text-center odd:bg-gray-200 even:bg-gray-100"
+        >
+          <td class="px-4 py-2">{{ prize.prizeId }}</td>
+          <td class="px-4 py-2">{{ prize.prizeName }}</td>
+          <td class="px-4 py-2">
+            <ul>
+              <li v-for="(quota, index) in prize.regions" :key="index">
+                {{ quota.regionName }}: {{ quota.numOfItem }}
+              </li>
+            </ul>
+          </td>
+          <td class="px-4 py-2">
+            <div
+              v-if="!isLoadingInAction"
+              class="flex gap-2 justify-center items-center"
+            >
+              <button
+                class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
+                @click="openModalEditPrize(prize)"
               >
-                <button
-                  class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
-                  @click="openModalEditPrize(prize)"
-                >
-                  Edit
-                </button>
-                <button
-                  class="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded ml-2"
-                  @click="deletePrize(prize.prizeId)"
-                >
-                  Delete
-                </button>
-              </div>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
+                Edit
+              </button>
+              <button
+                class="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded ml-2"
+                @click="deletePrize(prize.prizeId)"
+              >
+                Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
     </div>
 
     <modal-component

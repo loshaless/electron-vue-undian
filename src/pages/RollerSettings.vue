@@ -98,8 +98,8 @@ const prizeDetailModalState = reactive({
 })
 
 /* AUTOMATIC ROLLER */
-const rollAnimationTime = ref(1)
-const showWinnerTime = ref(1)
+const rollAnimationTime = ref(2.5)
+const showWinnerTime = ref(2.5)
 
 /* ROLLER QUEUE */
 function generateRollerQueue() {

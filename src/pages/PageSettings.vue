@@ -37,7 +37,7 @@ window.ipcRenderer.on(IpcChannels.GET_CATEGORY_JOIN_PRIZE, (event, category) => 
 })
 
 /* SCROLL SPEED */
-const scrollTime = ref<number>(100)
+const scrollTime = ref<number>(5000)
 function sendScrollTimeSettings() {
   window.ipcRenderer.send(IpcChannels.WINNER_PAGE_SET_SCROLL_TIME, scrollTime.value)
 }

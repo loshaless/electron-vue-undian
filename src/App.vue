@@ -40,13 +40,14 @@ window.ipcRenderer.on(IpcChannels.CHANGE_PAGE, (event, canChange) => {
 <template>
   <div 
     v-if="canChangePage"
-    class="bg-gray-800 p-4"
+    class="pt-4 pb-2 border-b-2 border-gray-200"
   >
     <nav class="container mx-auto flex justify-between items-center">
-      <ul class="flex space-x-3">
+      <ul class="flex space-x-3 items-center">
+        <img src="../public/Logo-CN-merah.png" alt="logo" class="h-10 mr-3" />
         <li>
           <a
-            :class="{'bg-gray-600 text-white': selectedPage === PAGE.PRIZE_PAGE, 'text-gray-300': selectedPage !== PAGE.PRIZE_PAGE}"
+            :class="{'button-selected': selectedPage === PAGE.PRIZE_PAGE, 'button-standby': selectedPage !== PAGE.PRIZE_PAGE}"
             @click="selectedPage = PAGE.PRIZE_PAGE"
             href="#"
             class="px-3 py-2 rounded-md text-sm font-medium"
@@ -56,7 +57,7 @@ window.ipcRenderer.on(IpcChannels.CHANGE_PAGE, (event, canChange) => {
         </li>
         <li v-if="isPrizeDataExist">
           <a
-            :class="{'bg-gray-600 text-white': selectedPage === PAGE.UPLOAD_PAGE, 'text-gray-300': selectedPage !== PAGE.UPLOAD_PAGE}"
+            :class="{'button-selected': selectedPage === PAGE.UPLOAD_PAGE, 'button-standby': selectedPage !== PAGE.UPLOAD_PAGE}"
             @click="selectedPage = PAGE.UPLOAD_PAGE"
             href="#"
             class="px-3 py-2 rounded-md text-sm font-medium"
@@ -66,7 +67,7 @@ window.ipcRenderer.on(IpcChannels.CHANGE_PAGE, (event, canChange) => {
         </li>
         <li>
           <a
-            :class="{'bg-gray-600 text-white': selectedPage === PAGE.PAGE_SETTINGS, 'text-gray-300': selectedPage !== PAGE.PAGE_SETTINGS}"
+            :class="{'button-selected': selectedPage === PAGE.PAGE_SETTINGS, 'button-standby': selectedPage !== PAGE.PAGE_SETTINGS}"
             @click="selectedPage = PAGE.PAGE_SETTINGS"
             href="#"
             class="px-3 py-2 rounded-md text-sm font-medium"
@@ -76,7 +77,7 @@ window.ipcRenderer.on(IpcChannels.CHANGE_PAGE, (event, canChange) => {
         </li>
         <li v-if="isPrizeDataExist && isCustomerDataExist">
           <a
-            :class="{'bg-gray-600 text-white': selectedPage === PAGE.ROLLER_SETTINGS, 'text-gray-300': selectedPage !== PAGE.ROLLER_SETTINGS}"
+            :class="{'button-selected': selectedPage === PAGE.ROLLER_SETTINGS, 'button-standby': selectedPage !== PAGE.ROLLER_SETTINGS}"
             @click="selectedPage = PAGE.ROLLER_SETTINGS"
             href="#"
             class="px-3 py-2 rounded-md text-sm font-medium"
@@ -86,7 +87,7 @@ window.ipcRenderer.on(IpcChannels.CHANGE_PAGE, (event, canChange) => {
         </li>
         <li>
           <a
-            :class="{'bg-gray-600 text-white': selectedPage === PAGE.REPORT_PAGE, 'text-gray-300': selectedPage !== PAGE.REPORT_PAGE}"
+            :class="{'button-selected': selectedPage === PAGE.REPORT_PAGE, 'button-standby': selectedPage !== PAGE.REPORT_PAGE}"
             @click="selectedPage = PAGE.REPORT_PAGE"
             href="#"
             class="px-3 py-2 rounded-md text-sm font-medium"
@@ -117,8 +118,3 @@ window.ipcRenderer.on(IpcChannels.CHANGE_PAGE, (event, canChange) => {
 
 </template>
 
-<style scoped>
-.navbar {
-  @apply flex-1 text-center cursor-pointer bg-gray-300 hover:bg-amber-300 p-3 rounded-2xl;
-}
-</style>

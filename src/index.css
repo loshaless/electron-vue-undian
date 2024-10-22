@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.navbar {
+  @apply flex-1 text-center cursor-pointer bg-gray-300 hover:bg-amber-300 p-3 rounded-2xl;
+}
+
+/* button */
+.button-selected {
+  @apply bg-[#ED1C24] text-white;
+}
+
+.button-standby {
+  @apply bg-[#efefef];
+}
+
+.button-selected-gradient {
+  @apply bg-gradient-to-r from-pink-500 via-pink-500 to-red-500 text-white;
+}
+
+.button-selected-gradient-2 {
+  @apply bg-gradient-to-r from-red-500 via-red-500 to-pink-500 text-white;
+}
+
+.card {
+  @apply bg-[#f8f8f8] shadow-gray-400 shadow-md;
+}
