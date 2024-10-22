@@ -187,31 +187,30 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
 
     <!-- Table to display prizes -->
     <div class="flex justify-center">
-      <table class="text-black rounded-lg shadow-gray-400 shadow-md">
-      <thead class="bg-gray-100">
+      <table class="table-1">
+      <thead>
         <tr>
-          <th class="px-4 py-2">ID</th>
-          <th class="px-4 py-2">Name</th>
-          <th class="px-4 py-2">Quota</th>
-          <th class="px-4 py-2">Action</th>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Quota</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
         <tr 
           v-for="prize in prizes" 
           :key="prize.prizeId" 
-          class="text-center odd:bg-gray-200 even:bg-gray-100"
         >
-          <td class="px-4 py-2">{{ prize.prizeId }}</td>
-          <td class="px-4 py-2">{{ prize.prizeName }}</td>
-          <td class="px-4 py-2">
+          <td>{{ prize.prizeId }}</td>
+          <td>{{ prize.prizeName }}</td>
+          <td>
             <ul>
               <li v-for="(quota, index) in prize.regions" :key="index">
                 {{ quota.regionName }}: {{ quota.numOfItem }}
               </li>
             </ul>
           </td>
-          <td class="px-4 py-2">
+          <td>
             <div
               v-if="!isLoadingInAction"
               class="flex gap-2 justify-center items-center"
@@ -253,7 +252,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
         <div class="mt-3 flex items-center gap-3">
           <p>Quota Detail : </p>
           <button
-            class="p-3 bg-orange-500 rounded-md hover:bg-orange-300"
+            class="p-2 rounded-md button-selected-gradient-2"
             @click="addRegionForPrize()"
           >
             Add More Region
@@ -320,7 +319,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
       <div class="flex justify-center mt-8">
         <button
           v-if="modalPrizeState.addedPrizeRegion.length > 0 || modalPrizeState.editedPrizeRegion.length > 0"
-          class="rounded-md bg-green-700 text-white hover:bg-amber-500 cursor-pointer py-3 px-8 w-3/4"
+          class="rounded-md button-selected py-2 px-8 w-3/4"
           @click="editedPrizeId ? saveEditedPrize() : saveNewPrize()"
         >
           {{ editedPrizeId ? `Edit Prize Id: ${editedPrizeId}` : 'Save New Prize' }}
@@ -394,21 +393,21 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
         >
           <button
             v-if="!modalRegionState.isEdit"
-            class="mt-3 rounded-md bg-green-700 text-white hover:bg-amber-500 cursor-pointer py-3 px-8"
+            class="mt-3 rounded-md button-gradient py-2 px-8"
             @click="modalRegionState.isEdit = !modalRegionState.isEdit"
           >
             Edit
           </button>
           <button
             v-if="modalRegionState.isEdit"
-            class="mt-3 rounded-md bg-green-700 text-white hover:bg-amber-500 cursor-pointer py-3 px-8"
+            class="mt-3 rounded-md button-selected-gradient py-2 px-8"
             @click="saveEditedRegion()"
           >
             Save
           </button>
           <button
             v-if="modalRegionState.isEdit"
-            class="mt-3 rounded-md bg-green-700 text-white hover:bg-amber-500 cursor-pointer py-3 px-8"
+            class="mt-3 rounded-md button-selected-gradient-2 py-2 px-8"
             @click="addRegion()"
           >
             Add Region

@@ -8,21 +8,46 @@
 
 /* button */
 .button-selected {
-  @apply bg-[#ED1C24] text-white;
+  @apply bg-[#ED1C24] text-white hover:scale-105 shadow-md shadow-red-400;
 }
 
 .button-standby {
-  @apply bg-[#efefef];
+  @apply bg-[#efefef] hover:scale-105 shadow-md shadow-gray-400;
 }
 
 .button-selected-gradient {
-  @apply bg-gradient-to-r from-pink-500 via-pink-500 to-red-500 text-white;
+  @apply bg-gradient-to-r from-pink-500 via-pink-500 to-red-500 text-white hover:scale-105 shadow-md shadow-red-400;
 }
 
 .button-selected-gradient-2 {
-  @apply bg-gradient-to-r from-red-500 via-red-500 to-pink-500 text-white;
+  @apply bg-gradient-to-r from-red-500 via-red-500 to-pink-500 text-white hover:scale-105 shadow-sm shadow-red-400;
+}
+
+.button-selected-gradient-3 {
+  @apply bg-gradient-to-r from-red-500 via-pink-500 to-red-500 text-white hover:scale-105 shadow-sm shadow-red-400;
 }
 
 .card {
   @apply bg-[#f8f8f8] shadow-gray-400 shadow-md;
+}
+
+.table-1 {
+  @apply text-black rounded-lg shadow-gray-400 shadow-md;
+
+  thead {
+    @apply bg-gray-100;
+
+    th {
+      @apply px-4 py-2;
+    }
+  }
+
+  tbody {
+    tr {
+      @apply odd:bg-gray-200 even:bg-gray-100;
+    }
+    td {
+      @apply px-4 py-2;
+    }
+  }
 }

@@ -50,7 +50,7 @@ window.ipcRenderer.on(IpcChannels.CHANGE_PAGE, (event, canChange) => {
             :class="{'button-selected': selectedPage === PAGE.PRIZE_PAGE, 'button-standby': selectedPage !== PAGE.PRIZE_PAGE}"
             @click="selectedPage = PAGE.PRIZE_PAGE"
             href="#"
-            class="px-3 py-2 rounded-md text-sm font-medium"
+            class="p-3 rounded-md text-sm font-medium"
           >
             Prize & Region Settings
           </a>
@@ -60,7 +60,7 @@ window.ipcRenderer.on(IpcChannels.CHANGE_PAGE, (event, canChange) => {
             :class="{'button-selected': selectedPage === PAGE.UPLOAD_PAGE, 'button-standby': selectedPage !== PAGE.UPLOAD_PAGE}"
             @click="selectedPage = PAGE.UPLOAD_PAGE"
             href="#"
-            class="px-3 py-2 rounded-md text-sm font-medium"
+            class="p-3 rounded-md text-sm font-medium"
           >
             Upload
           </a>
@@ -70,7 +70,7 @@ window.ipcRenderer.on(IpcChannels.CHANGE_PAGE, (event, canChange) => {
             :class="{'button-selected': selectedPage === PAGE.PAGE_SETTINGS, 'button-standby': selectedPage !== PAGE.PAGE_SETTINGS}"
             @click="selectedPage = PAGE.PAGE_SETTINGS"
             href="#"
-            class="px-3 py-2 rounded-md text-sm font-medium"
+            class="p-3 rounded-md text-sm font-medium"
           >
             Page Settings
           </a>
@@ -80,7 +80,7 @@ window.ipcRenderer.on(IpcChannels.CHANGE_PAGE, (event, canChange) => {
             :class="{'button-selected': selectedPage === PAGE.ROLLER_SETTINGS, 'button-standby': selectedPage !== PAGE.ROLLER_SETTINGS}"
             @click="selectedPage = PAGE.ROLLER_SETTINGS"
             href="#"
-            class="px-3 py-2 rounded-md text-sm font-medium"
+            class="p-3 rounded-md text-sm font-medium"
           >
             Roller Settings
           </a>
@@ -90,7 +90,7 @@ window.ipcRenderer.on(IpcChannels.CHANGE_PAGE, (event, canChange) => {
             :class="{'button-selected': selectedPage === PAGE.REPORT_PAGE, 'button-standby': selectedPage !== PAGE.REPORT_PAGE}"
             @click="selectedPage = PAGE.REPORT_PAGE"
             href="#"
-            class="px-3 py-2 rounded-md text-sm font-medium"
+            class="p-3 rounded-md text-sm font-medium"
           >
             Report Settings
           </a>

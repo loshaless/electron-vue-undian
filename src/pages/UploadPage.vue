@@ -184,22 +184,19 @@ window.ipcRenderer.on(IpcChannels.DELETE_WINNER_DATA, (event) => {
 
 <template>
   <div>
-    <div 
-      v-if="canShowCategory && !isCustomerDataExist"
-      class="rounded border border-gray-400 p-4 m-3"
-    >
-      <table class="table-auto w-full border-white text-center">
+    <div v-if="canShowCategory && !isCustomerDataExist">
+      <table class="table-1 mx-auto my-8">
         <thead>
           <tr>
-            <th class="px-4 py-2 border">Category</th>
-            <th class="px-4 py-2 border">Min. Balance</th>
-            <th class="px-4 py-2 border">Prize</th>
+            <th>Category</th>
+            <th>Min. Balance</th>
+            <th>Prize</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(category, index) in listOfCategory" :key="index">
-            <td class="border px-4 py-2">{{ category.name }}</td>
-            <td class="border px-4 py-2">
+            <td>{{ category.name }}</td>
+            <td>
               <input 
                 v-if="saveCategoryState.isEdit"
                 type="number" 
@@ -208,7 +205,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_WINNER_DATA, (event) => {
               >
               <p v-else>{{ formatNumber(category.minBalance) }}</p>
             </td>
-            <td class="border px-4 py-2">
+            <td>
               <multi-select-component
                 :isViewMode="!saveCategoryState.isEdit"
                 :options="prizes.map((p: PrizeDetail) => ({id: p.prizeId, name: p.prizeName}))"
@@ -226,13 +223,13 @@ window.ipcRenderer.on(IpcChannels.DELETE_WINNER_DATA, (event) => {
         <button 
           v-if="!saveCategoryState.isEdit"
           @click="saveCategoryState.isEdit = true"
-          class="bg-green-500 text-white py-2 rounded-md px-12 hover:bg-green-600 hover:scale-105"
+          class="py-2 rounded-md px-12 button-selected-gradient"
         >
           Edit
         </button>
         <div v-else class="flex gap-3">
           <button
-            class="bg-red-500 text-white py-2 rounded-md px-12 hover:bg-red-600 hover:scale-105"
+            class="py-2 rounded-md px-12 button-standby"
             @click="saveCategoryState.isEdit = false; getCategory()"
           >
             Cancel
@@ -241,7 +238,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_WINNER_DATA, (event) => {
             :disabled="!canSaveCategory"
             @click="saveCategory"
             :class="{'cursor-not-allowed': !canSaveCategory, 'cursor-pointer': canSaveCategory}"
-            class="bg-green-500 text-white py-2 rounded-md px-12 hover:bg-green-600 hover:scale-105"
+            class="py-2 rounded-md px-12 button-selected"
           >
             Save
           </button>
@@ -252,7 +249,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_WINNER_DATA, (event) => {
     <div class="rounded border border-gray-400 p-4 mx-3 my-8 flex justify-center">
       <div v-if="!isLoading" class="flex flex-col gap-4">
       <button
-        class="bg-blue-500 text-white py-2 rounded-md px-4 hover:bg-blue-600 hover:scale-105"
+        class="py-2 rounded-md px-4 button-selected-gradient-2"
         @click="openFileDialog"
       >
         {{ (pathUrl && isCustomerDataExist) ? "Change File" : "Select New File" }}
@@ -266,11 +263,11 @@ window.ipcRenderer.on(IpcChannels.DELETE_WINNER_DATA, (event) => {
         <template v-slot:toggle>
           <button
             :class="{
-                'bg-gray-500 cursor-not-allowed': !pathUrl,
-                'bg-blue-500 cursor-pointer': !!pathUrl,
+                'button-standby cursor-not-allowed': !pathUrl,
+                'button-selected-gradient cursor-pointer': !!pathUrl,
             }"
             :disabled="pathUrl === ''"
-            class="text-white p-2 rounded-md w-full"
+            class="p-2 rounded-md w-full"
             @click="uploadDataToDatabase"
           >
             Upload data to database
@@ -283,7 +280,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_WINNER_DATA, (event) => {
 
       <button
         v-if="isCustomerDataExist"
-        class="text-white bg-red-700 p-2 rounded-md hover:bg-red-600 hover:scale-105"
+        class="py-2 rounded-md px-12 button-selected-gradient-3"
         @click="deleteCustomerData"
       >
         Delete Customer Data
@@ -291,7 +288,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_WINNER_DATA, (event) => {
 
       <button
         v-if="isWinnerDataExist"
-        class="text-white bg-red-700 p-2 rounded-md hover:bg-red-600 hover:scale-105"
+        class="py-2 rounded-md px-12 button-selected-gradient"
         @click="deleteWinnerData"
       >
         Delete Winner Data
