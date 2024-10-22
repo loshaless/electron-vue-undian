@@ -8,7 +8,7 @@ import MultiSelectComponent from "../components/MultiSelectComponent.vue";
 import { CustomerTable } from "../constants/types/CustomerTable";
 import { useCategory } from "../composables/useCategory";
 import { Category } from "../constants/types/Category";
-import { formatNumber, replaceSpaceWithUnderscore } from "../utils/generalUtils";
+import { createTableName, formatNumber } from "../utils/generalUtils";
 
 /* GET LIST OF PRIZE */
 onMounted(() => {
@@ -129,11 +129,11 @@ function generateListOfCustomerTable(): CustomerTable[] {
       const prizeDetail: PrizeDetail | undefined = prizes.value.find((p: PrizeDetail) => p.prizeId === prizeId)
       
       prizeDetail?.regions.forEach((region: PrizeRegionDetail) => {
-        const tableName = `customer_${replaceSpaceWithUnderscore(category.name)}_${replaceSpaceWithUnderscore(region.regionName)}`
+        const tableName = createTableName(category.name, region.regionName)
       
         if (!setOfCustomerTable.has(tableName)) {
             result.push({
-            tableName: tableName,
+            tableName: tableName.toLowerCase(),
             minBalance: category.minBalance,
             regions: region.regionName
           })

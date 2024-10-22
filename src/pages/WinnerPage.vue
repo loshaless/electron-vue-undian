@@ -158,7 +158,7 @@ window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_VERTICAL_OFFSET, async (event,
             <thead>
               <tr>
                 <th>Prize Name</th>
-                <th>Account</th>
+                <th>Customer Number</th>
                 <th>Name</th>
                 <th>Region</th>
               </tr>
@@ -166,7 +166,7 @@ window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_VERTICAL_OFFSET, async (event,
             <tbody>
               <tr v-for="winner in winners" :key="winner.id">
                 <td>{{ winner.prize_name }}</td>
-                <td>{{ winner.account }}</td>
+                <td>{{ winner.cif }}</td>
                 <td>{{ winner.name }}</td>
                 <td>{{ winner.region }}</td>
               </tr>
@@ -174,11 +174,6 @@ window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_VERTICAL_OFFSET, async (event,
           </table>
         </div>
       </div>
-
-      <!-- YEAR -->
-      <p class="text-xl text-red-700 font-bold">
-        2006 - {{ new Date().getFullYear() }} CIMB NIAGA
-      </p>
     </div>
   </div>
 </template>

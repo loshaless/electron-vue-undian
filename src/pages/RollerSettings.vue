@@ -7,7 +7,7 @@ import {useCategory} from "../composables/useCategory";
 import {PrizeDetail, PrizeRegionDetail} from "../constants/types/PrizeDetail";
 import {Category} from "../constants/types/Category";
 import ModalComponent from "../components/ModalComponent.vue";
-import {formatNumber, replaceSpaceWithUnderscore} from "../utils/generalUtils";
+import { createTableName, formatNumber } from "../utils/generalUtils";
 import { WinnerView } from "../constants/types/WinnerView";
 import { PageName } from "../constants/enum/PageName";
 
@@ -74,7 +74,7 @@ const selectedCategoryData = computed(() => {
     const prizeDetail = prizeList.value.find((p: PrizeDetail) => p.prizeId === prizeId)
     prizeDetail?.regions.forEach((region: PrizeRegionDetail) => {
       result.totalWinner += +region.numOfItem
-      const tableName = `customer_${replaceSpaceWithUnderscore(category.name)}_${replaceSpaceWithUnderscore(region.regionName)}`
+      const tableName = createTableName(category.name, region.regionName)
 
       result.prize.push({
         tableName: tableName,
@@ -185,6 +185,7 @@ onUnmounted( async () => {
 })
 
 function startRollingAndGetWinner(winnerView: WinnerView, database: string) {  
+  window.ipcRenderer.send(IpcChannels.CHANGE_PAGE, PageName.ROLLER)
   window.ipcRenderer.send(IpcChannels.START_ROLLING)
   window.ipcRenderer.send(IpcChannels.GET_A_WINNER, winnerView, database)
 }

@@ -29,7 +29,7 @@ async function insertBatch(batchs: any[], conditions: CustomerTable[]): Promise<
     // insert to array of batch
     for (let i = 0; i < conditions.length; i++) {
       const condition = conditions[i]
-      if (condition.minBalance <= balance && (condition.regions === "All Region" || condition.regions === region)) {
+      if (condition.minBalance <= balance && (condition.regions === "All Region" || condition.regions.toLowerCase() === region.toLowerCase())) {
         arrayOfCumulativePoints[i] += points
         arrayOfBatch[i].push([customer_id, points, arrayOfCumulativePoints[i]])
       }

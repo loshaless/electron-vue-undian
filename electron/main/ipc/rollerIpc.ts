@@ -32,6 +32,7 @@ ipcMain.on(IpcChannels.GET_A_WINNER, async (event, winnerView: WinnerView, datab
         await editPrizeRegionNumOfItemByPrizeIdAndRegionId(winnerView.prizeId, winnerView.regionId)
         await dbRun("COMMIT");
 
+        winnerView.region = winnerCustomer.region
         event.reply(IpcChannels.GET_A_WINNER, winnerView)
         break
       }
