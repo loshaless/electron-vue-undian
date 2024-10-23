@@ -35,7 +35,7 @@ function startAutoScroll(element: HTMLElement, scrollTop = undefined) {
   };
 
   const setScrollInterval = () => {
-    if (intervalId) clearInterval(intervalId);
+    stopAutoScroll()
     intervalId = setInterval(updateScroll, scrollSpeed.value);
 
     /* to send scroll progress */

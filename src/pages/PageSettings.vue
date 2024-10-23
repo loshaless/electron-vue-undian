@@ -31,7 +31,7 @@ onMounted(() => {
   window.ipcRenderer.send(IpcChannels.GET_CATEGORY_JOIN_PRIZE)
 })
 
-const selectedCategoryId = ref<number>(1)
+const selectedCategoryId = ref<number>(0)
 window.ipcRenderer.on(IpcChannels.GET_CATEGORY_JOIN_PRIZE, (event, category) => {
   categoryOptions.value = category
 })
@@ -148,15 +148,10 @@ function sendVerticalOffset() {
       <div class="flex gap-3 items-center">
         <p>Category: </p>
         <select-component
+          @update:modelValue="selectedCategoryId = $event; setCategory()"
           :options="categoryOptions"
-          v-model="selectedCategoryId"
+          :model-value="selectedCategoryId"
         />
-        <button
-          class="w-48 p-2 rounded-md button-selected-gradient"
-          @click="setCategory"
-        >
-          Set Category
-        </button>
       </div>
 
       <!-- SCROLL TIME -->
@@ -176,7 +171,7 @@ function sendVerticalOffset() {
       </div>
 
       <!-- SCROLL CONTROL -->
-      <div class="flex gap-3 items-center">
+      <div class="flex gap-3 items-center" v-if="selectedCategoryId !== 0">
         <img
           src="/icon-play.png"
           alt="start"
@@ -240,7 +235,7 @@ function sendVerticalOffset() {
       <div class="w-full bg-gray-200 rounded-full h-4 mt-3">
         <div 
           class="h-4 rounded-full" 
-          :style="{ width: `${scrollProgressPercentage}`, background: 'blue' }"
+          :style="{ width: `${scrollProgressPercentage}`, background: 'red' }"
         ></div>
       </div>
       <p>{{ scrollProgressPercentage }}</p>

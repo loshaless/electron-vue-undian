@@ -278,13 +278,12 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
             min="1"
             type="number"
           >
-          <span
-            v-if="modalPrizeState.editedPrizeRegion.length + modalPrizeState.addedPrizeRegion.length > 1"
-            class="rounded-full bg-red-700 hover:bg-orange-700 cursor-pointer px-3 py-1 text-white hover:scale-110"
+          <img 
+            src="/icon-trash-can.svg" 
+            alt="delete" 
+            class="w-6 h-6 cursor-pointer hover:scale-110"
             @click="modalPrizeState.editedPrizeRegion.splice(index, 1); modalPrizeState.deletePrizeRegion.push(item.prizeRegionId)"
           >
-            X
-          </span>
         </div>
 
         <!-- ADDED PRIZE REGION -->
@@ -306,13 +305,12 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
             type="number"
             min="1"
           >
-          <span
-            v-if="modalPrizeState.editedPrizeRegion.length + modalPrizeState.addedPrizeRegion.length > 1"
-            class="rounded-full bg-red-700 hover:bg-orange-700 cursor-pointer px-3 py-1 text-white hover:scale-110"
+          <img 
+            src="/icon-trash-can.svg" 
+            alt="delete" 
+            class="w-6 h-6 cursor-pointer hover:scale-110"
             @click="modalPrizeState.addedPrizeRegion.splice(index, 1)"
           >
-            X
-          </span>
         </div>
       </div>
 
@@ -354,12 +352,12 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
                     placeholder="prize name"
                     type="text"
                   >
-                  <div
-                    class="rounded-full bg-red-700 hover:bg-orange-700 cursor-pointer h-full px-2 text-white hover:scale-110"
+                  <img 
+                    src="/icon-trash-can.svg" 
+                    alt="delete" 
+                    class="w-6 h-6 cursor-pointer hover:scale-110"
                     @click="deleteRegion(region.id)"
                   >
-                    X
-                  </div>
                 </div>
 
                 <p v-else>
@@ -377,12 +375,12 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
                     placeholder="prize name"
                     type="text"
                   >
-                  <div
-                    class="rounded-full bg-red-700 hover:bg-orange-700 cursor-pointer h-full px-2 text-white hover:scale-110"
+                  <img 
+                    src="/icon-trash-can.svg" 
+                    alt="delete" 
+                    class="w-6 h-6 cursor-pointer hover:scale-110"
                     @click="modalRegionState.addedRegion.splice(index, 1)"
                   >
-                    X
-                  </div>
                 </div>
               </td>
             </tr>
@@ -393,7 +391,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
         >
           <button
             v-if="!modalRegionState.isEdit"
-            class="mt-3 rounded-md button-gradient py-2 px-8"
+            class="mt-3 rounded-md button-selected-gradient py-2 px-8"
             @click="modalRegionState.isEdit = !modalRegionState.isEdit"
           >
             Edit

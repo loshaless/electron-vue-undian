@@ -5,7 +5,6 @@ import { dbRun } from "../database/init";
 import { Region } from "../../../src/constants/types/Region";
 
 ipcMain.on(IpcChannels.GET_REGION_DATA, async (event) => {
-  console.log('GET_REGION_DATA')
   try {
     const regionData = await getRegions()
     event.sender.send(IpcChannels.GET_REGION_DATA, regionData)
