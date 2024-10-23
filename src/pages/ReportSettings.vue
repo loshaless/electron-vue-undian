@@ -109,7 +109,7 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
     <!-- SETTINGS -->
     <div class="rounded-md border-2 border-gray-300 p-3 my-3 mx-5">
       <p class="font-bold text-center bg-[#ED1C24] text-white p-2 rounded-md mb-3">Header Settings</p>
-      <div class="flex gap-3 items-center">
+      <div class="flex gap-1 items-center">
         <p class="font-bold">Winner Category :</p>
         <multi-select-component
           :options="categoryOptions"
@@ -117,10 +117,10 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
           @update:modelValue="selectedCategoryId = $event"
         />
         <button
-          class="button-selected-gradient p-2 rounded-md ml-3"
+          class="button-selected-gradient py-2 px-5 rounded-md ml-3"
           @click="fillBody()"
         >
-          apply settings
+          apply
         </button>
       </div>
       <div class="flex gap-3 my-3 items-center">
@@ -153,12 +153,12 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
                   type="text"
                 />
                 <!-- close icon -->
-                 <div 
-                  class="rounded-full bg-red-500 flex items-center justify-center text-white px-2 cursor-pointer hover:bg-red-600 hover:scale-110"
+                 <img 
+                  src="/icon-trash-can.svg" 
+                  alt="delete" 
+                  class="w-5 h-5 cursor-pointer hover:scale-110"
                   @click="removeSigner(indexSigner)"
                 >
-                  X
-                 </div>
               </div>
               <div class="flex w-full items-center">
                 <div 
@@ -170,33 +170,28 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
                     class="w-3/4"
                     v-model="signer.name[indexName]"
                     type="text"
-                  >
-                  <div 
-                    v-if="signer.name.length > 1"
-                    class="rounded-full bg-gray-600 text-white m-auto cursor-pointer hover:bg-red-600 hover:scale-110 px-2"
+                  >                  
+                  <img 
+                    src="/icon-trash-can.svg" 
+                    alt="delete" 
+                    class="w-5 h-5 cursor-pointer hover:scale-110"
                     @click="removeName(indexSigner, indexName)"
                   >
-                    X
-                  </div>
                 </div>
-                <div
-                  v-if="signer.name.length < 4"
+                <img 
+                  src="/icon-add.png" 
+                  alt="add" 
+                  class="w-8 h-8 cursor-pointer hover:scale-110"
                   @click="addName(indexSigner)"
-                  class="rounded-full bg-purple-800 text-white flex items-center justify-center font-bold text-xl cursor-pointer hover:bg-purple-900 hover:scale-110 px-2"
                 >
-                  +
-                </div>
               </div>
             </div>
           </div>
           <div
-            class="min-h-32 w-1/4 flex box-border mt-6 items-center justify-center bg-gray-300 cursor-pointer rounded-lg hover:bg-gray-400 hover:scale-105"
+            class="min-h-32 w-1/4 flex box-border mt-6 items-center justify-center bg-[#f8f8f8] cursor-pointer rounded-lg hover:bg-[#efefef] hover:scale-105 shadow-md shadow-gray-400"
             @click="addSigner"
           >
-            <div
-              class="rounded-full bg-purple-800 text-white w-8 h-8 flex items-center justify-center font-bold text-xl">
-              +
-            </div>
+            <img src="/icon-add.png" alt="add">
           </div>
         </div>
       </div>
