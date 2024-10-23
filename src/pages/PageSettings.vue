@@ -126,7 +126,7 @@ function sendVerticalOffset() {
     <div class="mt-8">
       <label 
         for="file-upload" 
-        class="button-selected-gradient p-2 rounded-md cursor-pointer"
+        class="button-selected p-2 rounded-md cursor-pointer"
       >
         Upload {{ backgroundName }} Background
       </label>
@@ -163,7 +163,7 @@ function sendVerticalOffset() {
           class="border-gray-300 rounded p-1 border"
         >
         <button
-          class="p-2 rounded-md button-selected-gradient"
+          class="p-2 rounded-md button-selected"
           @click="sendScrollTimeSettings"
         >
           Set Scroll Time
@@ -208,7 +208,7 @@ function sendVerticalOffset() {
           class="border-gray-300 rounded p-1 border"
         >
         <button
-          class="p-2 rounded-md button-selected-gradient-2"
+          class="p-2 rounded-md button-selected"
           @click="sendHeightWidthSettings"
         >
           Set Height and Width
@@ -224,7 +224,7 @@ function sendVerticalOffset() {
           class="border-gray-300 rounded p-1 border"
         > 
         <button
-          class="p-2 rounded-md button-selected-gradient-3"
+          class="p-2 rounded-md button-selected"
           @click="sendVerticalOffset"
         >
           Set Vertical Offset

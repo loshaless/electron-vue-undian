@@ -223,7 +223,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_WINNER_DATA, (event) => {
         <button 
           v-if="!saveCategoryState.isEdit"
           @click="saveCategoryState.isEdit = true"
-          class="py-2 rounded-md px-12 button-selected-gradient"
+          class="py-2 rounded-md px-12 button-selected"
         >
           Edit
         </button>
@@ -249,7 +249,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_WINNER_DATA, (event) => {
     <div class="rounded border border-gray-400 p-4 mx-3 my-8 flex justify-center">
       <div v-if="!isLoading" class="flex flex-col gap-4">
       <button
-        class="py-2 rounded-md px-4 button-selected-gradient-2"
+        class="py-2 rounded-md px-4 button-selected"
         @click="openFileDialog"
       >
         {{ (pathUrl && isCustomerDataExist) ? "Change File" : "Select New File" }}
@@ -264,7 +264,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_WINNER_DATA, (event) => {
           <button
             :class="{
                 'button-standby cursor-not-allowed': !pathUrl,
-                'button-selected-gradient cursor-pointer': !!pathUrl,
+                'button-selected cursor-pointer': !!pathUrl,
             }"
             :disabled="pathUrl === ''"
             class="p-2 rounded-md w-full"
@@ -280,7 +280,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_WINNER_DATA, (event) => {
 
       <button
         v-if="isCustomerDataExist"
-        class="py-2 rounded-md px-12 button-selected-gradient-3"
+        class="py-2 rounded-md px-12 button-selected"
         @click="deleteCustomerData"
       >
         Delete Customer Data
@@ -288,7 +288,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_WINNER_DATA, (event) => {
 
       <button
         v-if="isWinnerDataExist"
-        class="py-2 rounded-md px-12 button-selected-gradient"
+        class="py-2 rounded-md px-12 button-selected"
         @click="deleteWinnerData"
       >
         Delete Winner Data

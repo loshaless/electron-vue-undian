@@ -171,13 +171,13 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
     <div class="p-5 m-3 flex-col justify-center">
       <div class="flex gap-4 items-center justify-center">
         <button
-          class="rounded-md button-selected-gradient py-3 px-8"
+          class="rounded-md button-selected py-3 px-8"
           @click="openModalCreatePrize(true)"
         >
           Create New Prize
         </button>
         <button
-          class="rounded-md button-selected-gradient-2 py-3 px-8"
+          class="rounded-md button-selected py-3 px-8"
           @click="openModalEditRegion()"
         >
           Edit Region
@@ -252,7 +252,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
         <div class="mt-3 flex items-center gap-3">
           <p>Quota Detail : </p>
           <button
-            class="p-2 rounded-md button-selected-gradient-2"
+            class="p-2 rounded-md button-selected"
             @click="addRegionForPrize()"
           >
             Add More Region
@@ -391,21 +391,21 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
         >
           <button
             v-if="!modalRegionState.isEdit"
-            class="mt-3 rounded-md button-selected-gradient py-2 px-8"
+            class="mt-3 rounded-md button-selected py-2 px-8"
             @click="modalRegionState.isEdit = !modalRegionState.isEdit"
           >
             Edit
           </button>
           <button
             v-if="modalRegionState.isEdit"
-            class="mt-3 rounded-md button-selected-gradient py-2 px-8"
+            class="mt-3 rounded-md button-selected py-2 px-8"
             @click="saveEditedRegion()"
           >
             Save
           </button>
           <button
             v-if="modalRegionState.isEdit"
-            class="mt-3 rounded-md button-selected-gradient-2 py-2 px-8"
+            class="mt-3 rounded-md button-selected py-2 px-8"
             @click="addRegion()"
           >
             Add Region

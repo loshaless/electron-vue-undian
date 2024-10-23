@@ -117,7 +117,7 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
           @update:modelValue="selectedCategoryId = $event"
         />
         <button
-          class="button-selected-gradient py-2 px-5 rounded-md ml-3"
+          class="button-selected py-2 px-5 rounded-md ml-3"
           @click="fillBody()"
         >
           apply
@@ -202,7 +202,7 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
         :disabled="!selectedCategoryId.length"
         :class="[
           {'cursor-not-allowed button-standby': !selectedCategoryId.length},
-          {'cursor-pointer button-selected-gradient': selectedCategoryId.length}
+          {'cursor-pointer button-selected': selectedCategoryId.length}
         ]"
         class="py-2 px-32 rounded-md"
         @click="generatePDF"
@@ -214,7 +214,7 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
         :disabled="!selectedCategoryId.length"
         :class="[
           {'cursor-not-allowed button-standby': !selectedCategoryId.length},
-          {'cursor-pointer button-selected-gradient-2': selectedCategoryId.length}
+          {'cursor-pointer button-selected': selectedCategoryId.length}
         ]"
         class="py-2 px-32 rounded-md"
         @click="generateTxt"

@@ -260,7 +260,7 @@ function stopRollerAndSendWinner() {
 
               <button
                 v-if="showWinnerTime > 0 && rollAnimationTime > 0 && !isRolling"
-                class="button-selected-gradient p-2 rounded-md mt-3"
+                class="button-selected p-2 rounded-md mt-3"
                 @click="startRollerWithoutStopper()"
               >
                 Start Roller Without Stopper
@@ -268,7 +268,7 @@ function stopRollerAndSendWinner() {
 
               <button
                 v-if="!isRolling"
-                class="button-selected-gradient-3 p-2 rounded-md mt-3"
+                class="button-selected p-2 rounded-md mt-3"
                 @click="startRollerManually()"
               >
                 Start Roller Manually
@@ -276,7 +276,7 @@ function stopRollerAndSendWinner() {
 
               <button
                 v-if="winner && isRolling"
-                class="button-selected-gradient-3 p-2 rounded-md mt-3"
+                class="button-selected p-2 rounded-md mt-3"
                 @click="stopRolling()"
               >
                 Stop Roller
@@ -292,7 +292,7 @@ function stopRollerAndSendWinner() {
             <p class="mb-1 text-lg mb-3">Min Balance : {{ formatNumber(selectedCategoryData.minBalance) }}</p>
             <div v-if="selectedCategoryData">
               <button
-                class="button-selected-gradient p-2 rounded-md"
+                class="button-selected p-2 rounded-md"
                 @click="prizeDetailModalState.isOpen = true"
               >
                 Open Prize Detail
