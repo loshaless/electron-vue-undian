@@ -75,6 +75,10 @@ ipcMain.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, async (event, filePath,
     for await (const line of rl) {
       index++
       const [cif, account, name, branch, region, points, balance] = line.split("|");
+      if ([cif, account, name, branch, region, points, balance].some(value => value == null || value.trim() === "")) {
+        throw new Error(`Invalid data: One or more fields are null or empty in line: ${line}`);
+      }
+
       cumulativePoints += BigInt(points)
       batch.push([index, cif, account, name, branch, region, parseInt(points), cumulativePoints, parseInt(balance)]);
 
@@ -106,8 +110,9 @@ ipcMain.on(IpcChannels.UPLOAD_CUSTOMER_DATA_TO_DATABASE, async (event, filePath,
 
   } catch (error) {
     await dbRun('ROLLBACK'); // Rollback transaction on error
-    console.error("Error processing file:", error);
     dialog.showErrorBox("Error", `Error processing file: ${error.message}`);
+    event.sender.send(IpcChannels.UPLOAD_COMPLETE, true);
+    event.sender.send(IpcChannels.IS_CUSTOMER_DATA_EXIST, false);
   }
 
 })

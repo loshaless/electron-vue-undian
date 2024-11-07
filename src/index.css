@@ -11,6 +11,10 @@
   @apply bg-[#ED1C24] text-white hover:scale-105 shadow-md shadow-red-400;
 }
 
+.button-disabled {
+  @apply cursor-not-allowed bg-[#efefef] hover:scale-100 shadow-md shadow-gray-400 text-black;
+}
+
 .button-standby {
   @apply bg-[#efefef] hover:scale-105 shadow-md shadow-gray-400;
 }

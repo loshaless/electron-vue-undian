@@ -37,7 +37,7 @@ function saveEditedRegion() {
 window.ipcRenderer.on(IpcChannels.MASS_EDIT_REGION, () => {
   modalRegionState.isLoading = false
   modalRegionState.isOpen = false
-  getRegion()
+  window.location.reload()
 })
 
 function getRegion() {
@@ -198,10 +198,10 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
       </thead>
       <tbody>
         <tr 
-          v-for="prize in prizes" 
+          v-for="(prize, index) in prizes" 
           :key="prize.prizeId" 
         >
-          <td>{{ prize.prizeId }}</td>
+          <td>{{ index + 1 }}</td>
           <td>{{ prize.prizeName }}</td>
           <td>
             <ul>
@@ -318,6 +318,8 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
         <button
           v-if="modalPrizeState.addedPrizeRegion.length > 0 || modalPrizeState.editedPrizeRegion.length > 0"
           class="rounded-md button-selected py-2 px-8 w-3/4"
+          :class="{'button-disabled': modalPrizeState.prizeDetail.prizeName === ''}"
+          :disabled="modalPrizeState.prizeDetail.prizeName === ''"
           @click="editedPrizeId ? saveEditedPrize() : saveNewPrize()"
         >
           {{ editedPrizeId ? `Edit Prize Id: ${editedPrizeId}` : 'Save New Prize' }}

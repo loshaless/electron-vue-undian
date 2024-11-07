@@ -42,14 +42,19 @@ function sendScrollTimeSettings() {
   window.ipcRenderer.send(IpcChannels.WINNER_PAGE_SET_SCROLL_TIME, scrollTime.value)
 }
 
+/* scroll state */
+const isScrolling = ref<boolean>(false)
+
 /* START SCROLL */
 function startScroll() {
   window.ipcRenderer.send(IpcChannels.WINNER_PAGE_START_SCROLL)
+  isScrolling.value = true
 }
 
 /* STOP SCROLL */
 function stopScroll() {
   window.ipcRenderer.send(IpcChannels.WINNER_PAGE_STOP_SCROLL)
+  isScrolling.value = false
 }
 
 /* RESTART SCROLL */
@@ -173,18 +178,21 @@ function sendVerticalOffset() {
       <!-- SCROLL CONTROL -->
       <div class="flex gap-3 items-center" v-if="selectedCategoryId !== 0">
         <img
+          v-if="!isScrolling"
           src="/icon-play.png"
           alt="start"
           class="w-10 cursor-pointer hover:scale-110"
           @click="startScroll"
         />
         <img
+          v-if="isScrolling"
           src="/icon-stop.png"
           alt="stop"
           class="w-10 cursor-pointer hover:scale-110"
           @click="stopScroll"
         />
         <img
+          v-if="!isScrolling"
           src="/icon-restart.png"
           alt="restart"
           class="w-10 cursor-pointer hover:scale-110"

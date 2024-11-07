@@ -118,6 +118,10 @@ window.ipcRenderer.on(IpcChannels.DELETE_CUSTOMER_IN_DATABASE, (event) => {
 })
 
 /* UPLOADING DATA */
+const canUploadData = computed(() => {
+  return listOfCategory.every((category: Category) => category.prizes?.length)
+})
+
 const insertedData = ref(0);
 const isLoading = ref(false);
 
@@ -190,7 +194,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_WINNER_DATA, (event) => {
           <tr>
             <th>Category</th>
             <th>Min. Balance</th>
-            <th>Prize</th>
+            <th class="min-w-[200px]">Prize</th>
           </tr>
         </thead>
         <tbody>
@@ -248,12 +252,24 @@ window.ipcRenderer.on(IpcChannels.DELETE_WINNER_DATA, (event) => {
 
     <div class="rounded border border-gray-400 p-4 mx-3 my-8 flex justify-center">
       <div v-if="!isLoading" class="flex flex-col gap-4">
-      <button
-        class="py-2 rounded-md px-4 button-selected"
-        @click="openFileDialog"
-      >
-        {{ (pathUrl && isCustomerDataExist) ? "Change File" : "Select New File" }}
-      </button>
+        <TooltipComponent
+          :canShow="!canUploadData"
+        >
+          <template v-slot:toggle>
+            <button
+              class="py-2 rounded-md px-4 button-selected flex mx-auto"
+              @click="openFileDialog"
+              :class="{'button-disabled': !canUploadData}"
+              :disabled="!canUploadData"
+            >
+              {{ (pathUrl && isCustomerDataExist) ? "Change File" : "Select New File" }}
+            </button>
+          </template>
+          <template v-slot:tooltipText>
+            Please fill the prize for each category!
+          </template>
+        </TooltipComponent>
+
 
       <tooltip-component
         :canShow="pathUrl === ''"
