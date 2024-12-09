@@ -9,12 +9,12 @@ export async function createBackgroundImageTable() {
       name TEXT NOT NULL,
       image_path TEXT DEFAULT null
     )`)
-  
+
     await initNameToBackgroundImageTable()
   }
 }
 
-const listOfPageName = [PageName.HOME, PageName.ROLLER, PageName.WINNER]
+const listOfPageName = [PageName.HOME, PageName.WINNER, 'Grand Prize', 'Premium Prize', 'Lucky Prize']
 
 export async function initNameToBackgroundImageTable() {
   // loop enum of PageName

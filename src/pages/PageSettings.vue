@@ -25,6 +25,20 @@ function handleFileUpload(event: Event) {
   }
 }
 
+function handleRollerFileUpload(event: Event) {
+  const input = event.target as HTMLInputElement;
+  console.log(selectedCategoryName.value)
+
+  if (input.files?.[0]) {
+    const file = input.files[0]
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      window.ipcRenderer.send(IpcChannels.UPLOAD_IMAGE_TO_DB, reader.result, selectedCategoryName.value)
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
 /* GET CATEGORY */
 const categoryOptions = ref([])
 onMounted(() => {
@@ -88,6 +102,10 @@ const verticalOffset = ref(200)
 function sendVerticalOffset() {
   window.ipcRenderer.send(IpcChannels.WINNER_PAGE_SET_VERTICAL_OFFSET, verticalOffset.value)
 }
+
+/* LIST CATEGORY NAME */
+const listCategoryName = ['Grand Prize', 'Premium Prize', 'Lucky Prize']
+const selectedCategoryName = ref('Grand Prize')
 </script>
 
 <template>
@@ -128,7 +146,10 @@ function sendVerticalOffset() {
       </div>
 
       <!-- Background Upload -->
-    <div class="mt-8">
+    <div
+      v-if="backgroundName !== PageName.ROLLER"
+      class="mt-8"
+    >
       <label
         for="file-upload"
         class="button-selected p-2 rounded-md cursor-pointer"
@@ -142,6 +163,25 @@ function sendVerticalOffset() {
         accept="image/*"
         class="hidden"
       />
+    </div>
+    <div v-else class="mt-8 flex gap-3">
+      <div v-for="category in listCategoryName" :key="category">
+        <label
+          for="file-upload"
+          class="button-selected p-2 rounded-md cursor-pointer"
+          @click="selectedCategoryName = category"
+        >
+          Upload {{ category }} Background
+        </label>
+        <input
+          id="file-upload"
+          type="file"
+          @change="handleRollerFileUpload"
+          accept="image/*"
+          class="hidden"
+        />
+      </div>
+
     </div>
 
     <!-- Winner Page Settings -->

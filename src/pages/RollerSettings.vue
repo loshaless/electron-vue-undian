@@ -47,6 +47,10 @@ window.ipcRenderer.on(IpcChannels.GET_CUMULATIVE_POINTS_AND_TOTAL_CUSTOMER, (eve
 const {listOfCategory} = useCategory(prizeList);
 const selectedCategory = ref(1);
 
+onMounted(() => {
+  window.ipcRenderer.send(IpcChannels.ROLLER_CATEGORY, 'Grand Prize')
+})
+
 const selectedCategoryData = computed(() => {
   const result = {
     categoryId: 0,
