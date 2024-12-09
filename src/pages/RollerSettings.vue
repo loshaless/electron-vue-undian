@@ -259,7 +259,7 @@ function stopRollerAndSendWinner() {
               </div>
 
               <button
-                v-if="showWinnerTime > 0 && rollAnimationTime > 0 && !isRolling"
+                v-if="showWinnerTime > 0 && rollAnimationTime > 0 && !isRolling && selectedCategoryData.totalWinner > 0"
                 class="button-selected p-2 rounded-md mt-3"
                 @click="startRollerWithoutStopper()"
               >
@@ -267,7 +267,7 @@ function stopRollerAndSendWinner() {
               </button>
 
               <button
-                v-if="!isRolling"
+                v-if="!isRolling && selectedCategoryData.totalWinner > 0"
                 class="button-selected p-2 rounded-md mt-3"
                 @click="startRollerManually()"
               >
