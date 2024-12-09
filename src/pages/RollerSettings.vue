@@ -92,6 +92,12 @@ const selectedCategoryData = computed(() => {
   return result
 })
 
+function generateRollerQueueAndChangeCategory(categoryId: number) {
+  selectedCategory.value = categoryId;
+  rollerQueue = generateRollerQueue()
+  window.ipcRenderer.send(IpcChannels.ROLLER_CATEGORY, selectedCategoryData.value.categoryName)
+}
+
 /* PRIZE DETAIL MODAL STATE */
 const prizeDetailModalState = reactive({
   isOpen: false
@@ -220,7 +226,7 @@ function stopRollerAndSendWinner() {
         <div class="flex gap-3 mt-3 items-center">
           <span>Category: </span>
           <SelectComponent
-            @update:modelValue=" selectedCategory = $event; rollerQueue = generateRollerQueue()"
+            @update:modelValue="generateRollerQueueAndChangeCategory($event)"
             :model-value="selectedCategory"
             :options="listOfCategory"
           />

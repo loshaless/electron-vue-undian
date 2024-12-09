@@ -55,7 +55,7 @@ onUnmounted(() => {
   stopRoller();
 });
 
-/* GET TOTQAL POINTS */
+/* GET TOTAL POINTS */
 function getTotalPoints(){
   window.ipcRenderer.send(IpcChannels.GET_TOTAL_CUMULATIVE_POINTS)
 }
@@ -78,6 +78,12 @@ onMounted(() => {
 window.ipcRenderer.on(IpcChannels.GET_BACKGROUND_IMAGE, (event, image) => {
   backgroundImage.value = image
 })
+
+/* Category Name */
+const categoryName = ref(`Grand Prize`)
+window.ipcRenderer.on(IpcChannels.ROLLER_CATEGORY, (event, name: string) => {
+  categoryName.value = name
+})
 </script>
 
 <template>
@@ -86,6 +92,8 @@ window.ipcRenderer.on(IpcChannels.GET_BACKGROUND_IMAGE, (event, image) => {
     :style="{ backgroundImage: `url(${backgroundImage})`, backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }"
     class="h-screen w-screen flex flex-col gap-5 items-center justify-center"
   >
+    <p class="text-7xl text-red-500 font-bold mb-5">{{categoryName}}</p>
+
     <div class="text-8xl text-red-700 font-bold flex gap-2">
       <span v-for="(digit, index) in digits" :key="index">
         {{ digit }}

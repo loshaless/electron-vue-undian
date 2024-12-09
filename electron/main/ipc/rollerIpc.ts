@@ -9,6 +9,7 @@ import { addWinner } from "../database/winnerDB";
 import { WinnerView } from "../../../src/constants/types/WinnerView";
 import { IpcChannels } from "../../../src/constants/enum/IpcChannels";
 import { editPrizeRegionNumOfItemByPrizeIdAndRegionId } from "../database/prize_regionDB";
+import {windows} from "../index";
 
 ipcMain.on(IpcChannels.GET_A_WINNER, async (event, winnerView: WinnerView, database: string) => {
   try {
@@ -43,5 +44,13 @@ ipcMain.on(IpcChannels.GET_A_WINNER, async (event, winnerView: WinnerView, datab
   } catch (error) {
     await dbRun("ROLLBACK");
     throw new Error(`err createWinner: ${error}`)
+  }
+})
+
+ipcMain.on(IpcChannels.ROLLER_CATEGORY, async (event, categoryName: String) => {
+  try {
+    windows.view.webContents.send(IpcChannels.ROLLER_CATEGORY, categoryName);
+  } catch (error) {
+    throw new Error(`err getWinnerByCategory: ${error}`)
   }
 })
