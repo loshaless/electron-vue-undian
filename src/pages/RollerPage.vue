@@ -35,7 +35,7 @@ window.ipcRenderer.on(IpcChannels.STOP_ROLLING, (event, winnerData: WinnerView) 
   const rollIdString = winnerData.rollId.toString()
   const numOfZero = numDigits.value - rollIdString.length
 
-  // IF ROLLID = 123 => it will generate new digit = 0000123
+  // IF ROLL_ID = 123 => it will generate new digit = 0000123
   const newDigits = Array(numOfZero).fill(0)
   for (let i = 0; i < rollIdString.length; i++) {
     newDigits.push(rollIdString[i])
@@ -81,8 +81,8 @@ window.ipcRenderer.on(IpcChannels.GET_BACKGROUND_IMAGE, (event, image) => {
 </script>
 
 <template>
-  <div 
-    v-if="backgroundImage" 
+  <div
+    v-if="backgroundImage"
     :style="{ backgroundImage: `url(${backgroundImage})`, backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }"
     class="h-screen w-screen flex flex-col gap-5 items-center justify-center"
   >

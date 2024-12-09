@@ -37,7 +37,3 @@ const updateValue = (event: Event) => {
     </select>
   </div>
 </template>
-
-<style scoped>
-/* Add any additional styles if needed */
-</style>

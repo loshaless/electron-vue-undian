@@ -28,7 +28,7 @@ onMounted(() => {
   getPrizeList()
 })
 
-/* GET CUMULATIVE POITNS AND TOTAL CUSTOMER */
+/* GET CUMULATIVE POINTS AND TOTAL CUSTOMER */
 function getCumulativePointsAndTotalCustomer() {
   window.ipcRenderer.send(IpcChannels.GET_CUMULATIVE_POINTS_AND_TOTAL_CUSTOMER)
 }
@@ -108,7 +108,7 @@ function generateRollerQueue() {
   selectedCategoryData.value.prize.forEach((prize) => {
     for (let i = 0; i < prize.numOfItem; i++) {
       result.push(
-        [prize.tableName, 
+        [prize.tableName,
           {
             prizeId: prize.prizeId,
             prizeName: prize.prizeName,
@@ -147,8 +147,7 @@ async function startRollerWithoutStopper() {
       await new Promise(resolve => setTimeout(resolve, showWinnerTime.value * 1000))
     }
 
-    /* Stop roller when user stop rolling manually and winner value reveived, 
-    then show the winner */
+    /* Stop roller when user stop rolling manually and winner value received, then show the winner */
     if (!isRolling.value) break;
 
     /* auto stop roller and show winner */
@@ -165,7 +164,7 @@ function startRollerManually() {
     rollerQueue = generateRollerQueue()
   }
   const [database, winnerView] = rollerQueue.shift()
-  
+
   startRollingAndGetWinner(winnerView, database)
   isRolling.value = true;
 }
@@ -184,7 +183,7 @@ onUnmounted( async () => {
   }
 })
 
-function startRollingAndGetWinner(winnerView: WinnerView, database: string) {  
+function startRollingAndGetWinner(winnerView: WinnerView, database: string) {
   window.ipcRenderer.send(IpcChannels.CHANGE_PAGE, PageName.ROLLER)
   window.ipcRenderer.send(IpcChannels.START_ROLLING)
   window.ipcRenderer.send(IpcChannels.GET_A_WINNER, winnerView, database)
@@ -221,7 +220,8 @@ function stopRollerAndSendWinner() {
         <div class="flex gap-3 mt-3 items-center">
           <span>Category: </span>
           <SelectComponent
-            v-model="selectedCategory"
+            @update:modelValue=" selectedCategory = $event; rollerQueue = generateRollerQueue()"
+            :model-value="selectedCategory"
             :options="listOfCategory"
           />
         </div>
@@ -289,7 +289,7 @@ function stopRollerAndSendWinner() {
           <div class="rounded-md p-5 card">
             <h3 class="font-bold text-2xl mb-1">Category {{ selectedCategoryData.categoryName }}</h3>
             <p class="text-lg">Total Winner : {{ selectedCategoryData.totalWinner }}</p>
-            <p class="mb-1 text-lg mb-3">Min Balance : {{ formatNumber(selectedCategoryData.minBalance) }}</p>
+            <p class="text-lg mb-3">Min Balance : {{ formatNumber(selectedCategoryData.minBalance) }}</p>
             <div v-if="selectedCategoryData">
               <button
                 class="button-selected p-2 rounded-md"
