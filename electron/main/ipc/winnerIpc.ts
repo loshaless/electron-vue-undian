@@ -19,9 +19,13 @@ ipcMain.on(IpcChannels.CREATE_TXT_REPORT, async (event, categoryId: number[]) =>
   try {
     const listOfWinner: WinnerDetail[] = await getWinnerDetailByCategory(categoryId)
 
-    const formattedData = listOfWinner.map(winner => {
-      return `${winner.cif}|${winner.account}|${winner.name}|${winner.branch}|${winner.region}|${winner.points}|${winner.balance}|${winner.roll_id}|${winner.prize_name}`;
-    }).join('\n');
+    const header = "CIF|Name|Branch|Region|Points|Balance|Roll ID|Prize Name";
+    const formattedData = [
+      header,
+      ...listOfWinner.map(winner => {
+        return `${winner.cif}|${winner.name}|${winner.branch}|${winner.region}|${winner.points}|${winner.balance}|${winner.roll_id}|${winner.prize_name}`;
+      })
+    ].join('\n');
 
     const { filePath } = await dialog.showSaveDialog({
       title: 'Save Report',
