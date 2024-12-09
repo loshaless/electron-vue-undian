@@ -72,13 +72,17 @@ window.ipcRenderer.on(IpcChannels.WINNER_PAGE_START_SCROLL, async (event) => {
 
 /* RESTART SCROLL */
 window.ipcRenderer.on(IpcChannels.WINNER_PAGE_RESTART_SCROLL, async (event, scrollTime) => {
+  restartScroll()
+})
+
+function restartScroll() {
   stopAutoScroll()
   const winnerListDiv = document.getElementById('winner-list');
   if (winnerListDiv) {
     winnerListDiv.scrollTop = 0
   }
   sendScrollProgress('0%')
-})
+}
 
 /* SCROLL PROGRESS */
 const scrollProgress = ref<string>('0%')
@@ -104,7 +108,7 @@ window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_SCROLL_TIME, async (event, scr
 })
 
 /* HEIGHT AND WIDTH */
-const height = ref(250) 
+const height = ref(250)
 const width = ref(400)
 
 window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_HEIGHT_WIDTH, async (event, h, w) => {
@@ -123,19 +127,19 @@ window.ipcRenderer.on(IpcChannels.GET_BACKGROUND_IMAGE, (event, image) => {
 })
 
 /* VERTICAL OFFSET */
-const verticalOffset = ref(200); 
+const verticalOffset = ref(200);
 window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_VERTICAL_OFFSET, async (event, offset) => {
   verticalOffset.value = offset
 })
 </script>
 
 <template>
-  <div 
-    v-if="backgroundImage" 
-    class="h-screen w-screen" 
+  <div
+    v-if="backgroundImage"
+    class="h-screen w-screen"
     :style="{ backgroundImage: `url(${backgroundImage})`, backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }"
   >
-    <div 
+    <div
       class="flex flex-col items-center justify-center gap-3"
       :style="{
         position: 'relative',
@@ -149,8 +153,8 @@ window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_VERTICAL_OFFSET, async (event,
 
       <!-- WINNER LIST -->
       <div class="flex items-center justify-center">
-        <div 
-          id="winner-list" 
+        <div
+          id="winner-list"
           :style="{ height: height + 'px', width: width + 'px' }"
           class="overflow-y-hidden"
         >
