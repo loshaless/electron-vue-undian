@@ -14,7 +14,7 @@ function changePage(pageName: PageName) {
 const backgroundName = ref(PageName.HOME)
 function handleFileUpload(event: Event) {
   const input = event.target as HTMLInputElement;
-  
+
   if (input.files?.[0]) {
     const file = input.files[0]
     const reader = new FileReader();
@@ -76,7 +76,7 @@ window.ipcRenderer.on(IpcChannels.WINNER_PAGE_GET_PROGRESS, (event, progress) =>
 
 /* HEIGHT AND WIDTH */
 const height = ref(400)
-const width = ref(400)
+const width = ref(800)
 
 /* SEND HEIGHT AND WIDTH */
 function sendHeightWidthSettings() {
@@ -101,7 +101,7 @@ function sendVerticalOffset() {
             {'button-standby': backgroundName !== PageName.HOME}
           ]"
           class="p-2 rounded-md text-black"
-          @click="changePage(PageName.HOME)"  
+          @click="changePage(PageName.HOME)"
         >
           Home Page
         </button>
@@ -129,23 +129,23 @@ function sendVerticalOffset() {
 
       <!-- Background Upload -->
     <div class="mt-8">
-      <label 
-        for="file-upload" 
+      <label
+        for="file-upload"
         class="button-selected p-2 rounded-md cursor-pointer"
       >
         Upload {{ backgroundName }} Background
       </label>
-      <input 
+      <input
         id="file-upload"
-        type="file" 
-        @change="handleFileUpload" 
-        accept="image/*" 
+        type="file"
+        @change="handleFileUpload"
+        accept="image/*"
         class="hidden"
       />
-    </div>  
+    </div>
 
     <!-- Winner Page Settings -->
-    <div 
+    <div
       v-if="backgroundName === PageName.WINNER"
       class="mt-5 flex flex-col gap-3"
     >
@@ -162,8 +162,8 @@ function sendVerticalOffset() {
       <!-- SCROLL TIME -->
       <div class="flex gap-3 items-center">
         <p>Scroll Time: </p>
-        <input 
-          type="number" 
+        <input
+          type="number"
           v-model="scrollTime"
           class="border-gray-300 rounded p-1 border"
         >
@@ -204,14 +204,14 @@ function sendVerticalOffset() {
       <h2 class="font-bold">Height and Width Screen</h2>
       <div class="flex gap-3 items-center">
         <p>Height: </p>
-        <input 
-          type="number" 
+        <input
+          type="number"
           v-model="height"
           class="border-gray-300 rounded p-1 border"
         >
         <p>Width: </p>
-        <input 
-          type="number" 
+        <input
+          type="number"
           v-model="width"
           class="border-gray-300 rounded p-1 border"
         >
@@ -226,11 +226,11 @@ function sendVerticalOffset() {
       <!-- VERTICAL OFFSET -->
       <div class="flex gap-3 items-center">
         <p>Vertical Offset: </p>
-        <input 
-          type="number" 
+        <input
+          type="number"
           v-model="verticalOffset"
           class="border-gray-300 rounded p-1 border"
-        > 
+        >
         <button
           class="p-2 rounded-md button-selected"
           @click="sendVerticalOffset"
@@ -241,8 +241,8 @@ function sendVerticalOffset() {
 
       <!-- SCROLL PROGRESS -->
       <div class="w-full bg-gray-200 rounded-full h-4 mt-3">
-        <div 
-          class="h-4 rounded-full" 
+        <div
+          class="h-4 rounded-full"
           :style="{ width: `${scrollProgressPercentage}`, background: 'red' }"
         ></div>
       </div>

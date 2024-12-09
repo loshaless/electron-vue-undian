@@ -108,8 +108,8 @@ window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_SCROLL_TIME, async (event, scr
 })
 
 /* HEIGHT AND WIDTH */
-const height = ref(250)
-const width = ref(400)
+const height = ref(400)
+const width = ref(800)
 
 window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_HEIGHT_WIDTH, async (event, h, w) => {
   height.value = h
@@ -160,16 +160,16 @@ window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_VERTICAL_OFFSET, async (event,
         >
           <table class="table-1 text-center">
             <thead class="sticky top-0">
-              <tr>
-                <th class="bg-[#ED1C24] text-white">Prize Name</th>
-                <th class="bg-[#ED1C24] text-white">Customer Number</th>
-                <th class="bg-[#ED1C24] text-white">Name</th>
-                <th class="bg-[#ED1C24] text-white">Region</th>
-              </tr>
+            <tr>
+              <th class="bg-[#ED1C24] text-white">Prize Name</th>
+              <th class="bg-[#ED1C24] text-white">Customer Number</th>
+              <th class="bg-[#ED1C24] text-white">Name</th>
+              <th class="bg-[#ED1C24] text-white">Region</th>
+            </tr>
             </thead>
             <tbody class="overflow-y-auto">
               <tr v-for="winner in winners" :key="winner.id">
-                <td>{{ winner.prize_name }}</td>
+                <td class="whitespace-nowrap">{{ winner.prize_name }}</td>
                 <td>{{ winner.cif }}</td>
                 <td>{{ winner.name }}</td>
                 <td>{{ winner.region }}</td>
