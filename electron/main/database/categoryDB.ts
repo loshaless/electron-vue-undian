@@ -23,10 +23,9 @@ export async function createCategoryTable() {
   if (isCategoryExist) return;
 
   // insert all
-  const insertPromises = categories.map(category => {
-    dbRun(`INSERT INTO category (name, min_balance) VALUES (?, ?)`, [category, 0]);
+  categories.map(async category => {
+    await dbRun(`INSERT INTO category (name, min_balance) VALUES (?, ?)`, [category, 0]);
   });
-  await Promise.all(insertPromises);
 }
 
 // insert multiple category
