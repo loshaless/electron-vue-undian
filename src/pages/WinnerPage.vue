@@ -29,7 +29,8 @@ function startAutoScroll(element: HTMLElement, scrollTop = undefined) {
     if (element.scrollTop + element.clientHeight < element.scrollHeight) {
       element.scrollTop += scrollAmount;
     } else {
-      stopAutoScroll();
+      // business requirement, if scroll reach bottom, scroll to top
+      element.scrollTop = 0;
     }
     updateScrollProgress(element);
   };
