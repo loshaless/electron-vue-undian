@@ -23,8 +23,8 @@ export async function createCategoryTable() {
   if (isCategoryExist) return;
 
   // insert all
-  categories.map(async category => {
-    await dbRun(`INSERT INTO category (name, min_balance) VALUES (?, ?)`, [category, 0]);
+  categories.map(async (category, index) => {
+    await dbRun(`INSERT INTO category (id, name, min_balance) VALUES (?, ?, ?)`, [index + 1, category, 0]);
   });
 }
 
@@ -44,6 +44,7 @@ export async function getCategoryJoinPrize() {
     prize.id as prize_id
     FROM category c
     LEFT JOIN prize ON prize.category_id = c.id
+    ORDER BY c.id asc 
 	`;
 
   const rows = await dbAll(sql);
