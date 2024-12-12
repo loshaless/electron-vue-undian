@@ -14,7 +14,7 @@ export async function createBackgroundImageTable() {
   }
 }
 
-const listOfPageName = [PageName.HOME, PageName.WINNER, 'Grand Prize', 'Premium Prize', 'Lucky Prize']
+const listOfPageName = [PageName.HOME, PageName.WINNER]
 
 export async function initNameToBackgroundImageTable() {
   // loop enum of PageName
