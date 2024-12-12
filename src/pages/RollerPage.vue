@@ -100,9 +100,6 @@ window.ipcRenderer.on(IpcChannels.ROLLER_CATEGORY, (event, name: string) => {
         {{ digit }}
       </span>
     </div>
-    <p class="text-3xl text-green-700">
-      {{ winnerState.name }}
-    </p>
     <p v-if="winnerState.name" class="text-3xl text-green-700">
       Selamat kepada {{ winnerState.name }} dari {{ winnerState.region }}
     </p>
