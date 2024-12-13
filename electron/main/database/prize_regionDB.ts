@@ -1,4 +1,4 @@
-import { dbRun } from "./init";
+import {dbGet, dbRun} from "./init";
 
 export async function createPrizeRegionTable() {
   await dbRun(`CREATE TABLE IF NOT EXISTS prize_region (
@@ -13,7 +13,7 @@ export async function createPrizeRegionTable() {
 
 export async function isPrizeRegionDataExist() {
   const sql = `SELECT id FROM prize_region limit 1`;
-  const rows = await dbRun(sql);
+  const rows = await dbGet(sql);
   return rows != undefined;
 }
 

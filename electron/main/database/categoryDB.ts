@@ -1,9 +1,9 @@
 import { dbRun, dbAll, dbGet } from "./init";
 
 const categories = [
-  "Grand Prize",
-  "Premium Prize",
-  "Lucky Prize"
+  { name: "Grand Prize", minBalance: 50000000 },
+  { name: "Premium Prize", minBalance: 10000000 },
+  { name: "Lucky Prize", minBalance: 2000000 }
 ]
 
 export async function isCategoryDataExist() {
@@ -24,7 +24,7 @@ export async function createCategoryTable() {
 
   // insert all
   categories.map(async (category, index) => {
-    await dbRun(`INSERT INTO category (id, name, min_balance) VALUES (?, ?, ?)`, [index + 1, category, 0]);
+    await dbRun(`INSERT INTO category (id, name, min_balance) VALUES (?, ?, ?)`, [index + 1, category.name, category.minBalance]);
   });
 }
 
