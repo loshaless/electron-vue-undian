@@ -25,6 +25,7 @@ export async function getPrizeId(name: string) {
 export interface AllPrizeJoinRegion {
   id: number,
   prize_name: string,
+  prize_image_path: string | null,
   region_id: number | null,
   region_name: string | null,
   num_of_item: number | null,
@@ -34,7 +35,8 @@ export interface AllPrizeJoinRegion {
 export async function getAllPrizeJoinRegion(): Promise<AllPrizeJoinRegion[]> {
   const sql = `
     SELECT prize.id, 
-    prize.name as prize_name, 
+    prize.name as prize_name,
+    prize.image_path as prize_image_path,
     region.id as region_id,
     region.name as region_name,
     prize_region.id as prize_region_id,
@@ -77,4 +79,9 @@ export async function editPrize(id: number, name: string) {
 export async function editCategoryPrize(id: number, categoryId: number) {
   const sql = `UPDATE prize SET category_id = ? WHERE id = ?`;
   await dbRun(sql, [categoryId, id]);
+}
+
+export async function editBackgroundImagePrize(id: number, imagePath: string) {
+  const sql = `UPDATE prize SET image_path = ? WHERE id = ?`;
+  await dbRun(sql, [imagePath, id]);
 }

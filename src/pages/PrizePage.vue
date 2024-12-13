@@ -27,7 +27,7 @@ function addRegion() {
 
 function saveEditedRegion() {
   modalRegionState.isLoading = true
-  window.ipcRenderer.send(IpcChannels.MASS_EDIT_REGION, 
+  window.ipcRenderer.send(IpcChannels.MASS_EDIT_REGION,
     JSON.parse(JSON.stringify(modalRegionState.editedRegion)),
     JSON.parse(JSON.stringify(modalRegionState.addedRegion)),
     JSON.parse(JSON.stringify(modalRegionState.deleteRegion))
@@ -164,6 +164,23 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
   isLoadingInAction.value = false
   getPrize()
 })
+
+/* UPLOAD PRIZE BACKGROUND */
+const prizeBackgroundId = ref(0)
+function handleFileUpload(event: Event) {
+  const input = event.target as HTMLInputElement;
+
+  if (input.files?.[0]) {
+    const file = input.files[0]
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      window.ipcRenderer.send(IpcChannels.UPLOAD_PRIZE_BACKGROUND_IMAGE, reader.result, prizeBackgroundId.value)
+      const changesPrize = prizes.value.find(prize => prize.prizeId === prizeBackgroundId.value) ?? {prizeImagePath: ''}
+      changesPrize.prizeImagePath = reader.result as string
+    };
+    reader.readAsDataURL(file);
+  }
+}
 </script>
 
 <template>
@@ -194,12 +211,13 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
           <th>Name</th>
           <th>Quota</th>
           <th>Action</th>
+          <th>Background Img</th>
         </tr>
       </thead>
       <tbody>
-        <tr 
-          v-for="(prize, index) in prizes" 
-          :key="prize.prizeId" 
+        <tr
+          v-for="(prize, index) in prizes"
+          :key="prize.prizeId"
         >
           <td>{{ index + 1 }}</td>
           <td>{{ prize.prizeName }}</td>
@@ -215,19 +233,45 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
               v-if="!isLoadingInAction"
               class="flex gap-2 justify-center items-center"
             >
-              <img 
-                src="/icon-cog.svg" 
-                alt="delete" 
-                class="w-6 h-6 cursor-pointer hover:scale-110" 
+              <img
+                src="/icon-cog.svg"
+                alt="delete"
+                class="w-6 h-6 cursor-pointer hover:scale-110"
                 @click="openModalEditPrize(prize)"
               >
-              <img 
-                src="/icon-trash-can.svg" 
-                alt="delete" 
-                class="w-6 h-6 cursor-pointer hover:scale-110" 
+              <img
+                src="/icon-trash-can.svg"
+                alt="delete"
+                class="w-6 h-6 cursor-pointer hover:scale-110"
                 @click="deletePrize(prize.prizeId)"
               >
             </div>
+          </td>
+          <td>
+            <label
+              for="file-upload"
+              @click="prizeBackgroundId = prize.prizeId"
+            >
+              <img
+                v-if="!prize.prizeImagePath"
+                src="/icon-upload.png"
+                alt="upload"
+                class="w-6 h-6 cursor-pointer hover:scale-110 mx-auto"
+              >
+              <img
+                v-else
+                :src="prize.prizeImagePath"
+                alt="upload"
+                class="w-52 h-32 cursor-pointer hover:scale-110 mx-auto"
+              >
+            </label>
+            <input
+              id="file-upload"
+              type="file"
+              @change="handleFileUpload"
+              accept="image/*"
+              class="hidden"
+            />
           </td>
         </tr>
         </tbody>
@@ -278,9 +322,9 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
             min="1"
             type="number"
           >
-          <img 
-            src="/icon-trash-can.svg" 
-            alt="delete" 
+          <img
+            src="/icon-trash-can.svg"
+            alt="delete"
             class="w-6 h-6 cursor-pointer hover:scale-110"
             @click="modalPrizeState.editedPrizeRegion.splice(index, 1); modalPrizeState.deletePrizeRegion.push(item.prizeRegionId)"
           >
@@ -305,9 +349,9 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
             type="number"
             min="1"
           >
-          <img 
-            src="/icon-trash-can.svg" 
-            alt="delete" 
+          <img
+            src="/icon-trash-can.svg"
+            alt="delete"
             class="w-6 h-6 cursor-pointer hover:scale-110"
             @click="modalPrizeState.addedPrizeRegion.splice(index, 1)"
           >
@@ -344,8 +388,8 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
             <tr v-for="(region, index) in modalRegionState.editedRegion" :key="region.id">
               <td class="border px-4 py-2 border-gray-800">{{ region.id }}</td>
               <td class="border px-4 py-2 border-gray-800">
-                <div 
-                  v-if="modalRegionState.isEdit && region.name !== 'All Region'" 
+                <div
+                  v-if="modalRegionState.isEdit && region.name !== 'All Region'"
                   class="flex gap-3 items-center"
                 >
                   <input
@@ -354,9 +398,9 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
                     placeholder="prize name"
                     type="text"
                   >
-                  <img 
-                    src="/icon-trash-can.svg" 
-                    alt="delete" 
+                  <img
+                    src="/icon-trash-can.svg"
+                    alt="delete"
                     class="w-6 h-6 cursor-pointer hover:scale-110"
                     @click="deleteRegion(region.id)"
                   >
@@ -377,9 +421,9 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
                     placeholder="prize name"
                     type="text"
                   >
-                  <img 
-                    src="/icon-trash-can.svg" 
-                    alt="delete" 
+                  <img
+                    src="/icon-trash-can.svg"
+                    alt="delete"
                     class="w-6 h-6 cursor-pointer hover:scale-110"
                     @click="modalRegionState.addedRegion.splice(index, 1)"
                   >
@@ -388,9 +432,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_PRIZE, () => {
             </tr>
           </tbody>
         </table>
-        <div 
-          class="flex justify-center gap-3"
-        >
+        <div class="flex justify-center gap-3">
           <button
             v-if="!modalRegionState.isEdit"
             class="mt-3 rounded-md button-selected py-2 px-8"

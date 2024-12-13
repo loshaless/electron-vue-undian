@@ -1,10 +1,20 @@
 import { ipcMain } from "electron";
 import { IpcChannels } from "../../../src/constants/enum/IpcChannels";
-import { addPrize, deletePrize, editPrize, isPrizeDataExist, getAllPrizeJoinRegion, AllPrizeJoinRegion, getPrizeId } from "../database/prizeDB";
+import {
+  addPrize,
+  deletePrize,
+  editPrize,
+  isPrizeDataExist,
+  getAllPrizeJoinRegion,
+  AllPrizeJoinRegion,
+  getPrizeId,
+  editBackgroundImagePrize
+} from "../database/prizeDB";
 import { addPrizeRegion, editPrizeRegion, deletePrizeRegion } from "../database/prize_regionDB";
 import { dialog } from "electron";
 import { PrizeDetail, PrizeRegionDetail } from "../../../src/constants/types/PrizeDetail";
 import { dbRun } from "../database/init";
+import {windows} from "../index";
 
 ipcMain.on(IpcChannels.ADD_PRIZE, async (event, prizeDetail: PrizeDetail, addedPrizeRegion: PrizeRegionDetail[]) => {
   try {
@@ -44,6 +54,7 @@ function transformData(data: AllPrizeJoinRegion[]){
       prize = {
         prizeId: item.id,
         prizeName: item.prize_name,
+        prizeImagePath: item.prize_image_path,
         regions: []
       };
       acc.push(prize);
@@ -56,7 +67,7 @@ function transformData(data: AllPrizeJoinRegion[]){
         numOfItem: item.num_of_item,
       });
     }
-    
+
     return acc;
   }, []);
 }
@@ -78,9 +89,9 @@ ipcMain.on(IpcChannels.DELETE_PRIZE, async (event, id) => {
 });
 
 ipcMain.on(IpcChannels.EDIT_PRIZE, async (
-  event, prizeDetail: PrizeDetail, 
-  editedPrizeRegion: PrizeRegionDetail[], 
-  addedPrizeRegion: PrizeRegionDetail[], 
+  event, prizeDetail: PrizeDetail,
+  editedPrizeRegion: PrizeRegionDetail[],
+  addedPrizeRegion: PrizeRegionDetail[],
   deletedPrizeRegion: number[]
 ) => {
   try {
@@ -117,3 +128,8 @@ ipcMain.on(IpcChannels.IS_PRIZE_DATA_EXIST, async (event) => {
   const isExist = await isPrizeDataExist();
   event.sender.send(IpcChannels.IS_PRIZE_DATA_EXIST, isExist);
 });
+
+ipcMain.on(IpcChannels.UPLOAD_PRIZE_BACKGROUND_IMAGE, async (event, imagePath: string, prizeId: number) => {
+  windows.view.webContents.send(IpcChannels.GET_BACKGROUND_PRIZE_IMAGE, imagePath)
+  await editBackgroundImagePrize(prizeId, imagePath)
+})
