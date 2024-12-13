@@ -4,9 +4,9 @@ const DBSOURCE = "db.sqlite";
 import { createCustomerTable } from "./customerDB";
 import { createCategoryTable } from "./categoryDB";
 import { createWinnerTable } from "./winnerDB";
-import { createPrizeTable } from "./prizeDB";
-import { createRegionTable, initRegion, isRegionExist } from "./regionDB";
-import { createPrizeRegionTable } from "./prize_regionDB";
+import {createPrizeTable, initPrizeData, isPrizeDataExist} from "./prizeDB";
+import { createRegionTable } from "./regionDB";
+import {createPrizeRegionTable, initPrizeRegionData, isPrizeRegionDataExist} from "./prize_regionDB";
 import { createTempTableNameTable } from "./tempTableNameDB";
 import { createBackgroundImageTable } from "./backgroundImageDB";
 
@@ -29,9 +29,14 @@ export const db = new sqlite3.Database(DBSOURCE, async (err) => {
   ]
   await Promise.all(promises)
 
-  const isRegionDataExist = await isRegionExist()
-  if (!isRegionDataExist) {
-    await initRegion()
+  const isPrizeExist = await isPrizeDataExist()
+  if(!isPrizeExist) {
+    await initPrizeData()
+  }
+
+  const isPrizeRegionExist = await isPrizeRegionDataExist()
+  if (!isPrizeRegionExist) {
+    await initPrizeRegionData()
   }
 });
 

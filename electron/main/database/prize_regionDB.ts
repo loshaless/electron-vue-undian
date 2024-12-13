@@ -11,6 +11,34 @@ export async function createPrizeRegionTable() {
   )`);
 }
 
+export async function isPrizeRegionDataExist() {
+  const sql = `SELECT id FROM prize_region limit 1`;
+  const rows = await dbRun(sql);
+  return rows != undefined;
+}
+
+export async function initPrizeRegionData() {
+  const sql = `
+    INSERT INTO prize_region (id, prize_id, region_id, num_of_item)
+    VALUES 
+    (1, 1, 2, 2),
+    (2, 1, 5, 1),
+    (3, 1, 4, 1),
+    (4, 1, 6, 1),
+    (5, 1, 3, 2),
+    (6, 1, 7, 1),
+    (7, 2, 2, 2),
+    (8, 2, 7, 1),
+    (9, 2, 4, 1),
+    (10, 2, 3, 2),
+    (11, 2, 5, 1),
+    (12, 2, 6, 1),
+    (13, 3, 1, 69),
+    (14, 4, 1, 6969);
+  `
+  await dbRun(sql);
+}
+
 export async function addPrizeRegion(prize_id: number, region_id: number, num_of_item: number) {
   const sql = `INSERT INTO prize_region (prize_id, region_id, num_of_item) VALUES (?, ?, ?)`;
   await dbRun(sql, [prize_id, region_id, num_of_item]);

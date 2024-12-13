@@ -5,6 +5,7 @@ export async function createPrizeTable() {
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(255) NOT NULL,
     category_id INTEGER,
+    image_path TEXT DEFAULT null,
     UNIQUE (name),
     FOREIGN KEY (category_id) REFERENCES category(id)
   )`);
@@ -19,11 +20,6 @@ export async function getPrizeId(name: string) {
   const sql = `SELECT id FROM prize WHERE name = ?`;
   const rows = await dbGet(sql, [name]);
   return rows?.id;
-}
-
-export async function getAllPrizes() {
-  const sql = `SELECT * FROM prize`;
-  return await dbAll(sql);
 }
 
 export interface AllPrizeJoinRegion {
@@ -54,6 +50,18 @@ export async function isPrizeDataExist() {
   const sql = `SELECT id FROM prize limit 1`;
   const rows = await dbGet(sql);
   return rows != undefined;
+}
+
+export async function initPrizeData() {
+    const sql = `
+      INSERT INTO prize (id, name, category_id, image_path)
+      VALUES
+        (1, 'Mobil All New Kijang Innova Zenis G HEV', 1, null),
+        (2, 'Sepeda Motor Honda PCX160 CBS', 2, null),
+        (3, 'Emas @ 10 gram', 3, null),
+        (4, 'Voucher Belanja Pluxee @ Rp 500,000', 3, null);
+    `
+    await dbRun(sql);
 }
 
 export async function deletePrize(id: number) {

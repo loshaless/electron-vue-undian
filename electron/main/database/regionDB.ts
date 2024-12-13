@@ -6,23 +6,26 @@ export async function createRegionTable() {
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(255)
   )`);
+
+  const isRegionDataExist = await isRegionExist();
+  if (!isRegionDataExist) {
+    await initRegion()
+  }
 }
 
-const regions = [
-  "All Region",
-  "Jakarta A",
-  "Jakarta B",
-  "Jabar Jateng",
-  "Jawa Timur",
-  "Sumatera",
-  "IBN & Kalimantan"
-]
 export async function initRegion() {
-  await dbRun('BEGIN TRANSACTION');
-  for (const region of regions) {
-    await addRegion(region);
-  }
-  await dbRun('COMMIT');
+  const sql = `
+    INSERT INTO region (id, name)
+    VALUES
+      (1, 'All Region'),
+      (2, 'Jakarta A'),
+      (3, 'Jakarta B'),
+      (4, 'Jabar Jateng'),
+      (5, 'Jawa Timur'),
+      (6, 'Sumatera'),
+      (7, 'Kalimantan');
+  `;
+  await dbRun(sql);
 }
 
 export async function addRegion(name: string) {
