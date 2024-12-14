@@ -10,7 +10,7 @@ const isLoadingInAction = ref(false)
 
 /* GET REGION DATA */
 const regions = ref<Region[]>([])
-window.ipcRenderer.on(IpcChannels.GET_REGION_DATA, (event, rows) => {
+window.ipcRenderer.on(IpcChannels.GET_REGION_DATA, (_, rows) => {
   if (rows) {
     regions.value = rows
   }
@@ -80,6 +80,7 @@ function openModalCreatePrize(isOpen: boolean) {
   modalPrizeState.prizeDetail = {
     prizeId: 0,
     prizeName: "",
+    prizeImagePath: "",
     regions: []
   }
   modalPrizeState.editedPrizeRegion = []
@@ -114,7 +115,7 @@ function saveNewPrize() {
   )
 }
 
-window.ipcRenderer.on(IpcChannels.ADD_PRIZE, (event) => {
+window.ipcRenderer.on(IpcChannels.ADD_PRIZE, (_) => {
   modalPrizeState.isLoading = false
   modalPrizeState.isOpen = false
   getPrize()
@@ -126,7 +127,7 @@ function getPrize() {
 }
 
 const prizes = ref<PrizeDetail[]>([])
-window.ipcRenderer.on(IpcChannels.GET_PRIZE, (event, rows) => {
+window.ipcRenderer.on(IpcChannels.GET_PRIZE, (_, rows) => {
   prizes.value = rows
 })
 
@@ -173,7 +174,7 @@ function handleFileUpload(event: Event) {
   if (input.files?.[0]) {
     const file = input.files[0]
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = (_) => {
       window.ipcRenderer.send(IpcChannels.UPLOAD_PRIZE_BACKGROUND_IMAGE, reader.result, prizeBackgroundId.value)
       const changesPrize = prizes.value.find(prize => prize.prizeId === prizeBackgroundId.value) ?? {prizeImagePath: ''}
       changesPrize.prizeImagePath = reader.result as string
@@ -181,6 +182,16 @@ function handleFileUpload(event: Event) {
     reader.readAsDataURL(file);
   }
 }
+
+/* CHECK IS CUSTOMER DATA EXIST */
+const isCustomerDataExist = ref(false);
+window.ipcRenderer.on(IpcChannels.IS_CUSTOMER_DATA_EXIST, (_, isExist) => {
+  isCustomerDataExist.value = isExist;
+});
+onMounted(() => {
+  window.ipcRenderer.send(IpcChannels.IS_CUSTOMER_DATA_EXIST);
+});
+
 </script>
 
 <template>
@@ -188,12 +199,14 @@ function handleFileUpload(event: Event) {
     <div class="p-5 m-3 flex-col justify-center">
       <div class="flex gap-4 items-center justify-center">
         <button
+          v-if="!isCustomerDataExist"
           class="rounded-md button-selected py-3 px-8"
           @click="openModalCreatePrize(true)"
         >
           Create New Prize
         </button>
         <button
+          v-if="!isCustomerDataExist"
           class="rounded-md button-selected py-3 px-8"
           @click="openModalEditRegion()"
         >
@@ -235,11 +248,12 @@ function handleFileUpload(event: Event) {
             >
               <img
                 src="/icon-cog.svg"
-                alt="delete"
+                alt="edit"
                 class="w-6 h-6 cursor-pointer hover:scale-110"
                 @click="openModalEditPrize(prize)"
               >
               <img
+                v-if="!isCustomerDataExist"
                 src="/icon-trash-can.svg"
                 alt="delete"
                 class="w-6 h-6 cursor-pointer hover:scale-110"
