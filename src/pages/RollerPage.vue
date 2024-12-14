@@ -71,19 +71,15 @@ onMounted(() => {
 
 /* BACKGROUND IMAGE */
 const backgroundImage = ref(``)
-onMounted(() => {
-  window.ipcRenderer.send(IpcChannels.GET_BACKGROUND_IMAGE, 'Grand Prize')
-})
-
-window.ipcRenderer.on(IpcChannels.GET_BACKGROUND_IMAGE, (event, image) => {
-  backgroundImage.value = image
-})
 
 /* Category Name */
 const categoryName = ref(`Grand Prize`)
 window.ipcRenderer.on(IpcChannels.ROLLER_CATEGORY, (event, name: string) => {
-  window.ipcRenderer.send(IpcChannels.GET_BACKGROUND_IMAGE, name)
   categoryName.value = name
+})
+
+window.ipcRenderer.on(IpcChannels.CHANGE_PRIZE_BACKGROUND, (event, pathName: string) => {
+  backgroundImage.value = pathName
 })
 </script>
 

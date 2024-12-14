@@ -1,4 +1,4 @@
-import { dbRun, dbAll, dbGet } from "./init";
+import {dbAll, dbGet, dbRun} from "./init";
 
 const categories = [
   { name: "Grand Prize", minBalance: 50000000 },
@@ -47,8 +47,7 @@ export async function getCategoryJoinPrize() {
     ORDER BY c.id asc 
 	`;
 
-  const rows = await dbAll(sql);
-  return rows;
+  return await dbAll(sql);
 }
 
 export async function editCategory(id: number, minBalance: number) {

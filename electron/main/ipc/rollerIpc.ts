@@ -11,6 +11,7 @@ import { IpcChannels } from "../../../src/constants/enum/IpcChannels";
 import { editPrizeRegionNumOfItemByPrizeIdAndRegionId } from "../database/prize_regionDB";
 import {windows} from "../index";
 import {getBackgroundImageByPrizeId} from "../database/prizeDB";
+import {getCategoryJoinPrize} from "../database/categoryDB";
 
 ipcMain.on(IpcChannels.GET_A_WINNER, async (event, winnerView: WinnerView, database: string) => {
   try {
@@ -58,7 +59,13 @@ ipcMain.on(IpcChannels.ROLLER_CATEGORY, async (event, categoryName: String) => {
 
 ipcMain.on(IpcChannels.CHANGE_PRIZE_BACKGROUND, async (event, prizeId: number) => {
   try {
-    const imagePath = await getBackgroundImageByPrizeId(prizeId)
+    let selectedPrizeId = prizeId;
+    if (!prizeId) {
+      const category = await getCategoryJoinPrize()
+      selectedPrizeId = category[0].prize_id
+    }
+
+    const imagePath = await getBackgroundImageByPrizeId(selectedPrizeId)
     windows.view.webContents.send(IpcChannels.CHANGE_PRIZE_BACKGROUND, imagePath);
   } catch (error) {
       throw new Error(`err changePrizeBackground: ${error}`)

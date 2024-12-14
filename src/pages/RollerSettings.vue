@@ -48,7 +48,9 @@ const {listOfCategory} = useCategory(prizeList);
 const selectedCategory = ref(1);
 
 onMounted(() => {
+  window.ipcRenderer.send(IpcChannels.CHANGE_PAGE, PageName.ROLLER)
   window.ipcRenderer.send(IpcChannels.ROLLER_CATEGORY, 'Grand Prize')
+  window.ipcRenderer.send(IpcChannels.CHANGE_PRIZE_BACKGROUND, 0)
 })
 
 const selectedCategoryData = computed(() => {
@@ -140,8 +142,6 @@ function generateRollerQueue() {
 let rollerQueue = reactive<any[]>([])
 const isRolling = ref(false);
 async function startRollerWithoutStopper() {
-  // CHANGE PAGE TO ROLLER PAGE
-  window.ipcRenderer.send(IpcChannels.CHANGE_PAGE, PageName.ROLLER)
   isRolling.value = true;
 
   /* generate roller queue if not exist */
@@ -177,8 +177,6 @@ async function startRollerWithoutStopper() {
 
 let lastPrizeId = 0
 function startRollerManually() {
-  // CHANGE PAGE TO ROLLER PAGE
-  window.ipcRenderer.send(IpcChannels.CHANGE_PAGE, PageName.ROLLER)
   if (rollerQueue.length === 0) {
     rollerQueue = generateRollerQueue()
   }
