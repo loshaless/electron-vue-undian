@@ -10,6 +10,7 @@ import { WinnerView } from "../../../src/constants/types/WinnerView";
 import { IpcChannels } from "../../../src/constants/enum/IpcChannels";
 import { editPrizeRegionNumOfItemByPrizeIdAndRegionId } from "../database/prize_regionDB";
 import {windows} from "../index";
+import {getBackgroundImageByPrizeId} from "../database/prizeDB";
 
 ipcMain.on(IpcChannels.GET_A_WINNER, async (event, winnerView: WinnerView, database: string) => {
   try {
@@ -52,5 +53,14 @@ ipcMain.on(IpcChannels.ROLLER_CATEGORY, async (event, categoryName: String) => {
     windows.view.webContents.send(IpcChannels.ROLLER_CATEGORY, categoryName);
   } catch (error) {
     throw new Error(`err getWinnerByCategory: ${error}`)
+  }
+})
+
+ipcMain.on(IpcChannels.CHANGE_PRIZE_BACKGROUND, async (event, prizeId: number) => {
+  try {
+    const imagePath = await getBackgroundImageByPrizeId(prizeId)
+    windows.view.webContents.send(IpcChannels.CHANGE_PRIZE_BACKGROUND, imagePath);
+  } catch (error) {
+      throw new Error(`err changePrizeBackground: ${error}`)
   }
 })

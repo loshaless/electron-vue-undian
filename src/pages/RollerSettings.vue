@@ -99,6 +99,9 @@ const selectedCategoryData = computed(() => {
 function generateRollerQueueAndChangeCategory(categoryId: number) {
   selectedCategory.value = categoryId;
   rollerQueue = generateRollerQueue()
+  const currentPrizeId = rollerQueue[0][1].prizeId
+  window.ipcRenderer.send(IpcChannels.CHANGE_PRIZE_BACKGROUND, currentPrizeId)
+  lastPrizeId = currentPrizeId
   window.ipcRenderer.send(IpcChannels.ROLLER_CATEGORY, selectedCategoryData.value.categoryName)
 }
 
@@ -149,6 +152,11 @@ async function startRollerWithoutStopper() {
   while (rollerQueue.length > 0 && isRolling.value) {
     /* get winner */
     const [database, winnerView] = rollerQueue.shift()
+    let currentPrizeId = winnerView.prizeId
+    if (lastPrizeId != currentPrizeId) {
+      window.ipcRenderer.send(IpcChannels.CHANGE_PRIZE_BACKGROUND, currentPrizeId)
+      lastPrizeId = currentPrizeId
+    }
     startRollingAndGetWinner(winnerView, database)
     await new Promise(resolve => setTimeout(resolve, rollAnimationTime.value * 1000))
 
@@ -167,6 +175,7 @@ async function startRollerWithoutStopper() {
   isRolling.value = false
 }
 
+let lastPrizeId = 0
 function startRollerManually() {
   // CHANGE PAGE TO ROLLER PAGE
   window.ipcRenderer.send(IpcChannels.CHANGE_PAGE, PageName.ROLLER)
@@ -174,6 +183,11 @@ function startRollerManually() {
     rollerQueue = generateRollerQueue()
   }
   const [database, winnerView] = rollerQueue.shift()
+  let currentPrizeId = winnerView.prizeId
+  if (lastPrizeId != currentPrizeId) {
+    window.ipcRenderer.send(IpcChannels.CHANGE_PRIZE_BACKGROUND, currentPrizeId)
+    lastPrizeId = currentPrizeId
+  }
 
   startRollingAndGetWinner(winnerView, database)
   isRolling.value = true;

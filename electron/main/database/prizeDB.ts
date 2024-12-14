@@ -85,3 +85,9 @@ export async function editBackgroundImagePrize(id: number, imagePath: string) {
   const sql = `UPDATE prize SET image_path = ? WHERE id = ?`;
   await dbRun(sql, [imagePath, id]);
 }
+
+export async function getBackgroundImageByPrizeId(id: number) {
+  const sql = `SELECT image_path FROM prize WHERE id = ?`;
+  const rows = await dbGet(sql, [id]);
+  return rows?.image_path;
+}
