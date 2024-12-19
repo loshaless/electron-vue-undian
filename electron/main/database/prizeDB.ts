@@ -60,8 +60,8 @@ export async function initPrizeData() {
       VALUES
         (1, 'Mobil All New Kijang Innova Zenis G HEV', 1, null),
         (2, 'Sepeda Motor Honda PCX160 CBS', 2, null),
-        (3, 'Emas @ 10 gram', 3, null),
-        (4, 'Voucher Belanja Pluxee @ Rp 500,000', 3, null);
+        (3, 'Voucher Belanja Pluxee @ Rp 500,000', 3, null),
+        (4, 'Emas @ 10 gram', 3, null);
     `
     await dbRun(sql);
 }

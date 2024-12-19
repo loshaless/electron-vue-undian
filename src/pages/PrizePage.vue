@@ -247,6 +247,7 @@ onMounted(() => {
               class="flex gap-2 justify-center items-center"
             >
               <img
+                v-if="!isCustomerDataExist"
                 src="/icon-cog.svg"
                 alt="edit"
                 class="w-6 h-6 cursor-pointer hover:scale-110"

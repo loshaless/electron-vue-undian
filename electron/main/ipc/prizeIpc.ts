@@ -117,10 +117,11 @@ ipcMain.on(IpcChannels.EDIT_PRIZE, async (
 
     await Promise.all(promises);
     await dbRun('COMMIT');
-    event.sender.send(IpcChannels.EDIT_PRIZE);
   } catch (err) {
     await dbRun('ROLLBACK');
     dialog.showErrorBox("Error", `Error editing prize: ${err.message}`);
+  } finally {
+    event.sender.send(IpcChannels.EDIT_PRIZE);
   }
 });
 

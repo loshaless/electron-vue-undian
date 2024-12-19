@@ -33,8 +33,8 @@ export async function initPrizeRegionData() {
     (10, 2, 3, 2),
     (11, 2, 5, 1),
     (12, 2, 6, 1),
-    (13, 3, 1, 69),
-    (14, 4, 1, 6969);
+    (13, 3, 1, 6900),
+    (14, 4, 1, 69);
   `
   await dbRun(sql);
 }

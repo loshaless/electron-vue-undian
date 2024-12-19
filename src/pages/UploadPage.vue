@@ -42,27 +42,28 @@ const canSaveCategory = computed(() => {
 
 function saveCategory() {
   /* all edited category */
-  const edditedCategories = listOfCategory.map((category: Category) => ({
+  const editedCategories = listOfCategory.map((category: Category) => ({
     id: category.id,
     minBalance: category.minBalance
   }))
 
   /* all edited prize that is related to category */
-  const edditedCategoryPrizes: {prizeId: number, categoryId: number}[] = []
+  const editedCategoryPrizes: {prizeId: number, categoryId: number}[] = []
   listOfCategory.forEach((category: Category) => {
     category.prizes?.forEach((prizeId: number) => {
-      edditedCategoryPrizes.push({
+      editedCategoryPrizes.push({
         prizeId: prizeId,
         categoryId: category.id
       })
     })
   })
+
   window.ipcRenderer.send(
-    IpcChannels.SAVE_CATEGORY, 
-    JSON.parse(JSON.stringify(edditedCategories)),
-    JSON.parse(JSON.stringify(edditedCategoryPrizes))
+    IpcChannels.SAVE_CATEGORY,
+    JSON.parse(JSON.stringify(editedCategories)),
+    JSON.parse(JSON.stringify(editedCategoryPrizes))
   )
-  
+
   saveCategoryState.isEdit = false
   saveCategoryState.isLoading = true
 }
@@ -131,10 +132,10 @@ function generateListOfCustomerTable(): CustomerTable[] {
   listOfCategory.forEach((category: Category) => {
     category.prizes?.forEach((prizeId: number) => {
       const prizeDetail: PrizeDetail | undefined = prizes.value.find((p: PrizeDetail) => p.prizeId === prizeId)
-      
+
       prizeDetail?.regions.forEach((region: PrizeRegionDetail) => {
         const tableName = createTableName(category.name, region.regionName)
-      
+
         if (!setOfCustomerTable.has(tableName)) {
             result.push({
             tableName: tableName.toLowerCase(),
@@ -201,9 +202,9 @@ window.ipcRenderer.on(IpcChannels.DELETE_WINNER_DATA, (event) => {
           <tr v-for="(category, index) in listOfCategory" :key="index">
             <td>{{ category.name }}</td>
             <td>
-              <input 
+              <input
                 v-if="saveCategoryState.isEdit"
-                type="number" 
+                type="number"
                 class="w-full p-2 rounded-md border"
                 v-model="category.minBalance"
               >
@@ -214,7 +215,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_WINNER_DATA, (event) => {
                 :isViewMode="!saveCategoryState.isEdit"
                 :options="prizes.map((p: PrizeDetail) => ({id: p.prizeId, name: p.prizeName}))"
                 placeholder="Select Prizes"
-                :selectedOptions="category.prizes ?? []"  
+                :selectedOptions="category.prizes ?? []"
                 @update:modelValue="handleUpdatePrize(index, $event)"
               />
             </td>
@@ -224,7 +225,7 @@ window.ipcRenderer.on(IpcChannels.DELETE_WINNER_DATA, (event) => {
 
       <!-- EDIT CATEGORY BUTTON -->
       <div class="flex justify-center mt-3">
-        <button 
+        <button
           v-if="!saveCategoryState.isEdit"
           @click="saveCategoryState.isEdit = true"
           class="py-2 rounded-md px-12 button-selected"
