@@ -19,7 +19,18 @@ export async function addWinner(prizeName: string, rollId: number, customerId: n
 
 export async function getWinnerByCategory(categoryId: number[]) {
   const placeholders = categoryId.map(() => '?').join(',');
-  const sql = `SELECT * FROM winner WHERE category IN (${placeholders})`;
+  const sql = `
+    SELECT
+        w.prize_name,
+        w.roll_id,
+        w.customer_name,
+        c.branch,
+        w.region,
+        w.created_at
+    FROM winner w 
+    join customer c on w.customer_id = c.customer_id
+    WHERE category IN (${placeholders})
+  `;
   return await dbAll(sql, categoryId);
 }
 

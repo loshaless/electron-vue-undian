@@ -165,6 +165,7 @@ window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_VERTICAL_OFFSET, async (event,
               <th class="bg-[#ED1C24] text-white">Prize Name</th>
               <th class="bg-[#ED1C24] text-white">Customer Number</th>
               <th class="bg-[#ED1C24] text-white">Name</th>
+              <th class="bg-[#ED1C24] text-white">Branch</th>
               <th class="bg-[#ED1C24] text-white">Region</th>
             </tr>
             </thead>
@@ -173,6 +174,7 @@ window.ipcRenderer.on(IpcChannels.WINNER_PAGE_SET_VERTICAL_OFFSET, async (event,
                 <td class="whitespace-nowrap">{{ winner.prize_name }}</td>
                 <td>{{ winner.cif }}</td>
                 <td>{{ winner.name }}</td>
+                <td>{{ winner.branch }}</td>
                 <td>{{ winner.region }}</td>
               </tr>
             </tbody>

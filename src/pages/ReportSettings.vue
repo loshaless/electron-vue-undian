@@ -153,15 +153,15 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
                   type="text"
                 />
                 <!-- close icon -->
-                 <img 
-                  src="/icon-trash-can.svg" 
-                  alt="delete" 
+                 <img
+                  src="/icon-trash-can.svg"
+                  alt="delete"
                   class="w-5 h-5 cursor-pointer hover:scale-110"
                   @click="removeSigner(indexSigner)"
                 >
               </div>
               <div class="flex w-full items-center">
-                <div 
+                <div
                   v-for="(name, indexName) in signer.name"
                   :key="indexName"
                   class="border-2 border-gray-300 rounded-md p-1 flex gap-2 w-1/4 mr-2"
@@ -170,17 +170,17 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
                     class="w-3/4"
                     v-model="signer.name[indexName]"
                     type="text"
-                  >                  
-                  <img 
-                    src="/icon-trash-can.svg" 
-                    alt="delete" 
+                  >
+                  <img
+                    src="/icon-trash-can.svg"
+                    alt="delete"
                     class="w-5 h-5 cursor-pointer hover:scale-110"
                     @click="removeName(indexSigner, indexName)"
                   >
                 </div>
-                <img 
-                  src="/icon-add.png" 
-                  alt="add" 
+                <img
+                  src="/icon-add.png"
+                  alt="add"
                   class="w-8 h-8 cursor-pointer hover:scale-110"
                   @click="addName(indexSigner)"
                 >
@@ -237,9 +237,10 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
             <tr style="color: white;">
               <th style="padding: 0.25rem; border: 1px solid; background-color: #ED1C24;">No</th>
               <th style="padding: 0.25rem; border: 1px solid; background-color: #ED1C24;">Prize</th>
-              <th style="padding: 0.25rem; border: 1px solid; background-color: #ED1C24;">RollId</th>
+              <th style="padding: 0.25rem; border: 1px solid; background-color: #ED1C24;">Nomor Undian</th>
               <th style="padding: 0.25rem; border: 1px solid; background-color: #ED1C24;">Customer Name</th>
-              <th style="padding: 0.25rem; border: 1px solid; background-color: #ED1C24;">Area</th>
+              <th style="padding: 0.25rem; border: 1px solid; background-color: #ED1C24;">Branch</th>
+              <th style="padding: 0.25rem; border: 1px solid; background-color: #ED1C24;">Region</th>
               <th style="padding: 0.25rem; border: 1px solid; background-color: #ED1C24;">Time</th>
             </tr>
             </thead>
@@ -250,6 +251,7 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
               <td style="border: 1px solid; text-align: center;">{{ winner.prize_name }}</td>
               <td style="border: 1px solid; text-align: center;">{{ winner.roll_id }}</td>
               <td style="border: 1px solid; text-align: center;">{{ winner.customer_name }}</td>
+              <td style="border: 1px solid; text-align: center;">{{ winner.branch }}</td>
               <td style="border: 1px solid; text-align: center;">{{ winner.region }}</td>
               <td style="border: 1px solid; text-align: center;">{{ winner.created_at }}</td>
             </tr>
@@ -262,7 +264,7 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
         <div style="display: flex; margin-bottom: 0.5rem;">
           <p style="font-weight: bold;">{{ placeAndDate }}</p>
         </div>
-        
+
         <!-- SIGNERS -->
         <div style="width: 100%; display: flex; flex-wrap: wrap; margin-bottom: 3rem;">
           <div

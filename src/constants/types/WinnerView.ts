@@ -5,5 +5,6 @@ export interface WinnerView {
   winnerName: string,
   categoryId: number,
   regionId: number,
-  region: string
+  region: string,
+  branchName: string
 }

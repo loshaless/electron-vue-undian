@@ -8,6 +8,7 @@ const winnerState = reactive({
   name: '',
   region: '',
   prizeName: '',
+  branchName: ''
 })
 const numDigits = ref(3);
 const digits = ref(Array(numDigits.value).fill(0));
@@ -31,6 +32,7 @@ window.ipcRenderer.on(IpcChannels.STOP_ROLLING, (event, winnerData: WinnerView) 
   winnerState.region = winnerData.region
   winnerState.prizeName = winnerData.prizeName
   winnerState.name = winnerData.winnerName
+  winnerState.branchName = winnerData.branchName
 
   const rollIdString = winnerData.rollId.toString()
   const numOfZero = numDigits.value - rollIdString.length
@@ -48,6 +50,7 @@ function stopRoller() {
   winnerState.name = ''
   winnerState.prizeName = ''
   winnerState.region = ''
+  winnerState.branchName = ''
   clearInterval(intervalId);
 }
 
@@ -96,8 +99,13 @@ window.ipcRenderer.on(IpcChannels.CHANGE_PRIZE_BACKGROUND, (event, pathName: str
         {{ digit }}
       </span>
     </div>
-    <p v-if="winnerState.name" class="text-3xl text-green-700">
-      Selamat kepada {{ winnerState.name }} dari {{ winnerState.region }}
-    </p>
+    <div
+      v-if="winnerState.name"
+      class="text-3xl text-green-700 text-center"
+    >
+      <p>Selamat kepada {{ winnerState.name }}</p>
+      <p>{{ winnerState.branchName }}</p>
+      <p>{{ winnerState.region }}</p>
+    </div>
   </div>
 </template>

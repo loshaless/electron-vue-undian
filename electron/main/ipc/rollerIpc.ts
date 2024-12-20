@@ -30,6 +30,7 @@ ipcMain.on(IpcChannels.GET_A_WINNER, async (event, winnerView: WinnerView, datab
         /* this data used for winner view in the second window */
         winnerView.rollId = rollId
         winnerView.winnerName = winnerCustomer.name
+        winnerView.branchName = winnerCustomer.branch
 
         await addWinner(winnerView.prizeName, winnerView.rollId, winnerRoll.customer_id, winnerView.winnerName, winnerCustomer.region, winnerView.categoryId)
         await editPrizeRegionNumOfItemByPrizeIdAndRegionId(winnerView.prizeId, winnerView.regionId)
