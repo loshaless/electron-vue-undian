@@ -237,6 +237,7 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
             <tr style="color: white;">
               <th style="padding: 0.25rem; border: 1px solid; background-color: #ED1C24;">No</th>
               <th style="padding: 0.25rem; border: 1px solid; background-color: #ED1C24;">Prize</th>
+              <th style="padding: 0.25rem; border: 1px solid; background-color: #ED1C24;">CIF</th>
               <th style="padding: 0.25rem; border: 1px solid; background-color: #ED1C24;">Nomor Undian</th>
               <th style="padding: 0.25rem; border: 1px solid; background-color: #ED1C24;">Customer Name</th>
               <th style="padding: 0.25rem; border: 1px solid; background-color: #ED1C24;">Branch</th>
@@ -249,6 +250,7 @@ window.ipcRenderer.on(IpcChannels.GET_WINNER_BY_CATEGORY, (event, listOfWinner) 
             <tr v-for="(winner, index) in winners" :key="winner.id">
               <td style="border: 1px solid; text-align: center;">{{ index + 1 }}</td>
               <td style="border: 1px solid; text-align: center;">{{ winner.prize_name }}</td>
+              <td style="border: 1px solid; text-align: center;">{{ winner.cif }}</td>
               <td style="border: 1px solid; text-align: center;">{{ winner.roll_id }}</td>
               <td style="border: 1px solid; text-align: center;">{{ winner.customer_name }}</td>
               <td style="border: 1px solid; text-align: center;">{{ winner.branch }}</td>

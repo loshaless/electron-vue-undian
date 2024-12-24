@@ -25,6 +25,7 @@ export async function getWinnerByCategory(categoryId: number[]) {
         w.roll_id,
         w.customer_name,
         c.branch,
+        c.cif,
         w.region,
         w.created_at
     FROM winner w 
